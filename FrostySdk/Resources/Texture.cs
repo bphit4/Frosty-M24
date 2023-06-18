@@ -1,4 +1,4 @@
-﻿using FrostySdk.IO;
+using FrostySdk.IO;
 using FrostySdk.Managers;
 using System;
 using System.Diagnostics;
@@ -143,7 +143,7 @@ namespace FrostySdk.Resources
             Width = reader.ReadUShort();
             Height = reader.ReadUShort();
             Depth = reader.ReadUShort();
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound))
             {
                 m_sliceCount = reader.ReadByte();
             }
@@ -165,9 +165,14 @@ namespace FrostySdk.Resources
                 reader.ReadByte();
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 Unknown3[0] = reader.ReadUInt();
+            }
+
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                reader.BaseStream.Seek(4, SeekOrigin.Current);
             }
 
             m_chunkId = reader.ReadGuid();
@@ -194,7 +199,7 @@ namespace FrostySdk.Resources
 
             AssetNameHash = reader.ReadUInt();
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden22, ProfileVersion.Madden23))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden23))
             {
                 Unknown3[0] = reader.ReadUInt();
             }
@@ -206,9 +211,14 @@ namespace FrostySdk.Resources
                 Unknown3[0] = reader.ReadUInt();
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound))
             {
                 reader.ReadLong();
+            }
+
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                reader.BaseStream.Seek(12, SeekOrigin.Current);
             }
 
 #if FROSTY_DEVELOPER
@@ -253,7 +263,7 @@ namespace FrostySdk.Resources
                 writer.Write(Height);
                 writer.Write(Depth);
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound))
                 {
                     writer.Write((byte)0);
                 }
@@ -275,7 +285,7 @@ namespace FrostySdk.Resources
                     writer.Write(MipCount);
                 }
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
                 {
                     writer.Write(Unknown3[0]);
                 }
@@ -316,7 +326,7 @@ namespace FrostySdk.Resources
                     writer.Write(Unknown3[0]);
                 }
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound))
                 {
                     writer.Write(0);
                 }
