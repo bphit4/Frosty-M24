@@ -1,7 +1,7 @@
 # FrostyToolsuite
 The most advanced modding platform for games running on DICE's Frostbite game engine.
 
-**Please Note: This Branch is not associated with any offical release by the Frosty Dev team and none of the Frosty Devs have and contribution to this version. 
+**Please Note: This Branch is not associated with any offical release by the Frosty Dev team and none of the Frosty Devs have and contribution to this version that differs from their offical releases. 
 
 ## Setup
 
