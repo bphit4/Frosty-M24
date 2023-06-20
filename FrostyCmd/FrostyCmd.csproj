@@ -206,6 +206,10 @@
     <None Include="Banners\deadspace.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="Banners\madden24.png" />
+    <Content Include="Banners\PGATour.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="ThirdParty\libfbxsdk.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

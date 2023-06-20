@@ -80,6 +80,17 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem x:Name="ToolsMenuItem" Header="Tools" Height="22">
+                    <MenuItem x:Name="OptionsMenuItem" Header="Options" Click="optionsMenuItem_Click">
+                        <MenuItem.Icon>
+                            <Image Source="pack://application:,,,/FrostyCore;component/Images/Settings.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator></Separator>
+                    <MenuItem x:Name="OpenColorizer" Header="Frostbite Colorizer" Click="OpenColorizer_Click">
+                        <MenuItem.Icon>
+                            <Image Source="/FrostyEditor;component/Images/Colorizer.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Window" Height="22">
                     <MenuItem x:Name="CloseAllDocumentsMenuItem" Header="Close All Documents" InputGestureText="Ctrl + D" Click="closeAllDocumentsMenuItem_Click">

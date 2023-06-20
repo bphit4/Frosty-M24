@@ -812,7 +812,7 @@ namespace Frosty.Core.Viewport
                 else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa17, ProfileVersion.Fifa18,
                     ProfileVersion.Fifa19, ProfileVersion.Fifa20,
                     ProfileVersion.NeedForSpeedHeat, ProfileVersion.Fifa21,
-                    ProfileVersion.Fifa22, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                    ProfileVersion.Fifa22, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
                 {
                     paramName = paramName.ToLower();
                     if (paramName.StartsWith("colortexture") || paramName.StartsWith("diffuse") || paramName.Contains("basecolor"))
@@ -845,7 +845,7 @@ namespace Frosty.Core.Viewport
                 }
 
                 // Madden
-                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden19, ProfileVersion.Madden20, ProfileVersion.Madden21, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden19, ProfileVersion.Madden20, ProfileVersion.Madden21, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     paramName = paramName.ToLower();
                     if (paramName.StartsWith("colortexture")) { DiffuseTexture = state.TextureLibrary.LoadTextureAsset(value.External.FileGuid); }
@@ -1094,7 +1094,7 @@ namespace Frosty.Core.Viewport
                 MaskTexture = state.TextureLibrary.LoadTextureAsset(App.AssetManager.GetEbxEntry(ProfilesLibrary.DefaultMask).Guid);
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedHeat, ProfileVersion.NeedForSpeedUnbound))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedHeat, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.PGATour))
             {
                 bool tangentSpace = false;
                 foreach (var elem in section.MeshSection.GeometryDeclDesc[0].Elements)
@@ -2051,7 +2051,7 @@ namespace Frosty.Core.Viewport
                 if (idx != -1) material.TextureParameters[idx] = param;
                 else material.TextureParameters.Add(param);
             }
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.StarWarsBattlefrontII, ProfileVersion.Anthem, ProfileVersion.StarWarsSquadrons, ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.StarWarsBattlefrontII, ProfileVersion.Anthem, ProfileVersion.StarWarsSquadrons, ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 foreach (dynamic param in shader.ConditionalParameters)
                 {

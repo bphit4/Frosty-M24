@@ -1,4 +1,4 @@
-using FrostySdk.IO;
+﻿using FrostySdk.IO;
 using FrostySdk.Managers;
 using System;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ namespace FrostySdk.Resources
     {
         TT_2d = 0x0,
         TT_Cube = 0x1,
-        TT_3d = 0x2,
+        TT_3d = 0xf2,
         TT_2dArray = 0x3,
         TT_1dArray = 0x4,
         TT_1d = 0x5,
@@ -36,20 +36,16 @@ namespace FrostySdk.Resources
 
     public class Texture : Resource, IDisposable
     {
-        public uint FirstMipOffset
-        {
+        public uint FirstMipOffset {
             get => m_compressedMipOffsets[0];
             set => m_compressedMipOffsets[0] = value;
         }
-        public uint SecondMipOffset
-        {
+        public uint SecondMipOffset {
             get => m_compressedMipOffsets[1];
             set => m_compressedMipOffsets[1] = value;
         }
-        public string PixelFormat
-        {
-            get
-            {
+        public string PixelFormat {
+            get {
                 string enumType = "RenderFormat";
                 string retVal = Enum.Parse(TypeLibrary.GetType(enumType), m_pixelFormat.ToString()).ToString();
                 return retVal.Replace(enumType + "_", "");
@@ -59,11 +55,9 @@ namespace FrostySdk.Resources
         public TextureFlags Flags { get; set; }
         public ushort Width { get; private set; }
         public ushort Height { get; private set; }
-        public ushort SliceCount
-        {
+        public ushort SliceCount {
             get => m_sliceCount;
-            set
-            {
+            set {
                 m_sliceCount = value;
                 if (Type == TextureType.TT_2dArray || Type == TextureType.TT_3d)
                 {
@@ -83,8 +77,7 @@ namespace FrostySdk.Resources
         public uint RangeStart { get; set; }
         public uint RangeEnd { get; set; }
         public uint[] Unknown3 { get; } = new uint[4];
-        public Guid ChunkId
-        {
+        public Guid ChunkId {
             get => m_chunkId;
             set => m_chunkId = value;
         }
@@ -280,14 +273,14 @@ namespace FrostySdk.Resources
                 writer.Write(MipCount);
                 writer.Write(FirstMip);
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
-                {
-                    writer.Write(MipCount);
-                }
-
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
                 {
                     writer.Write(Unknown3[0]);
+                }
+
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+                {
+                    writer.Write(0);  // 4 byte padding before GUID/Chunk ID for Madden24
                 }
 
                 writer.Write(m_chunkId);
@@ -314,9 +307,11 @@ namespace FrostySdk.Resources
 
                 writer.Write(AssetNameHash);
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
                 {
-                    writer.Write(Unknown3[0]);
+                    writer.Write(0);  // Write 4 bytes
+                    writer.Write(0);  // Write 4 bytes
+                    writer.Write(0);  // Write 4 bytes. Total extra 12 bytes for Madden24
                 }
 
                 writer.WriteFixedSizedString(TextureGroup, 16);

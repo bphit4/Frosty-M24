@@ -126,14 +126,25 @@
     <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\FrostbiteColorizer.xaml.cs">
+      <DependentUpon>FrostbiteColorizer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Themes\FrostbiteColorizerStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\FrostbiteColorizer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -288,6 +299,7 @@
     <Resource Include="Credits.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Colorizer.png" />
     <Content Include="Resources\Meshes\Flag.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

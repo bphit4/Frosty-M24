@@ -1187,6 +1187,61 @@ namespace FrostyCmd
                 blobs.Add(key, writer.ToByteArray());
             }
         }
+        private void CreatePGATourProfile()
+        {
+            string key = "PGATour";
+            using (NativeWriter writer = new NativeWriter(new MemoryStream()))
+            {
+                writer.WriteObfuscatedString("PGA Tour");
+                writer.Write((int)ProfileVersion.Madden23);
+                writer.WriteObfuscatedString("PGATour");
+                writer.WriteObfuscatedString(typeof(NullDeobfuscator).Name);
+                writer.WriteObfuscatedString(AssetManager.GetLoaderName("CasAssetLoader"));
+                writer.Write(CreateSources("Patch;false", "Data;false"));
+                writer.WriteObfuscatedString("PGATourSDK");
+                writer.Write(CreateBanner("PGATour"));
+                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_color");
+                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_rsmN");
+                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_normal");
+                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_dat");
+                writer.Write(0); // shared bundle names
+                writer.Write(0); // ignored res types
+
+                // Flags (MustAddChunks, EbxVersion, RequiresKey)
+                ProfileFlags pf = new ProfileFlags(0, 6, 1);
+                pf.Write(writer);
+
+                blobs.Add(key, writer.ToByteArray());
+            }
+        }
+        private void CreateMadden24Profile()
+        {
+            string key = "Madden24";
+            using (NativeWriter writer = new NativeWriter(new MemoryStream()))
+            {
+                writer.WriteObfuscatedString("Madden NFL 24™");
+                writer.Write((int)ProfileVersion.Madden24);
+                writer.WriteObfuscatedString("madden24");
+                writer.WriteObfuscatedString(typeof(NullDeobfuscator).Name);
+                writer.WriteObfuscatedString(AssetManager.GetLoaderName("CasAssetLoader"));
+                writer.Write(CreateSources("Patch;false", "Data;false"));
+                writer.WriteObfuscatedString("MADDEN24SDK");
+                writer.Write(CreateBanner("madden24"));
+                writer.WriteObfuscatedString("content/common/textures/debug/debug_texture_color");
+                writer.WriteObfuscatedString("content/common/textures/debug/debug_texture_norm");
+                writer.WriteObfuscatedString("content/Common/textures/debug/debug_texture_coeff");
+                writer.WriteObfuscatedString("content/common/textures/debug/debug_texture_alpha");
+                writer.Write(0); // shared bundle names
+                writer.Write(0); // ignored res types
+
+                // Flags (MustAddChunks, EbxVersion, RequiresKey)
+                ProfileFlags pf = new ProfileFlags(0, 6, 1);
+                pf.Write(writer);
+
+                blobs.Add(key, writer.ToByteArray());
+            }
+        }
+
         #endregion
 
         public ProfileCreator()
@@ -1231,6 +1286,8 @@ namespace FrostyCmd
             CreateMadden23Profile();
             CreateFifa23Profile();
             CreateDeadSpaceProfile();
+            CreatePGATourProfile();
+            CreateMadden24Profile();
 
 #endif
 

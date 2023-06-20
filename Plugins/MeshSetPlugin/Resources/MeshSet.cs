@@ -559,7 +559,7 @@ namespace MeshSetPlugin.Resources
             uint boneCount = 0;
 
             if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 boneListOffset = reader.ReadLong();
                 boneCount = reader.ReadUShort();
@@ -579,7 +579,7 @@ namespace MeshSetPlugin.Resources
 
                 m_unk2 = reader.ReadUInt();
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
                 {
                     if (ProfilesLibrary.IsLoaded(ProfileVersion.DeadSpace))
                     {
@@ -757,7 +757,7 @@ namespace MeshSetPlugin.Resources
                 reader.Pad(16);
             }
             else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 m_unknownHash1 = reader.ReadLong(); // some hash
 
@@ -765,7 +765,7 @@ namespace MeshSetPlugin.Resources
                 {
                     m_unknownHash2 = reader.ReadLong(); // some other hash
                 }
-                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     m_unknownHash3 = reader.ReadUInt(); // some other hash
                 }
@@ -893,7 +893,7 @@ namespace MeshSetPlugin.Resources
             meshContainer.WriteRelocPtr("STR", m_sectionIndex + ":" + m_materialName, writer);
 
             if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 if (m_boneList.Count > 0)
                 {
@@ -920,7 +920,7 @@ namespace MeshSetPlugin.Resources
 
                 writer.Write(m_unk2);
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
                 {
                     writer.Write(0L);
                 }
@@ -1078,7 +1078,7 @@ namespace MeshSetPlugin.Resources
                 writer.WritePadding(16);
             }
             else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 // some hash
                 writer.Write(m_unknownHash1);
@@ -1088,7 +1088,7 @@ namespace MeshSetPlugin.Resources
                     // some other hash
                     writer.Write(m_unknownHash2);
                 }
-                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     // some other hash
                     writer.Write(m_unknownHash3);
@@ -1318,7 +1318,7 @@ namespace MeshSetPlugin.Resources
                 m_adjacencyData = new byte[m_adjacencyBufferSize];
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 reader.ReadLong();
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.DeadSpace))
@@ -1715,7 +1715,7 @@ namespace MeshSetPlugin.Resources
                 writer.Write(m_adjacencyData.Length);
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 writer.Write(0L);
             }
@@ -1859,6 +1859,8 @@ namespace MeshSetPlugin.Resources
                     case (int)ProfileVersion.Battlefield2042:
                     case (int)ProfileVersion.NeedForSpeedUnbound:
                     case (int)ProfileVersion.DeadSpace:
+                    case (int)ProfileVersion.PGATour:
+                    case (int)ProfileVersion.Madden24:
                         return true;
                     default:
                         return false;
@@ -1919,7 +1921,7 @@ namespace MeshSetPlugin.Resources
 
             m_nameHash = reader.ReadUInt();
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 m_meshType = (MeshType)reader.ReadByte();
                 m_unk = reader.ReadByte();
@@ -1943,7 +1945,7 @@ namespace MeshSetPlugin.Resources
                 ProfileVersion.NeedForSpeedEdge, ProfileVersion.NeedForSpeedRivals,
                 ProfileVersion.PlantsVsZombiesGardenWarfare, ProfileVersion.DragonAgeInquisition,
                 ProfileVersion.Battlefield4, ProfileVersion.PlantsVsZombiesGardenWarfare2,
-                ProfileVersion.NeedForSpeed, ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                ProfileVersion.NeedForSpeed, ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 for (int i = 0; i < MaxLodCount * 2; i++)
                 {
@@ -1955,7 +1957,8 @@ namespace MeshSetPlugin.Resources
                 ProfileVersion.Madden20, ProfileVersion.Fifa20,
                 ProfileVersion.Madden21, ProfileVersion.Fifa21,
                 ProfileVersion.Madden22, ProfileVersion.Fifa22,
-                ProfileVersion.Madden23, ProfileVersion.Fifa23))
+                ProfileVersion.Madden23, ProfileVersion.Fifa23,
+                ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 m_flags = (MeshSetLayoutFlags)reader.ReadULong();
             }
@@ -1966,7 +1969,7 @@ namespace MeshSetPlugin.Resources
 
             if (HasNewPartBoneLayout)
             {
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Madden23))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     m_shaderDrawOrder = reader.ReadShort();
                     m_shaderDrawOrderUserSlot = reader.ReadShort();
@@ -1992,7 +1995,7 @@ namespace MeshSetPlugin.Resources
             ushort lodCount = reader.ReadUShort();
             ushort sectionCount = reader.ReadUShort();
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 for (int i = 0; i < 6; i++)
                 {
@@ -2006,7 +2009,7 @@ namespace MeshSetPlugin.Resources
                 if (m_meshType == MeshType.MeshType_Skinned)
                 {
                     m_boneCount = reader.ReadUShort();
-                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                     {
                         m_bonePartCount = reader.ReadUInt();
                     }
@@ -2045,7 +2048,7 @@ namespace MeshSetPlugin.Resources
                 else
                 {
                     m_bonePartCount = reader.ReadUShort();
-                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                     {
                         m_boneCount = reader.ReadUInt();
                     }
@@ -2313,7 +2316,7 @@ namespace MeshSetPlugin.Resources
             meshContainer.WriteRelocPtr("STR", m_name, writer);
             writer.Write(m_nameHash);
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 writer.Write((byte)m_meshType);
                 writer.Write(m_unk);
@@ -2337,7 +2340,7 @@ namespace MeshSetPlugin.Resources
                 ProfileVersion.NeedForSpeedEdge, ProfileVersion.NeedForSpeedRivals,
                 ProfileVersion.PlantsVsZombiesGardenWarfare, ProfileVersion.DragonAgeInquisition,
                 ProfileVersion.Battlefield4, ProfileVersion.PlantsVsZombiesGardenWarfare2,
-                ProfileVersion.NeedForSpeed, ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                ProfileVersion.NeedForSpeed, ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 for (int i = 0; i < MaxLodCount * 2; i++)
                 {
@@ -2350,7 +2353,8 @@ namespace MeshSetPlugin.Resources
                             ProfileVersion.Madden20, ProfileVersion.Fifa20,
                             ProfileVersion.Madden21, ProfileVersion.Fifa21,
                             ProfileVersion.Madden22, ProfileVersion.Fifa22,
-                            ProfileVersion.Madden23, ProfileVersion.Fifa23))
+                            ProfileVersion.Madden23, ProfileVersion.Fifa23,
+                            ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 writer.Write((ulong)m_flags);
             }
@@ -2361,7 +2365,7 @@ namespace MeshSetPlugin.Resources
 
             if (HasNewPartBoneLayout)
             {
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Madden23))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     writer.Write(m_shaderDrawOrder);
                     writer.Write(m_shaderDrawOrderUserSlot);
@@ -2389,7 +2393,7 @@ namespace MeshSetPlugin.Resources
 
             writer.Write(sectionCount);
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden22, ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 for (int i = 0; i < 6; i++)
                 {
@@ -2403,7 +2407,7 @@ namespace MeshSetPlugin.Resources
                 if (m_meshType == MeshType.MeshType_Skinned)
                 {
                     writer.Write((ushort)m_boneCount);
-                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                     {
                         writer.Write(m_bonePartCount);
                     }
@@ -2436,7 +2440,7 @@ namespace MeshSetPlugin.Resources
                 else
                 {
                     writer.Write((ushort)m_bonePartCount);
-                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden20, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                     {
                         writer.Write(m_boneCount);
                     }

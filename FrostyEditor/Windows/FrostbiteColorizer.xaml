@@ -1,0 +1,244 @@
+﻿<ctrl:FrostyDockableWindow x:Class="FrostyEditor.Windows.FrostbiteColorizer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ctrl="clr-namespace:Frosty.Controls;assembly=FrostyControls"
+        xmlns:local="clr-namespace:FrostyEditor.Windows"
+        mc:Ignorable="d"
+        Title="Frostbite Colorizer" Height="428" Width="450"
+        WindowStartupLocation="CenterScreen"
+        Icon="/FrostyEditor;component/AppIcon.ico"
+        ResizeMode="NoResize"
+        Background="{StaticResource WindowBackground }">
+
+    <ctrl:FrostyWindow.Resources>
+        <ctrl:WindowCloseCommand x:Key="CloseCommand"></ctrl:WindowCloseCommand>
+    </ctrl:FrostyWindow.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="225"></ColumnDefinition>
+            <ColumnDefinition Width="50"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="150"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Border Background="#2a2a2a" Grid.ColumnSpan="3" BorderBrush="#DA0037" BorderThickness="0 0 0 2"></Border>
+        
+        <Label Content="RGB Values"
+               Foreground="White" 
+               FontSize="20" 
+               Grid.Column="0" 
+               Grid.Row="0"
+               FontWeight="Bold"
+               FontFamily="Consolas"
+               VerticalAlignment="Center"
+               Margin="20 0 0 0"></Label>
+        
+        <Label Content="Output"
+               Foreground="White" 
+               FontSize="20" 
+               Grid.Column="2" 
+               Grid.Row="0"
+               FontWeight="Bold"
+               FontFamily="Consolas"
+               VerticalAlignment="Center"
+               Margin="20 0 0 0"></Label>
+
+        <StackPanel Grid.Row="1" Margin="5 20 5 20">
+            <Slider x:Name="rSlider" 
+                    Style="{StaticResource Horizontal_Slider_Red}"
+                    Background="Red" 
+                    Value="255" 
+                    Margin="0 0 0 20"
+                    Maximum="255"
+                    IsSnapToTickEnabled="True"
+                    TickFrequency="1"
+                    Cursor="Hand"
+                    ValueChanged="rSlider_ValueChanged">
+            </Slider>
+            <Slider x:Name="gSlider" 
+                    Style="{StaticResource Horizontal_Slider_Green}"
+                    Background="Green" 
+                    Value="0" 
+                    Margin="0 0 0 20"
+                    Maximum="255"
+                    IsSnapToTickEnabled="True"
+                    TickFrequency="1"
+                    Cursor="Hand"
+                    ValueChanged="gSlider_ValueChanged"></Slider>
+            <Slider x:Name="bSlider" 
+                    Style="{StaticResource Horizontal_Slider_Blue}"
+                    Background="Blue" 
+                    Value="0" 
+                    Margin="0 0 0 20"
+                    Maximum="255"
+                    IsSnapToTickEnabled="True"
+                    TickFrequency="1"
+                    Cursor="Hand"
+                    ValueChanged="bSlider_ValueChanged"></Slider>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0 19 0 0">
+            <TextBox x:Name="redValue"
+                     Text="{Binding ElementName=rSlider, Path=Value, Mode=TwoWay}" 
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     FontFamily="Consolas"
+                     FontSize="16"
+                     FontWeight="Bold"
+                     Background="#333"
+                     Padding="2"></TextBox>
+            <TextBox x:Name="greenValue"
+                     Text="{Binding ElementName=gSlider, Path=Value, Mode=TwoWay}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     FontFamily="Consolas"
+                     FontSize="16"
+                     FontWeight="Bold"
+                     Margin="0 15 0 0"
+                     Background="#333"
+                     Padding="2"></TextBox>
+            <TextBox x:Name="blueValue"
+                     Text="{Binding ElementName=bSlider, Path=Value, Mode=TwoWay}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     FontFamily="Consolas"
+                     FontSize="16"
+                     FontWeight="Bold"
+                     Margin="0 17 0 0"
+                     Background="#333"
+                     Padding="2"></TextBox>
+        </StackPanel>
+
+        <Border x:Name="colorOutput" Background="red" Grid.Column="2" Grid.Row="1" Margin="15"></Border>
+
+        <Border Background="#2a2a2a" Grid.Row="2" Grid.ColumnSpan="3" BorderBrush="#DA0037" BorderThickness="0 0 0 2"></Border>
+
+        <Label Content="Frosty Values"
+               Foreground="White" 
+               FontSize="20" 
+               Grid.Column="0" 
+               Grid.Row="2"
+               FontWeight="Bold"
+               FontFamily="Consolas"
+               VerticalAlignment="Center"
+               Margin="20 0 0 0"></Label>
+
+        <Button x:Name="btnConvert"
+                Background="#DA0037"
+                Content="Convert"
+                FontFamily="Consolas"
+                FontWeight="Bold"
+                FontSize="16"
+                Grid.Row="2"
+                Grid.Column="2"
+                Margin="12 8"
+                Cursor="Hand"
+                Click="btnConvert_Click"></Button>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.ColumnSpan="3" HorizontalAlignment="center">
+            <StackPanel Margin="10 10 0 0">
+                <Border Background="#333"
+                        Width="130"
+                        Margin="5"
+                        BorderThickness="2"
+                        BorderBrush="#444"
+                        CornerRadius="5">
+                    <StackPanel VerticalAlignment="Center">
+                        <Label Content="X"
+                               FontFamily="Consolas"
+                               FontWeight="Bold"
+                               FontSize="16"></Label>
+                        <Separator Background="#444"></Separator>
+                        <Label x:Name="xValue" 
+                               Content="1"
+                               FontFamily="Consolas"
+                               FontWeight="Medium"
+                               FontSize="16"></Label>
+                    </StackPanel>
+                </Border>
+                <Button x:Name="btnCopyX"
+                    Background="#DA0037"
+                    Content="Copy"
+                    FontFamily="Consolas"
+                    FontWeight="Bold"
+                    FontSize="16"
+                    Height="25"
+                    Margin="10 15 10 0"
+                    Cursor="Hand"
+                    Click="btnCopyX_Click">
+                </Button>
+            </StackPanel>
+            <StackPanel Margin="0 10 0 0">
+                <Border Background="#333"
+                        Width="130"
+                        Margin="5"
+                        BorderThickness="2"
+                        BorderBrush="#444"
+                        CornerRadius="5">
+                    <StackPanel VerticalAlignment="Center">
+                        <Label Content="Y"
+                               FontFamily="Consolas"
+                               FontWeight="Bold"
+                               FontSize="16"></Label>
+                        <Separator Background="#444"></Separator>
+                        <Label x:Name="yValue" 
+                               Content="0"
+                               FontFamily="Consolas"
+                               FontWeight="Medium"
+                               FontSize="16"></Label>
+                    </StackPanel>
+                </Border>
+                <Button x:Name="btnCopyY"
+                    Background="#DA0037"
+                    Content="Copy"
+                    FontFamily="Consolas"
+                    FontWeight="Bold"
+                    FontSize="16"
+                    Height="25"
+                    Margin="10 15 10 0"
+                    Cursor="Hand"
+                    Click="btnCopyY_Click"></Button>
+            </StackPanel>
+            <StackPanel Margin="0 10 10 0">
+                <Border Background="#333"
+                        Width="130"
+                        Margin="5"
+                        BorderThickness="2"
+                        BorderBrush="#444"
+                        CornerRadius="5">
+                    <StackPanel VerticalAlignment="Center">
+                        <Label Content="Z"
+                               FontFamily="Consolas"
+                               FontWeight="Bold"
+                               FontSize="16"></Label>
+                        <Separator Background="#444"></Separator>
+                        <Label x:Name="zValue" 
+                               Content="0"
+                               FontFamily="Consolas"
+                               FontWeight="Medium"
+                               FontSize="16"></Label>
+                    </StackPanel>
+                </Border>
+                <Button x:Name="btnCopyZ"
+                    Background="#DA0037"
+                    Content="Copy"
+                    FontFamily="Consolas"
+                    FontWeight="Bold"
+                    FontSize="16"
+                    Height="25"
+                    Margin="10 15 10 0"
+                    Cursor="Hand"
+                    Click="btnCopyZ_Click"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</ctrl:FrostyDockableWindow>

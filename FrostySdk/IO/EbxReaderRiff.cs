@@ -212,7 +212,7 @@ namespace FrostySdk.IO
 
         internal override void InternalReadObjects()
         {
-            EbxClass c = std.GetClass(classGuids[0]).Value;
+            EbxClass c = GetClass(classGuids[0]);
             foreach (EbxInstance inst in instances)
             {
                 Type objType = TypeLibrary.GetType(classGuids[inst.ClassRef]);
@@ -295,6 +295,36 @@ namespace FrostySdk.IO
             }
 
             return newClassType.Value;
+        }
+        internal EbxClass GetClass(Guid guid)
+        {
+            EbxClass? patchClass = patchStd.GetClass(guid);
+            EbxClass c;
+
+            if (patchClass.HasValue)
+            {
+                c = patchClass.Value;
+            }
+            else
+            {
+                c = std.GetClass(guid).Value;
+            }
+
+            return c;
+        }
+
+        internal new EbxClass GetClass(Type objType)
+        {
+            EbxClass? classType = null;
+            foreach (TypeInfoGuidAttribute attr in objType.GetCustomAttributes<TypeInfoGuidAttribute>())
+            {
+                if (classGuids.Contains(attr.Guid))
+                {
+                    classType = GetClass(attr.Guid);
+                }
+            }
+
+            return classType.Value;
         }
 
         internal override object ReadClass(EbxClass classType, object obj, long startOffset)
@@ -614,7 +644,7 @@ namespace FrostySdk.IO
                         value = Enum.Parse(GetType(enumClass), tmpValue.ToString());
                     }
                 }
-                
+
                 return new BoxedValueRef(value, boxedValuetype, subType, boxedValuecategory);
             }
             finally

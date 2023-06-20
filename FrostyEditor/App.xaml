@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="/FrostyCore;component/Themes/Generic.xaml"/>
                 <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
                 <ResourceDictionary Source="/FrostyEditor;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="/FrostyEditor;component/Themes/FrostbiteColorizerStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
