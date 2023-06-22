@@ -469,10 +469,6 @@ namespace FrostySdk.Managers
 
         public uint GetModifiedCount()
         {
-            if (!IsCacheGenerated())
-            {
-                return 0;
-            }
             uint modifiedEbx = (uint)m_ebxList.Values.Count((EbxAssetEntry entry) => entry.IsModified);
             uint modifiedRes = (uint)m_resList.Values.Count((ResAssetEntry entry) => entry.IsModified);
             uint modifiedChunks = (uint)m_chunkList.Values.Count((ChunkAssetEntry entry) => entry.IsModified);
