@@ -2562,7 +2562,7 @@ namespace Frosty.ModSupport
 
             if (modHead != patchHead)
             {
-                Directory.Delete(modPath + "../", true);
+                Directory.Delete(Path.Combine(modPath, "../"), true);
                 return false;
             }
 
