@@ -13,6 +13,8 @@ using Frosty.Hash;
 using Frosty.Core.Commands;
 using System.Windows.Data;
 using FrostySdk.Managers.Entries;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using Frosty.Core.Windows;
 
 namespace Frosty.Core.Controls
 {
@@ -58,7 +60,7 @@ namespace Frosty.Core.Controls
         //}
     }
 
-    internal class AssetPath
+    public class AssetPath
     {
         private static readonly ImageSource ClosedImage = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/CloseFolder.png") as ImageSource;
         private static readonly ImageSource OpenImage = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/OpenFolder.png") as ImageSource;
@@ -311,6 +313,12 @@ namespace Frosty.Core.Controls
         public ICommand FindOpenedAssetCommand => new RelayCommand(FindOpenedAsset);
 
         #endregion
+        
+        #region OnFindOpenedAsset
+
+        public ICommand BatchExportSelectedCommand => new RelayCommand(BatchExportSelected);
+
+        #endregion
 
         #endregion
         
@@ -403,7 +411,21 @@ namespace Frosty.Core.Controls
         {
             SelectAsset(App.EditorWindow.GetOpenedAssetEntry());
         }
-        
+
+        public void BatchExportSelected(object obj)
+        {
+            if (m_selectedPath == null)
+                return;
+
+            BatchExportSelectedWindow win = new BatchExportSelectedWindow(m_selectedPath, ItemsSource);
+            if (win.ShowDialog() == true)
+            {
+                
+            }
+
+            //App.Logger.Log("0xnot a valid string hash.");
+
+        }
         private void UpdateViewType()
         {
             if (GridView)

@@ -114,6 +114,7 @@ namespace FsLocalizationPlugin
             newChunkEntry.Size = buf.Length;
             newChunkEntry.H32 = Fnv1.HashString(origEntry.Name.ToLower());
             newChunkEntry.FirstMip = -1;
+            newChunkEntry.IsTocChunk = true;
 
             runtimeResources.AddResource(new RuntimeChunkResource(newChunkEntry), buf);
 

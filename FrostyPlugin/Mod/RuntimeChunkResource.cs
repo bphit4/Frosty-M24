@@ -19,6 +19,10 @@ namespace Frosty.Core.Mod
             h32 = entry.H32;
             firstMip = entry.FirstMip;
             superBundlesToAdd.AddRange(entry.AddedSuperBundles);
+            if (entry.IsTocChunk)
+            {
+                flags |= 0x02;
+            }
         }
     }
 }

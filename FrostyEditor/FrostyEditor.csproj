@@ -300,6 +300,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Colorizer.png" />
+    <Resource Include="Images\blueprintbundlefiletype.png" />
     <Content Include="Resources\Meshes\Flag.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

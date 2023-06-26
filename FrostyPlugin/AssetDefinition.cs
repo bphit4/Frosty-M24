@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media;
 using FrostySdk.Managers.Entries;
+using System;
+using System.Diagnostics;
 
 namespace Frosty.Core
 {
@@ -163,6 +165,18 @@ namespace Frosty.Core
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// When implemented in a derived class, performs the batch export of the assets, providing the path to export to.
+        /// Child implementations are intended to remove successfully exported assets from the list and return the new list.
+        /// </summary>
+        /// <param name="entries">The list of <see cref="EbxAssetEntry"/> to export.</param>
+        /// <param name="path">A string representing the root path to export to.</param>
+        /// <returns>A list of <see cref="EbxAssetEntry"/> that were not exported.</returns>
+        public virtual List<EbxAssetEntry> BatchExport(List<EbxAssetEntry> entries, string path, Stopwatch stopWatch = null)
+        {
+            return entries;
         }
 
         /// <summary>

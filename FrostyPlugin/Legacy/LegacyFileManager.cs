@@ -171,6 +171,7 @@ namespace Frosty.Core.Legacy
                 {
                     assetChunkEntry.AddToSuperBundle(sbId);
                 }
+                assetChunkEntry.ModifiedEntry.AddToChunkBundle = true;
                 assetChunkEntry.ModifiedEntry.UserData = "legacy;" + lfe.Name;
 
                 // link to main ebx

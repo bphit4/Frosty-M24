@@ -18,6 +18,7 @@ namespace FrostySdk.Managers.Entries
 
         public int H32;
         public int FirstMip = -1;
+        public bool IsTocChunk;
         public bool TocChunkSpecialHack;
         public List<int> SuperBundles = new List<int>();
         public List<int> AddedSuperBundles = new List<int>();

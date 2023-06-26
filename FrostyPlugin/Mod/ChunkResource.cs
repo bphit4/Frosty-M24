@@ -61,6 +61,7 @@ namespace Frosty.Core.Mod
             chunkEntry.H32 = h32;
             chunkEntry.FirstMip = firstMip;
             chunkEntry.AddedSuperBundles.AddRange(superBundlesToAdd);
+            chunkEntry.IsTocChunk = IsTocChunk;
 
             if (chunkEntry.FirstMip == -1 && chunkEntry.RangeStart != 0)
                 chunkEntry.FirstMip = 0;

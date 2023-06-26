@@ -543,6 +543,8 @@ namespace SoundEditorPlugin
                     main.Write(writer, new List<WAV.IRIFFChunk>(new WAV.IRIFFChunk[] { fmt, data }));
                 }
             });
+
+            logger.Log("Exported {0} to {1}", AssetEntry.Name, filename);
         }
 
         private void SoundImportMenuItem_Click(object sender, RoutedEventArgs e)
