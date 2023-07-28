@@ -6,7 +6,7 @@ The most advanced modding platform for games running on DICE's Frostbite game en
 The link to main Frosty Devs Version is located here
 https://github.com/CadeEvs/FrostyToolsuite
 
-We used Version 1.0.7 which is no longer supported by the Frosty Devs.  Please direct all questions here or to the Madden Modding Discord. 
+We used Version 1.0.7 which is no longer supported by the Frosty Devs.  Please direct all questions and issues to the Madden Modding Discord. 
 https://discord.gg/MuCUeg5eGS
  
 ## Setup
