@@ -1176,7 +1176,7 @@ namespace FrostySdk
                 size = (ulong)Oodle.Compress2(Oodle.OodleFormat.Kraken, ptr1.AddrOfPinnedObject(), buffer.Length, ptr2.AddrOfPinnedObject(), Oodle.OodleCompressionLevel.Optimal3, Oodle.GetOptions(Oodle.OodleFormat.Kraken, Oodle.OodleCompressionLevel.Optimal3));
             }
             else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa21, ProfileVersion.Fifa22,
-                ProfileVersion.NeedForSpeedUnbound, ProfileVersion.PGATour))
+                ProfileVersion.NeedForSpeedUnbound))
             {
                 // Leviathan
                 compressCode = 0x1970;

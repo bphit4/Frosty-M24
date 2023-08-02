@@ -19,6 +19,8 @@ using Frosty.Core.Windows;
 using Frosty.Core.Screens;
 using System.Runtime.InteropServices;
 using FrostySdk.Managers.Entries;
+using System.Windows.Media;
+using System.Windows.Input;
 
 namespace TexturePlugin
 {
@@ -40,10 +42,10 @@ namespace TexturePlugin
 
     public enum ImageFormat
     {
+        DDS,
         PNG,
         TGA,
-        HDR,
-        DDS
+        HDR
     }
 
     public struct TextureImportOptions
@@ -107,6 +109,25 @@ namespace TexturePlugin
         private ComboBox m_sliceComboBox;
         private Border m_sliceToolBarItem;
         private bool m_textureIsSrgb;
+        private Slider ZoomSlider;
+        public ICommand ZoomInCommand { get; }
+        public ICommand ZoomOutCommand { get; }
+        private ScaleTransform ZoomTransform;
+        private double _zoomValue = 1.0;
+        private bool isZoomedIn = false;
+
+        public double ZoomValue
+        {
+
+            get { return _zoomValue; }
+            set
+            {
+                if (_zoomValue != value)
+                {
+                    _zoomValue = value;
+                }
+            }
+        }
 
         static FrostyTextureEditor()
         {
@@ -116,6 +137,8 @@ namespace TexturePlugin
         public FrostyTextureEditor(ILogger inLogger)
             : base(inLogger)
         {
+            ZoomInCommand = new RelayCommand(param => ZoomIn(), param => CanZoomIn());
+            ZoomOutCommand = new RelayCommand(param => ZoomOut(), param => CanZoomOut());
         }
 
         public override void OnApplyTemplate()
@@ -128,8 +151,11 @@ namespace TexturePlugin
                 ulong resRid = ((dynamic)RootObject).Resource;
                 m_textureAsset = App.AssetManager.GetResAs<Texture>(App.AssetManager.GetResEntry(resRid));
                 m_textureIsSrgb = m_textureAsset.PixelFormat.Contains("SRGB") || ((m_textureAsset.Flags & TextureFlags.SrgbGamma) != 0);
-
                 m_renderer.Screen = new TextureScreen(m_textureAsset);
+                m_renderer.PreviewMouseWheel += Renderer_PreviewMouseWheel;
+                m_renderer.MouseLeftButtonDown += Renderer_MouseLeftButtonDown;
+                m_renderer.MouseLeftButtonUp += Renderer_MouseLeftButtonUp;
+                m_renderer.MouseMove += Renderer_MouseMove;
             }
 
             m_textureFormatText = GetTemplateChild(PART_TextureFormat) as TextBlock;
@@ -146,8 +172,137 @@ namespace TexturePlugin
             {
                 m_sliceToolBarItem.Visibility = Visibility.Collapsed;
             }
+            ZoomSlider = GetTemplateChild("ZoomSlider") as Slider;
+            ZoomTransform = GetTemplateChild("ZoomTransform") as ScaleTransform;
+            ZoomValue = ZoomSlider.Value; // Update the ZoomValue property
+            ZoomTransform.ScaleX = ZoomValue;
+            ZoomTransform.ScaleY = ZoomValue;
+
+            if (ZoomSlider != null)
+            {
+                ZoomSlider.ValueChanged += ZoomSlider_ValueChanged;
+            }
+ 
+            Button zoomResetButton = GetTemplateChild("ZoomResetButton") as Button;
+            if (zoomResetButton != null)
+            {
+                zoomResetButton.Click += ZoomResetButton_Click;
+            }
 
             UpdateControls();
+        }
+        private void ZoomIn()
+        {
+            ZoomValue += 0.1;
+            ZoomSlider.Value = ZoomValue; // Update the ZoomSlider's value
+        }
+        private void ZoomOut()
+        {
+            ZoomValue -= 0.1;
+            ZoomSlider.Value = ZoomValue;
+
+            if (ZoomValue == 0.1)
+            {
+                m_renderer.RenderTransform = new TranslateTransform(0, 0);
+            }
+        }
+        private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            ZoomTransform.ScaleX = ZoomSlider.Value;
+            ZoomTransform.ScaleY = ZoomSlider.Value;
+            ZoomValue = ZoomSlider.Value;
+
+            Button zoomResetButton = this.Template.FindName("ZoomResetButton", this) as Button;
+            if (zoomResetButton != null)
+            {
+                if (ZoomValue == 0.1)
+                {
+                    zoomResetButton.Content = "Zoom";
+                }
+                else
+                {
+                    zoomResetButton.Content = "Reset";
+                }
+            }
+        }
+        private bool CanZoomIn()
+        {
+            return true;
+        }
+        private bool CanZoomOut()
+        {
+            return true;
+        }
+        private void Renderer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                if (e.Delta > 0)
+                {
+                    ZoomIn();
+                }
+                else if (e.Delta < 0)
+                {
+                    ZoomOut();
+                }
+
+                e.Handled = true;
+            }
+        }
+        private Point _lastDragPoint;
+        private TranslateTransform _currentTransform;
+
+        private void Renderer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var mousePos = e.GetPosition(m_renderer);
+            if (mousePos.X <= m_renderer.ActualWidth && mousePos.Y < m_renderer.ActualHeight && m_renderer.IsMouseOver)
+            {
+                _lastDragPoint = mousePos;
+                Mouse.Capture(m_renderer);
+                e.Handled = true;
+            }
+        }
+
+        private void Renderer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            m_renderer.ReleaseMouseCapture();
+
+            // Update the current transform when the mouse button is released
+            _currentTransform = m_renderer.RenderTransform as TranslateTransform;
+        }
+
+        private void Renderer_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (m_renderer.IsMouseCaptured)
+            {
+                Point currentPoint = e.GetPosition(m_renderer);
+                var transform = m_renderer.RenderTransform as TranslateTransform ?? new TranslateTransform();
+                transform.X += currentPoint.X - _lastDragPoint.X;
+                transform.Y += currentPoint.Y - _lastDragPoint.Y;
+                m_renderer.RenderTransform = transform;
+
+                _lastDragPoint = currentPoint;
+            }
+        }
+        private void ZoomResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button zoomResetButton = sender as Button;
+            if (!isZoomedIn)
+            {
+                ZoomValue = 1.5;
+                ZoomSlider.Value = ZoomValue;
+                zoomResetButton.Content = "Reset";
+            }
+            else
+            {
+                ZoomValue = 0.1;
+                ZoomSlider.Value = ZoomValue;
+                zoomResetButton.Content = "Zoom";
+
+                // Reset the image position
+                m_renderer.RenderTransform = new TranslateTransform(0, 0);
+            }
+            isZoomedIn = !isZoomedIn;
         }
 
         public override List<ToolbarItem> RegisterToolbarItems()
@@ -155,7 +310,7 @@ namespace TexturePlugin
             List<ToolbarItem> toolbarItems = base.RegisterToolbarItems();
             toolbarItems.Add(new ToolbarItem("Export", "Export Texture", "Images/Export.png", new RelayCommand((object state) => { ExportButton_Click(this, new RoutedEventArgs()); })));
             toolbarItems.Add(new ToolbarItem("Import", "Import Texture", "Images/Import.png", new RelayCommand((object state) => { ImportButton_Click(this, new RoutedEventArgs()); })));
-            
+
             return toolbarItems;
         }
 
@@ -173,7 +328,7 @@ namespace TexturePlugin
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture");
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "DDS (*.dds)|*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr", "Texture");
             if (m_textureAsset.Type != TextureType.TT_2d)
             {
                 ofd.Multiselect = true;
@@ -220,7 +375,7 @@ namespace TexturePlugin
                         }
 
                         // exit loop if all faces exist
-                        if (faceExists.All((bool a) => a==true))
+                        if (faceExists.All((bool a) => a == true))
                             break;
 
                         FrostyMessageBox.Show("There was a duplicate or missing face defined, please try again", "Frosty Editor", MessageBoxButton.OK);
@@ -261,7 +416,7 @@ namespace TexturePlugin
                         }
 
                         // exit loop if all faces exist
-                        if (faceExists.All((bool a) => a==true))
+                        if (faceExists.All((bool a) => a == true))
                             break;
 
                         FrostyMessageBox.Show("There was a duplicate or missing slice defined, please try again", "Frosty Editor", MessageBoxButton.OK);
@@ -521,7 +676,7 @@ namespace TexturePlugin
 
                     message = "Texture " + ofd.FileName + " successfully imported";
                 }
-                
+
                 logger.Log(message);
             }
         }
@@ -531,15 +686,31 @@ namespace TexturePlugin
             float newWidth = m_textureAsset.Width;
             float newHeight = m_textureAsset.Height;
 
-            if (newWidth > 2048)
+            if (m_textureAsset.Width == 4096 && m_textureAsset.Height == 8192)
             {
-                newWidth = 2048;
-                newHeight = (newHeight * (newWidth / m_textureAsset.Width));
+                if (newWidth > 4096)
+                {
+                    newWidth = 4096;
+                    newHeight = (newHeight * (newWidth / m_textureAsset.Width));
+                }
+                if (newHeight > 4096)
+                {
+                    newHeight = 4096;
+                    newWidth = (newWidth * (newHeight / m_textureAsset.Height));
+                }
             }
-            if (newHeight > 2048)
+            else
             {
-                newHeight = 2048;
-                newWidth = (newWidth * (newHeight / m_textureAsset.Height));
+                if (newWidth > 2048)
+                {
+                    newWidth = 2048;
+                    newHeight = (newHeight * (newWidth / m_textureAsset.Width));
+                }
+                if (newHeight > 2048)
+                {
+                    newHeight = 2048;
+                    newWidth = (newWidth * (newHeight / m_textureAsset.Height));
+                }
             }
 
             m_renderer.Width = newWidth;
@@ -585,6 +756,7 @@ namespace TexturePlugin
                 }
                 m_sliceComboBox.SelectedIndex = 0;
             }
+
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
@@ -592,7 +764,7 @@ namespace TexturePlugin
             ImageFormat format = ImageFormat.PNG;
             bool bResult = false;
 
-            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture", AssetEntry.Filename, false);
+            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", "DDS (*.dds)|*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr", "Texture", AssetEntry.Filename, false);
             while (true)
             {
                 string initialDir = sfd.InitialDirectory;
@@ -631,7 +803,7 @@ namespace TexturePlugin
                         }
 
                         bool bExists = false;
-                        foreach(string filename in filenames)
+                        foreach (string filename in filenames)
                         {
                             if (File.Exists(filename))
                                 bExists |= true;
@@ -653,7 +825,7 @@ namespace TexturePlugin
 
             FrostyTaskWindow.Show("Exporting Texture", AssetEntry.Filename, (task) =>
             {
-                string[] filters = new string[] { "*.png", "*.tga", "*.hdr", "*.dds" };
+                string[] filters = new string[] { "*.dds", "*.png", "*.tga", "*.hdr" };
 
                 TextureExporter exporter = new TextureExporter();
                 exporter.Export(m_textureAsset, sfd.FileName, filters[sfd.FilterIndex - 1]);
@@ -697,7 +869,7 @@ namespace TexturePlugin
                 // All others
                 else if (header.HasExtendedHeader)
                 {
-                    switch(header.ExtendedHeader.dxgiFormat)
+                    switch (header.ExtendedHeader.dxgiFormat)
                     {
                         case SharpDX.DXGI.Format.R32G32B32A32_Float: pixelFormat = "ARGB32F"; break;
                         case SharpDX.DXGI.Format.R9G9B9E5_Sharedexp: pixelFormat = "R9G9B9E5F"; break;
@@ -938,5 +1110,6 @@ namespace TexturePlugin
 
             return buf;
         }
+
     }
 }

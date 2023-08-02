@@ -1767,7 +1767,7 @@ namespace FrostyModManager
             {
                 Filter = "*.fbpack;*.zip (Frostbite Pack) | *.fbpack;*.zip",
                 Title = "Import Pack",
-                Multiselect = false
+                Multiselect = true
             };
 
             if (ofd.ShowDialog() == true)

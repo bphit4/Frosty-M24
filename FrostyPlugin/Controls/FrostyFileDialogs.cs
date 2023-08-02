@@ -25,7 +25,7 @@ namespace Frosty.Core.Controls
             {
                 Title = title,
                 Filter = filter,
-                Multiselect = false,
+                Multiselect = true,
                 InitialDirectory = di.Exists ? di.FullName : ""
             };
         }

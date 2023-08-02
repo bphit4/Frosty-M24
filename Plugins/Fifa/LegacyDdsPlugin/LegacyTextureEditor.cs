@@ -104,7 +104,7 @@ namespace LegacyDdsPlugin
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture");
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "DDS (*.dds)|*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr", "Texture");
             if (ofd.ShowDialog())
             {
                 AssetEntry entry = AssetEntry;
@@ -159,7 +159,7 @@ namespace LegacyDdsPlugin
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             ImageFormat format = ImageFormat.PNG;
-            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture", AssetEntry.Filename, false);
+            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", "DDS (*.dds)|*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr", "Texture", AssetEntry.Filename, false);
             if (sfd.ShowDialog())
             {
                 format = (ImageFormat)(sfd.FilterIndex - 1);

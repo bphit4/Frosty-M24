@@ -30,7 +30,7 @@ namespace AtlasTexturePlugin
         {
             if (!base.Export(entry, path, filterType))
             {
-                if (filterType == "png" || filterType == "tga" || filterType == "hdr" || filterType == "dds")
+                if (filterType == "dds" || filterType == "tga" || filterType == "hdr" || filterType == "png")
                 {
                     EbxAsset asset = App.AssetManager.GetEbx(entry);
                     dynamic textureAsset = (dynamic)asset.RootObject;

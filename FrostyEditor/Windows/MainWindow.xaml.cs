@@ -967,23 +967,30 @@ namespace FrostyEditor.Windows
         private void contextMenuImportAsset_Click(object sender, RoutedEventArgs e)
         {
             LegacyFileEntry selectedAsset = legacyExplorer.SelectedAsset as LegacyFileEntry;
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Legacy file", "*." + selectedAsset.Type + " (Legacy Files)|*." + selectedAsset.Type, "FifaLegacy");
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Legacy file", "*." + selectedAsset.Type + " (Legacy Files)|*." + selectedAsset.Type, "FifaLegacy")
+            {
+                Multiselect = true // Allow multiple file selection
+            };
 
             if (ofd.ShowDialog())
             {
-                FrostyTaskWindow.Show("Importing Legacy Asset", "", (task) =>
+                foreach (var fileName in ofd.FileNames)
                 {
-                    byte[] buffer;
-                    using (NativeReader reader = new NativeReader(new FileStream(ofd.FileName, FileMode.Open, FileAccess.Read)))
-                        buffer = reader.ReadToEnd();
+                    FrostyTaskWindow.Show("Importing Legacy Asset", "", (task) =>
+                    {
+                        byte[] buffer;
+                        using (NativeReader reader = new NativeReader(new FileStream(fileName, FileMode.Open, FileAccess.Read)))
+                            buffer = reader.ReadToEnd();
 
-                    App.AssetManager.ModifyCustomAsset("legacy", selectedAsset.Name, buffer);
-                });
+                        App.AssetManager.ModifyCustomAsset("legacy", selectedAsset.Name, buffer);
+                    });
 
-                App.Logger.Log("{0} imported to {1}", ofd.FileName, selectedAsset.Name);
+                    App.Logger.Log("{0} imported to {1}", fileName, selectedAsset.Name);
+                }
                 legacyExplorer.RefreshItems();
             }
         }
+
 
         private void contextMenuExportAsset_Click(object sender, RoutedEventArgs e)
         {
@@ -1040,13 +1047,19 @@ namespace FrostyEditor.Windows
                 filterString += "|" + filter.FilterString;
             filterString = filterString.Trim('|');
 
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Asset", filterString, assetDefinition.GetType().Name);
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Asset", filterString, assetDefinition.GetType().Name)
+            {
+                Multiselect = true // Allow multiple file selection
+            };
             if (ofd.ShowDialog())
             {
-                if (assetDefinition.Import(entry, ofd.FileName, filters[ofd.FilterIndex - 1].Extension))
+                foreach (var fileName in ofd.FileNames)
                 {
-                    dataExplorer.RefreshItems();
-                    App.Logger.Log("Imported {0} into {1}", ofd.FileName, entry.Name);
+                    if (assetDefinition.Import(entry, fileName, filters[ofd.FilterIndex - 1].Extension))
+                    {
+                        dataExplorer.RefreshItems();
+                        App.Logger.Log("Imported {0} into {1}", fileName, entry.Name);
+                    }
                 }
             }
         }
@@ -1270,12 +1283,60 @@ namespace FrostyEditor.Windows
             FrostyEditableLabel label = FindVisualChild<FrostyEditableLabel>(gen.ContainerFromItem(stack.Pop()));
             label.Text = label.Text ?? "";
             label.BeginEdit();
-        }   
+        }
+        private HashSet<TreeViewItem> selectedItems = new HashSet<TreeViewItem>();
 
         private void BookmarkTreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             TreeViewItem item = sender as TreeViewItem;
-            item.IsSelected = true;
+            if ((Keyboard.Modifiers & ModifierKeys.Control) != 0)
+            {
+                if (item != null)
+                {
+                    if (this.selectedItems.Contains(item))
+                    {
+                        // Deselect item
+                        item.IsSelected = false;
+                        this.selectedItems.Remove(item);
+                    }
+                    else
+                    {
+                        // Select item
+                        item.IsSelected = true;
+                        this.selectedItems.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                // If control is not being held down, clear the list and select the clicked item
+                foreach (TreeViewItem selectedItem in this.selectedItems)
+                {
+                    selectedItem.IsSelected = false;
+                }
+                this.selectedItems.Clear();
+
+                if (item != null)
+                {
+                    item.IsSelected = true;
+                    this.selectedItems.Add(item);
+                }
+            }
+            e.Handled = true;
+        }
+
+        private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TreeView && e.OriginalSource is FrameworkElement fe && fe.DataContext is TreeViewItem)
+            {
+                return;
+            }
+
+            foreach (TreeViewItem selectedItem in this.selectedItems)
+            {
+                selectedItem.IsSelected = false;
+            }
+            this.selectedItems.Clear();
         }
 
         private void BookmarkTreeView_MouseDoubleClick()

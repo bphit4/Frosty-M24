@@ -16,8 +16,7 @@ namespace Frosty.Core.Controls
 
         #region -- GridVisible --
         public static readonly DependencyProperty GridVisibleProperty = DependencyProperty.Register("GridVisible", typeof(bool), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(true));
-        public bool GridVisible
-        {
+        public bool GridVisible {
             get => (bool)GetValue(GridVisibleProperty);
             set => SetValue(GridVisibleProperty, value);
         }
@@ -25,8 +24,7 @@ namespace Frosty.Core.Controls
 
         #region -- Texture --
         public static readonly DependencyProperty TextureProperty = DependencyProperty.Register("Texture", typeof(object), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(null, OnTextureChanged));
-        public object Texture
-        {
+        public object Texture {
             get => GetValue(TextureProperty);
             set => SetValue(TextureProperty, value);
         }
@@ -39,8 +37,7 @@ namespace Frosty.Core.Controls
 
         #region -- RedChannelEnabled --
         public static readonly DependencyProperty RedChannelEnabledProperty = DependencyProperty.Register("RedChannelEnabled", typeof(bool), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(true, OnRedChannelEnabledChanged));
-        public bool RedChannelEnabled
-        {
+        public bool RedChannelEnabled {
             get => (bool)GetValue(RedChannelEnabledProperty);
             set => SetValue(RedChannelEnabledProperty, value);
         }
@@ -56,8 +53,7 @@ namespace Frosty.Core.Controls
 
         #region -- GreenChannelEnabled --
         public static readonly DependencyProperty GreenChannelEnabledProperty = DependencyProperty.Register("GreenChannelEnabled", typeof(bool), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(true, OnGreenChannelEnabledChanged));
-        public bool GreenChannelEnabled
-        {
+        public bool GreenChannelEnabled {
             get => (bool)GetValue(GreenChannelEnabledProperty);
             set => SetValue(GreenChannelEnabledProperty, value);
         }
@@ -73,8 +69,7 @@ namespace Frosty.Core.Controls
 
         #region -- BlueChannelEnabled --
         public static readonly DependencyProperty BlueChannelEnabledProperty = DependencyProperty.Register("BlueChannelEnabled", typeof(bool), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(true, OnBlueChannelEnabledChanged));
-        public bool BlueChannelEnabled
-        {
+        public bool BlueChannelEnabled {
             get => (bool)GetValue(BlueChannelEnabledProperty);
             set => SetValue(BlueChannelEnabledProperty, value);
         }
@@ -90,8 +85,7 @@ namespace Frosty.Core.Controls
 
         #region -- AlphaChannelEnabled --
         public static readonly DependencyProperty AlphaChannelEnabledProperty = DependencyProperty.Register("AlphaChannelEnabled", typeof(bool), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(true, OnAlphaChannelEnabledChanged));
-        public bool AlphaChannelEnabled
-        {
+        public bool AlphaChannelEnabled {
             get => (bool)GetValue(AlphaChannelEnabledProperty);
             set => SetValue(AlphaChannelEnabledProperty, value);
         }
@@ -107,8 +101,7 @@ namespace Frosty.Core.Controls
 
         #region -- SrgbEnabled --
         public static readonly DependencyProperty SrgbEnabledProperty = DependencyProperty.Register("SrgbEnabled", typeof(bool), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(true, OnSrgbEnabledChanged));
-        public bool SrgbEnabled
-        {
+        public bool SrgbEnabled {
             get => (bool)GetValue(SrgbEnabledProperty);
             set => SetValue(SrgbEnabledProperty, value);
         }
@@ -124,8 +117,7 @@ namespace Frosty.Core.Controls
 
         #region -- TextureFormat --
         public static readonly DependencyProperty TextureFormatProperty = DependencyProperty.Register("TextureFormat", typeof(string), typeof(FrostyTextureViewer), new FrameworkPropertyMetadata(""));
-        public string TextureFormat
-        {
+        public string TextureFormat {
             get => (string)GetValue(TextureFormatProperty);
             set => SetValue(TextureFormatProperty, value);
         }

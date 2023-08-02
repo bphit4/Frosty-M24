@@ -1193,17 +1193,17 @@ namespace FrostyCmd
             using (NativeWriter writer = new NativeWriter(new MemoryStream()))
             {
                 writer.WriteObfuscatedString("PGA Tour");
-                writer.Write((int)ProfileVersion.Madden23);
+                writer.Write((int)ProfileVersion.PGATour);
                 writer.WriteObfuscatedString("PGATour");
                 writer.WriteObfuscatedString(typeof(NullDeobfuscator).Name);
                 writer.WriteObfuscatedString(AssetManager.GetLoaderName("CasAssetLoader"));
                 writer.Write(CreateSources("Patch;false", "Data;false"));
                 writer.WriteObfuscatedString("PGATourSDK");
                 writer.Write(CreateBanner("PGATour"));
-                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_color");
-                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_rsmN");
-                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_normal");
-                writer.WriteObfuscatedString("Objects/Golfbag/Bags/EA/PGATourDefault/textures/GolfBag_EA_PGATourDefault_dat");
+                writer.WriteObfuscatedString("Textures/Generic/Debug_N");
+                writer.WriteObfuscatedString("Levels/Global_Textures/PinFlags/Debug_PinFlag_color");
+                writer.WriteObfuscatedString("Effects/Game/Texture/NoAtlas/Utility/Debug_Arrow_01");
+                writer.WriteObfuscatedString("Textures/Generic/NormalmapDefault_N");
                 writer.Write(0); // shared bundle names
                 writer.Write(0); // ignored res types
 
