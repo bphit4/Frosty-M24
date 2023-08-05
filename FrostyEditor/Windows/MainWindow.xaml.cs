@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -947,31 +948,34 @@ namespace FrostyEditor.Windows
 
         private void contextMenuOpen_Click(object sender, RoutedEventArgs e)
         {
-            if (m_currentExplorer.SelectedAsset == null)
-                return;
-            OpenAsset(m_currentExplorer.SelectedAsset, m_currentExplorer == dataExplorer);
+            foreach (var asset in m_currentExplorer.SelectedAssets)
+            {
+                OpenAsset(asset, m_currentExplorer == dataExplorer);
+            }
         }
 
         private void contextMenuRevert_Click(object sender, RoutedEventArgs e)
         {
-            AssetEntry entry = m_currentExplorer.SelectedAsset;
-            if (!entry.IsModified)
-                return;
-
-            for (int i = 1; i < TabControl.Items.Count; i++)
+            foreach (var asset in m_currentExplorer.SelectedAssets)
             {
-                FrostyTabItem tabItem = TabControl.Items[i] as FrostyTabItem;
-                if (tabItem.TabId == entry.Name)
+                if (!asset.IsModified)
+                    continue;
+
+                for (int i = 1; i < TabControl.Items.Count; i++)
                 {
-                    RemoveTab(tabItem);
-                    break;
+                    FrostyTabItem tabItem = TabControl.Items[i] as FrostyTabItem;
+                    if (tabItem.TabId == asset.Name)
+                    {
+                        RemoveTab(tabItem);
+                        break;
+                    }
                 }
+
+                FrostyTaskWindow.Show("Reverting Asset", "", (task) => { App.AssetManager.RevertAsset(asset, suppressOnModify: false); });
+
+                dataExplorer.RefreshAll();
+                legacyExplorer.RefreshAll();
             }
-
-            FrostyTaskWindow.Show("Reverting Asset", "", (task) => { App.AssetManager.RevertAsset(entry, suppressOnModify: false); });
-
-            dataExplorer.RefreshAll();
-            legacyExplorer.RefreshAll();
         }
 
         private void contextMenuImportAsset_Click(object sender, RoutedEventArgs e)
@@ -1493,38 +1497,47 @@ namespace FrostyEditor.Windows
         }
         private void contextMenuCopyName_Click(object sender, RoutedEventArgs e)
         {
-            var selectedAsset = m_currentExplorer.SelectedAsset;
-            if (selectedAsset != null)
+            var selectedAssets = m_currentExplorer.SelectedAssets;
+            if (selectedAssets != null && selectedAssets.Count > 0)
             {
-                string fileName = selectedAsset.DisplayName;
-
-                // Check if the selected asset is a legacy file and append the file extension
-                if (selectedAsset is LegacyFileEntry legacyAsset)
+                StringBuilder names = new StringBuilder();
+                foreach (var asset in selectedAssets)
                 {
-                    fileName += "." + legacyAsset.Type.ToLower();
-                }
+                    string fileName = asset.DisplayName;
 
-                Clipboard.SetText(fileName);
+                    // Check if the selected asset is a legacy file and append the file extension
+                    if (asset is LegacyFileEntry legacyAsset)
+                    {
+                        fileName += "." + legacyAsset.Type.ToLower();
+                    }
+
+                    names.AppendLine(fileName);
+                }
+                Clipboard.SetText(names.ToString().TrimEnd());
             }
         }
         private void contextMenuCopyPath_Click(object sender, RoutedEventArgs e)
         {
-            var selectedAsset = m_currentExplorer.SelectedAsset;
-            if (selectedAsset != null)
+            var selectedAssets = m_currentExplorer.SelectedAssets;
+            if (selectedAssets != null && selectedAssets.Count > 0)
             {
-                string fileName = selectedAsset.DisplayName;
-
-                // Check if the selected asset is a legacy file and append the file extension
-                if (selectedAsset is LegacyFileEntry legacyAsset)
+                StringBuilder paths = new StringBuilder();
+                foreach (var asset in selectedAssets)
                 {
-                    fileName += "." + legacyAsset.Type.ToLower();
-                }
+                    string fileName = asset.DisplayName;
 
-                string fullPathWithFileName = System.IO.Path.Combine(selectedAsset.Path, fileName);
-                fullPathWithFileName = fullPathWithFileName.Replace('\\', '/');
-                Clipboard.SetText(fullPathWithFileName);
+                    // Check if the selected asset is a legacy file and append the file extension
+                    if (asset is LegacyFileEntry legacyAsset)
+                    {
+                        fileName += "." + legacyAsset.Type.ToLower();
+                    }
+
+                    string fullPathWithFileName = System.IO.Path.Combine(asset.Path, fileName);
+                    fullPathWithFileName = fullPathWithFileName.Replace('\\', '/');
+                    paths.AppendLine(fullPathWithFileName);
+                }
+                Clipboard.SetText(paths.ToString().TrimEnd());
             }
         }
-
     }
 }

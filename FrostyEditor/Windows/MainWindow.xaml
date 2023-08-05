@@ -438,7 +438,7 @@
                                 </Grid>
 
                                 <Grid Grid.Row="1" Margin="2" Background="{StaticResource ListBackground}">
-                                    <ListView x:Name="LoadedPluginsList">
+                                    <ListView x:Name="LoadedPluginsList" SelectionMode="Multiple">
                                         <ListView.View>
                                             <ctrl2:FrostyAutoSizedGridView>
                                                 <GridView.Columns>
