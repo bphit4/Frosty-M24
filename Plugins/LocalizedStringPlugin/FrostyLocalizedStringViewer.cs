@@ -107,8 +107,8 @@ namespace LocalizedStringPlugin
             CurrentFilterstringID = "";
             ComboFilterType = GetTemplateChild(PART_FilterType) as ComboBox;
             ComboFilterType.Items.Add("Display all strings");
-            ComboFilterType.Items.Add("Show only modified strings");
-            ComboFilterType.Items.Add("Show only unmodified strings");
+            ComboFilterType.Items.Add("Show Only Modified strings");
+            ComboFilterType.Items.Add("Show Only Unmodified strings");
             ComboFilterType.SelectedIndex = 0;
             ComboFilterType.SelectionChanged += ComboFilterType_SelectionChanged;
 

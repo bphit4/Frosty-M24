@@ -531,6 +531,10 @@ namespace FrostyEditor.Windows
             dataExplorer.ShowOnlyModified = false;
             legacyExplorer.ShowOnlyModified = false;
 
+            // reset show only unmodified flag
+            dataExplorer.ShowOnlyUnModified = false;
+            legacyExplorer.ShowOnlyUnModified = false;
+
             m_autoSaveTimer?.Start();
         }
 
@@ -644,6 +648,12 @@ namespace FrostyEditor.Windows
 
                 dataExplorer.ShowOnlyModified = false;
                 dataExplorer.ShowOnlyModified = true;
+
+                legacyExplorer.ShowOnlyUnModified = false;
+                legacyExplorer.ShowOnlyUnModified = true;
+
+                dataExplorer.ShowOnlyUnModified = false;
+                dataExplorer.ShowOnlyUnModified = true;
 
                 // report success
                 App.Logger.Log("Loaded {0}", m_project.Filename);
@@ -1481,5 +1491,40 @@ namespace FrostyEditor.Windows
 
             win.Show();
         }
+        private void contextMenuCopyName_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedAsset = m_currentExplorer.SelectedAsset;
+            if (selectedAsset != null)
+            {
+                string fileName = selectedAsset.DisplayName;
+
+                // Check if the selected asset is a legacy file and append the file extension
+                if (selectedAsset is LegacyFileEntry legacyAsset)
+                {
+                    fileName += "." + legacyAsset.Type.ToLower();
+                }
+
+                Clipboard.SetText(fileName);
+            }
+        }
+        private void contextMenuCopyPath_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedAsset = m_currentExplorer.SelectedAsset;
+            if (selectedAsset != null)
+            {
+                string fileName = selectedAsset.DisplayName;
+
+                // Check if the selected asset is a legacy file and append the file extension
+                if (selectedAsset is LegacyFileEntry legacyAsset)
+                {
+                    fileName += "." + legacyAsset.Type.ToLower();
+                }
+
+                string fullPathWithFileName = System.IO.Path.Combine(selectedAsset.Path, fileName);
+                fullPathWithFileName = fullPathWithFileName.Replace('\\', '/');
+                Clipboard.SetText(fullPathWithFileName);
+            }
+        }
+
     }
 }

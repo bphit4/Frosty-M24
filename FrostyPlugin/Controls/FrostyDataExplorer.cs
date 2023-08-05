@@ -105,6 +105,7 @@ namespace Frosty.Core.Controls
     }
 
     [TemplatePart(Name = PART_ShowOnlyModifiedCheckBox, Type = typeof(CheckBox))]
+    [TemplatePart(Name = PART_ShowOnlyUnModifiedCheckBox, Type = typeof(CheckBox))]
     [TemplatePart(Name = PART_FilterTextBox, Type = typeof(TextBox))]
     [TemplatePart(Name = PART_AssetTreeView, Type = typeof(TreeView))]
     [TemplatePart(Name = PART_AssetListView, Type = typeof(ListView))]
@@ -113,6 +114,7 @@ namespace Frosty.Core.Controls
         public string FilteredText { get => m_filterTextBox.Text; }
 
         private const string PART_ShowOnlyModifiedCheckBox = "PART_ShowOnlyModifiedCheckBox";
+        private const string PART_ShowOnlyUnModifiedCheckBox = "PART_ShowOnlyUnModifiedCheckBox";
         private const string PART_FilterTextBox = "PART_FilterTextBox";
         private const string PART_AssetTreeView = "PART_AssetTreeView";
         private const string PART_AssetListView = "PART_AssetListView";
@@ -173,6 +175,16 @@ namespace Frosty.Core.Controls
             ctrl.UpdateTreeView();
         }
         #endregion
+        public static readonly DependencyProperty ShowOnlyUnModifiedProperty = DependencyProperty.Register(nameof(ShowOnlyUnModified), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(false, OnShowOnlyUnModifiedChanged));
+        public bool ShowOnlyUnModified {
+            get => (bool)GetValue(ShowOnlyUnModifiedProperty);
+            set => SetValue(ShowOnlyUnModifiedProperty, value);
+        }
+        private static void OnShowOnlyUnModifiedChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            FrostyDataExplorer ctrl = o as FrostyDataExplorer;
+            ctrl.UpdateTreeView();
+        }
 
         #region -- MultiSelect --
         public static readonly DependencyProperty MultiSelectProperty = DependencyProperty.Register(nameof(MultiSelect), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(null));
@@ -618,6 +630,9 @@ namespace Frosty.Core.Controls
                 if (ShowOnlyModified && !entry.IsModified)
                     continue;
 
+                if (ShowOnlyUnModified && entry.IsModified)
+                    continue;
+
                 if (!FilterText(entry.Name, entry))
                     continue;
 
@@ -689,6 +704,8 @@ namespace Frosty.Core.Controls
             foreach (AssetEntry entry in ItemsSource)
             {
                 if (ShowOnlyModified && !entry.IsModified)
+                    continue;
+                if (ShowOnlyUnModified && entry.IsModified)
                     continue;
                 if (entry.Path.Equals(fullPath, StringComparison.OrdinalIgnoreCase))
                 {

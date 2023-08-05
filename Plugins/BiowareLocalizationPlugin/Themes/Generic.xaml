@@ -52,8 +52,8 @@
                                             <Button Grid.Column="5" Name="PART_SearchTextButton" ClickMode="Press" Margin="8,0,4,2" Padding="10,0,10,0"
                                                     ToolTip="Opens a new window to search for a text in the currently displayed range of text ids">Search for Text</Button>
                                             <CheckBox Grid.Column="6" Name="PART_ModifiedOnlyCB" IsThreeState="False" Margin="6,2,2,1">
-                                                <Label Content="Show only modified" Margin="0,-5,0,0"
-                                                       ToolTip="Shows only modified or added texts when enabled."/>
+                                                <Label Content="Show Only Modified" Margin="0,-5,0,0"
+                                                       ToolTip="Shows Only Modified or added texts when enabled."/>
                                             </CheckBox>
                                             <Label Grid.Column="7" Content="Select Resource(s):" Margin="10,-2,4,0"/>
                                             <ComboBox Grid.Column="8" Name="PART_ResourceSelector" BorderThickness="1" Width="Auto" Height="Auto"/>

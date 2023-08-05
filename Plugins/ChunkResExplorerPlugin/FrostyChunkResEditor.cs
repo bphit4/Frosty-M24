@@ -98,6 +98,7 @@ namespace ChunkResEditorPlugin
     [TemplatePart(Name = PART_RevertMenuItem, Type = typeof(MenuItem))]
     [TemplatePart(Name = PART_ChunkFilter, Type = typeof(TextBox))]
     [TemplatePart(Name = PART_ChunkModified, Type = typeof(CheckBox))]
+    [TemplatePart(Name = PART_ChunkUnModified, Type = typeof(CheckBox))]
     public class FrostyChunkResEditor : FrostyBaseEditor
     {
         public override ImageSource Icon => ChunkResEditorMenuExtension.imageSource;
@@ -111,6 +112,7 @@ namespace ChunkResEditorPlugin
         private const string PART_RevertMenuItem = "PART_RevertMenuItem";
         private const string PART_ChunkFilter = "PART_ChunkFilter";
         private const string PART_ChunkModified = "PART_ChunkModified";
+        private const string PART_ChunkUnModified = "PART_ChunkUnModified";
 
         private ListBox chunksListBox;
         private ListBox chunksBundleBox;
@@ -118,6 +120,7 @@ namespace ChunkResEditorPlugin
         private ListBox resBundleBox;
         private TextBox chunkFilterTextBox;
         private CheckBox chunkModifiedBox;
+        private CheckBox chunkUnModifiedBox;
         private ILogger logger;
 
         static FrostyChunkResEditor()
@@ -140,6 +143,7 @@ namespace ChunkResEditorPlugin
             resExplorer = GetTemplateChild(PART_ResExplorer) as FrostyDataExplorer;
             chunkFilterTextBox = GetTemplateChild(PART_ChunkFilter) as TextBox;
             chunkModifiedBox = GetTemplateChild(PART_ChunkModified) as CheckBox;
+            chunkUnModifiedBox = GetTemplateChild(PART_ChunkUnModified) as CheckBox;
 
             resExplorer.SelectionChanged += ResExplorer_SelectionChanged;
             MenuItem mi = GetTemplateChild(PART_ResExportMenuItem) as MenuItem;
@@ -157,6 +161,8 @@ namespace ChunkResEditorPlugin
             chunkFilterTextBox.KeyUp += ChunkFilterTextBox_KeyUp;
             chunkModifiedBox.Checked += ChunkFilterTextBox_LostFocus;
             chunkModifiedBox.Unchecked += ChunkFilterTextBox_LostFocus;
+            chunkUnModifiedBox.Checked += ChunkFilterTextBox_LostFocus;
+            chunkUnModifiedBox.Unchecked += ChunkFilterTextBox_LostFocus;
         }
 
         private void ResExplorer_SelectionChanged(object sender, RoutedEventArgs e)
@@ -252,22 +258,30 @@ namespace ChunkResEditorPlugin
 
         private void UpdateFilter()
         {
-            if (chunkFilterTextBox.Text == "" & chunkModifiedBox.IsChecked == false)
+            if (chunkFilterTextBox.Text == "" & chunkModifiedBox.IsChecked == false & chunkUnModifiedBox.IsChecked == false)
             {
                 chunksListBox.Items.Filter = null;
                 return;
             }
-            else if (chunkFilterTextBox.Text != "" & chunkModifiedBox.IsChecked == false)
+            else if (chunkFilterTextBox.Text != "" & chunkModifiedBox.IsChecked == false & chunkUnModifiedBox.IsChecked == false)
             {
                 chunksListBox.Items.Filter = new Predicate<object>((object a) => ((ChunkAssetEntry)a).Id.ToString().Contains(chunkFilterTextBox.Text.ToLower()));
             }
-            else if (chunkFilterTextBox.Text == "" & chunkModifiedBox.IsChecked == true)
+            else if (chunkFilterTextBox.Text == "" & chunkModifiedBox.IsChecked == true & chunkUnModifiedBox.IsChecked == false)
             {
                 chunksListBox.Items.Filter = new Predicate<object>((object a) => ((ChunkAssetEntry)a).IsModified);
             }
-            else if (chunkFilterTextBox.Text != "" & chunkModifiedBox.IsChecked == true)
+            else if (chunkFilterTextBox.Text == "" & chunkModifiedBox.IsChecked == false & chunkUnModifiedBox.IsChecked == true)
+            {
+                chunksListBox.Items.Filter = new Predicate<object>((object a) => !((ChunkAssetEntry)a).IsModified);
+            }
+            else if (chunkFilterTextBox.Text != "" & chunkModifiedBox.IsChecked == true & chunkUnModifiedBox.IsChecked == false)
             {
                 chunksListBox.Items.Filter = new Predicate<object>((object a) => (((ChunkAssetEntry)a).IsModified) & ((ChunkAssetEntry)a).Id.ToString().Contains(chunkFilterTextBox.Text.ToLower()));
+            }
+            else if (chunkFilterTextBox.Text != "" & chunkModifiedBox.IsChecked == false & chunkUnModifiedBox.IsChecked == true)
+            {
+                chunksListBox.Items.Filter = new Predicate<object>((object a) => (!((ChunkAssetEntry)a).IsModified) & ((ChunkAssetEntry)a).Id.ToString().Contains(chunkFilterTextBox.Text.ToLower()));
             }
         }
 

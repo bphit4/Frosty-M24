@@ -188,7 +188,10 @@
                                     </Button>
                                     <!-- Show Only Modified -->
                                     <CheckBox x:Name="PART_ShowOnlyModifiedCheckBox" VerticalAlignment="Center" Margin="6,0,0,0" IsChecked="{Binding Path=ShowOnlyModified, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}">
-                                        <TextBlock Text="Show only modified" Margin="4,-1,0,0" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
+                                        <TextBlock Text="Show Only Modified" Margin="4,-1,0,0" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
+                                    </CheckBox>
+                                    <CheckBox x:Name="PART_ShowOnlyUnModifiedCheckBox" VerticalAlignment="Center" Margin="6,0,0,0" IsChecked="{Binding Path=ShowOnlyUnModified, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}">
+                                        <TextBlock Text="Show Only Unmodified" Margin="4,-1,0,0" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
                                     </CheckBox>
                                 </StackPanel>
                             </Border>

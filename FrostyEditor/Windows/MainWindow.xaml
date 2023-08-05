@@ -670,6 +670,17 @@
                                                     <Image Source="/FrostyEditor;component/Images/Import.png"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
+                                            <Separator/>
+                                            <MenuItem Header="Copy Name" Click="contextMenuCopyName_Click">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/FrostyEditor;component/Images/Copy.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Copy Path" Click="contextMenuCopyPath_Click">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/FrostyEditor;component/Images/Copy.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                         </ContextMenu>
                                     </core:FrostyDataExplorer.AssetContextMenu>
                                 </core:FrostyDataExplorer>
@@ -698,6 +709,17 @@
                                             <MenuItem Header="Import" Click="contextMenuImportAsset_Click">
                                                 <MenuItem.Icon>
                                                     <Image Source="/FrostyEditor;component/Images/Import.png" Opacity="0.5"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator/>
+                                            <MenuItem Header="Copy Name" Click="contextMenuCopyName_Click">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/FrostyEditor;component/Images/Copy.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Copy Path" Click="contextMenuCopyPath_Click">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/FrostyEditor;component/Images/Copy.png"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                         </ContextMenu>

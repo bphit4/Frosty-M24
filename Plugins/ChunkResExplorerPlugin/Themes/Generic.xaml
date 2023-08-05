@@ -37,7 +37,9 @@
                                 </Grid.RowDefinitions>
                                 <DockPanel Grid.Row="0" LastChildFill="True" Background="{StaticResource ControlBackground}">
                                     <CheckBox x:Name="PART_ChunkModified" Margin="0, 2, 0, 0" BorderThickness="1" VerticalContentAlignment="Center"/>
-                                    <Label Content="Show only modified " Margin="0, 2, 0, 0" FontFamily="Global User Interface"/>
+                                    <Label Content="Show Only Modified " Margin="0, 2, 0, 0" FontFamily="Global User Interface"/>
+                                    <CheckBox x:Name="PART_ChunkUnModified" Margin="0, 2, 0, 0" BorderThickness="1" VerticalContentAlignment="Center"/>
+                                    <Label Content="Show Only Unmodified " Margin="0, 2, 0, 0" FontFamily="Global User Interface"/>
                                 </DockPanel>
                                 <TextBox Grid.Row="1" x:Name="PART_ChunkFilter" BorderThickness="1" Margin="1" VerticalContentAlignment="Center"/>
 
