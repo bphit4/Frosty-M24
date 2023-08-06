@@ -42,7 +42,7 @@
                                     <ctrl:FrostyWatermarkTextBox x:Name="PART_BundleFilterTextBox" Margin="1,0,1,1" WatermarkText="Filter" BorderThickness="1"/>
                                 </Grid>
                                 
-                                <ListBox Grid.Row="2" x:Name="PART_BundlesListBox">
+                                <ListBox Grid.Row="2" x:Name="PART_BundlesListBox" SelectionMode="Extended">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" Foreground="{StaticResource FontColor}" FontFamily="MS Reference Sans Serif"/>
@@ -70,8 +70,8 @@
                                 </Border>
 
                                 <TextBox x:Name="PART_SuperBundleTextBox" Grid.Row="1" Margin="1,0,1,0" VerticalContentAlignment="Center" Height="22" BorderThickness="1" FontFamily="MS Reference Sans Serif" IsReadOnly="True"/>
-                                
-                                <core:FrostyDataExplorer x:Name="PART_DataExplorer" Grid.Row="2"/>
+
+                                <core:FrostyDataExplorer x:Name="PART_DataExplorer" Grid.Row="2" MultiSelect="True"/>
                             </Grid>
                         </ctrl:FrostyDockablePanel>
                         

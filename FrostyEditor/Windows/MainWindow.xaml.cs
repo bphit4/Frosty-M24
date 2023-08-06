@@ -980,31 +980,53 @@ namespace FrostyEditor.Windows
 
         private void contextMenuImportAsset_Click(object sender, RoutedEventArgs e)
         {
-            LegacyFileEntry selectedAsset = legacyExplorer.SelectedAsset as LegacyFileEntry;
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Legacy file", "*." + selectedAsset.Type + " (Legacy Files)|*." + selectedAsset.Type, "FifaLegacy")
+            IList<LegacyFileEntry> assets = legacyExplorer.SelectedAssets.Cast<LegacyFileEntry>().ToList();
+
+            if (assets.Count == 0)
+            {
+                App.Logger.Log("[Core] No assets selected for import.");
+                return;
+            }
+
+            LegacyFileEntry firstAsset = assets[0];
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Legacy file", "*." + firstAsset.Type + " (Legacy Files)|*." + firstAsset.Type, "FifaLegacy")
             {
                 Multiselect = true // Allow multiple file selection
             };
 
             if (ofd.ShowDialog())
             {
+                Dictionary<string, LegacyFileEntry> assetDict = assets.ToDictionary(a => Path.GetFileNameWithoutExtension(a.Name).ToLower() + "." + a.Type.ToLower(), a => a);
+
                 foreach (var fileName in ofd.FileNames)
                 {
-                    FrostyTaskWindow.Show("Importing Legacy Asset", "", (task) =>
+                    string fileKey = Path.GetFileNameWithoutExtension(fileName).ToLower() + "." + Path.GetExtension(fileName).TrimStart('.').ToLower();
+
+                    if (assetDict.ContainsKey(fileKey))
                     {
-                        byte[] buffer;
-                        using (NativeReader reader = new NativeReader(new FileStream(fileName, FileMode.Open, FileAccess.Read)))
-                            buffer = reader.ReadToEnd();
+                        LegacyFileEntry asset = assetDict[fileKey];
 
-                        App.AssetManager.ModifyCustomAsset("legacy", selectedAsset.Name, buffer);
-                    });
+                        App.Logger.Log("[Core] Attempting to import file: {0}", fileName);
 
-                    App.Logger.Log("{0} imported to {1}", fileName, selectedAsset.Name);
+                        FrostyTaskWindow.Show("Importing Legacy Asset", "", (task) =>
+                        {
+                            byte[] buffer;
+                            using (NativeReader reader = new NativeReader(new FileStream(fileName, FileMode.Open, FileAccess.Read)))
+                                buffer = reader.ReadToEnd();
+
+                            App.AssetManager.ModifyCustomAsset("legacy", asset.Name, buffer);
+                        });
+
+                        App.Logger.Log("{0} imported to {1}", fileName, asset.Name);
+                    }
+                    else
+                    {
+                        App.Logger.Log("[Core] No matching asset found for file: {0}", fileName);
+                    }
                 }
                 legacyExplorer.RefreshItems();
             }
         }
-
 
         private void contextMenuExportAsset_Click(object sender, RoutedEventArgs e)
         {
@@ -1049,56 +1071,98 @@ namespace FrostyEditor.Windows
 
         private void contextMenuImportEbx_Click(object sender, RoutedEventArgs e)
         {
-            EbxAssetEntry entry = dataExplorer.SelectedAsset as EbxAssetEntry;
-
-            AssetDefinition assetDefinition = App.PluginManager.GetAssetDefinition(entry.Type) ?? new AssetDefinition();
-
-            List<AssetImportType> filters = new List<AssetImportType>();
-            assetDefinition.GetSupportedImportTypes(filters);
-
-            string filterString = "";
-            foreach (AssetImportType filter in filters)
-                filterString += "|" + filter.FilterString;
-            filterString = filterString.Trim('|');
-
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Asset", filterString, assetDefinition.GetType().Name)
+            try
             {
-                Multiselect = true // Allow multiple file selection
-            };
-            if (ofd.ShowDialog())
-            {
-                foreach (var fileName in ofd.FileNames)
+                App.Logger.Log("Starting Ebx Import...");
+
+                IList<AssetEntry> assets = dataExplorer.SelectedAssets;
+                if (assets.Count == 0)
                 {
-                    if (assetDefinition.Import(entry, fileName, filters[ofd.FilterIndex - 1].Extension))
+                    App.Logger.Log("No assets selected.");
+                    return;
+                }
+
+                // Log the selected assets for debugging
+                foreach (var asset in assets)
+                {
+                    App.Logger.Log($"Selected asset: {asset.Name}");
+                }
+
+                EbxAssetEntry firstEntry = assets[0] as EbxAssetEntry;
+                AssetDefinition assetDefinition = App.PluginManager.GetAssetDefinition(firstEntry.Type) ?? new AssetDefinition();
+
+                List<AssetImportType> filters = new List<AssetImportType>();
+                assetDefinition.GetSupportedImportTypes(filters);
+
+                string filterString = "";
+                foreach (AssetImportType filter in filters)
+                    filterString += "|" + filter.FilterString;
+                filterString = filterString.Trim('|');
+
+                FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Asset", filterString, assetDefinition.GetType().Name)
+                {
+                    Multiselect = true
+                };
+                if (ofd.ShowDialog())
+                {
+                    App.Logger.Log("File dialog opened successfully.");
+                    foreach (var fileName in ofd.FileNames)
                     {
-                        dataExplorer.RefreshItems();
-                        App.Logger.Log("Imported {0} into {1}", fileName, entry.Name);
+                        App.Logger.Log($"Attempting to import file: {fileName}");
+                        string assetName = Path.GetFileNameWithoutExtension(fileName);
+                        EbxAssetEntry matchingAsset = assets.FirstOrDefault(a => a.Name.EndsWith(assetName, StringComparison.OrdinalIgnoreCase)) as EbxAssetEntry;
+
+                        if (matchingAsset != null && assetDefinition.Import(matchingAsset, fileName, filters[ofd.FilterIndex - 1].Extension))
+                        {
+                            dataExplorer.RefreshItems();
+                            App.Logger.Log("Imported {0} into {1}", fileName, matchingAsset.Name);
+                        }
+                        else
+                        {
+                            App.Logger.Log($"Failed to import {fileName} into {matchingAsset?.Name ?? "null"}");
+                        }
                     }
                 }
+                else
+                {
+                    App.Logger.Log("File dialog was cancelled or failed to open.");
+                }
+            }
+            catch (Exception ex)
+            {
+                App.Logger.LogError($"Error during Ebx import: {ex.Message}");
             }
         }
 
         private void contextMenuExportEbx_Click(object sender, RoutedEventArgs e)
         {
-            EbxAssetEntry entry = (EbxAssetEntry)dataExplorer.SelectedAsset;
-            if (entry != null)
+            IList<AssetEntry> assets = dataExplorer.SelectedAssets;
+            if (assets.Count == 0)
+                return;
+
+            EbxAssetEntry entry = (EbxAssetEntry)assets[0];
+            AssetDefinition assetDefinition = App.PluginManager.GetAssetDefinition(entry.Type) ?? new AssetDefinition();
+
+            List<AssetExportType> filters = new List<AssetExportType>();
+            assetDefinition.GetSupportedExportTypes(filters);
+
+            string filterString = "";
+            foreach (AssetExportType filter in filters)
+                filterString += "|" + filter.FilterString;
+            filterString = filterString.Trim('|');
+
+            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Asset", filterString, assetDefinition.GetType().Name, entry.Filename);
+            if (sfd.ShowDialog())
             {
-                AssetDefinition assetDefinition = App.PluginManager.GetAssetDefinition(entry.Type) ?? new AssetDefinition();
-
-                List<AssetExportType> filters = new List<AssetExportType>();
-                assetDefinition.GetSupportedExportTypes(filters);
-
-                string filterString = "";
-                foreach (AssetExportType filter in filters)
-                    filterString += "|" + filter.FilterString;
-                filterString = filterString.Trim('|');
-
-                FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Asset", filterString, assetDefinition.GetType().Name, entry.Filename);
-                if (sfd.ShowDialog())
+                string directoryPath = Path.GetDirectoryName(sfd.FileName);
+                foreach (EbxAssetEntry asset in assets)
                 {
-                    if (assetDefinition.Export(entry, sfd.FileName, filters[sfd.FilterIndex - 1].Extension))
+                    string extension = filters[sfd.FilterIndex - 1].Extension.StartsWith(".") ? filters[sfd.FilterIndex - 1].Extension : "." + filters[sfd.FilterIndex - 1].Extension;
+                    string assetFileName = Path.Combine(directoryPath, asset.Filename + extension);
+
+                    if (assetDefinition.Export(asset, assetFileName, filters[sfd.FilterIndex - 1].Extension))
                     {
-                        App.Logger.Log("Exported {0} to {1}", entry.Name, sfd.FileName);
+                        App.Logger.Log("Exported {0} to {1}", asset.Name, assetFileName);
                     }
                 }
             }

@@ -326,7 +326,7 @@ namespace TexturePlugin
             screen.MipLevel = m_mipsComboBox.SelectedIndex;
         }
 
-        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        public void ImportButton_Click(object sender, RoutedEventArgs e)
         {
             FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "DDS (*.dds)|*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr", "Texture");
             if (m_textureAsset.Type != TextureType.TT_2d)
@@ -833,7 +833,7 @@ namespace TexturePlugin
             logger.Log("Texture successfully exported to " + sfd.FileName);
         }
 
-        private void GetPixelFormat(TextureUtils.DDSHeader header, out string pixelFormat, out TextureFlags flags)
+        public void GetPixelFormat(TextureUtils.DDSHeader header, out string pixelFormat, out TextureFlags flags)
         {
             pixelFormat = "Unknown";
             flags = 0;

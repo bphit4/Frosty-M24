@@ -646,7 +646,7 @@
 
                         <ctrl2:FrostyTabItem x:Name="dataExplorerTabItem" Icon="/FrostyEditor;component/Images/Database.png" Header="Data Explorer" CloseButtonVisible="False">
                             <Border BorderBrush="{StaticResource ControlBackground}" BorderThickness="0,2,0,0">
-                                <core:FrostyDataExplorer x:Name="dataExplorer" SelectedAssetDoubleClick="dataExplorer_SelectedAssetDoubleClick" SelectionChanged="dataExplorer_SelectionChanged" BookmarkContext="Asset Bookmarks">
+                                <core:FrostyDataExplorer x:Name="dataExplorer" MultiSelect="True" SelectedAssetDoubleClick="dataExplorer_SelectedAssetDoubleClick" SelectionChanged="dataExplorer_SelectionChanged" BookmarkContext="Asset Bookmarks">
                                     <core:FrostyDataExplorer.AssetContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Open" Click="contextMenuOpen_Click">
