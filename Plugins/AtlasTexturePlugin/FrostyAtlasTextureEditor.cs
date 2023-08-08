@@ -312,7 +312,7 @@ namespace AtlasTexturePlugin
             DefaultStyleKeyProperty.OverrideMetadata(typeof(FrostyAtlasTextureEditor), new FrameworkPropertyMetadata(typeof(FrostyAtlasTextureEditor)));
         }
 
-        public FrostyAtlasTextureEditor(ILogger inLogger) 
+        public FrostyAtlasTextureEditor(ILogger inLogger)
             : base(inLogger)
         {
         }
@@ -330,7 +330,7 @@ namespace AtlasTexturePlugin
             List<ToolbarItem> toolbarItems = base.RegisterToolbarItems();
             toolbarItems.Add(new ToolbarItem("Export", "Export Atlas Texture", "Images/Export.png", new RelayCommand((object state) => { ExportButton_Click(this, new RoutedEventArgs()); })));
             toolbarItems.Add(new ToolbarItem("Import", "Import Atlas Texture", "Images/Import.png", new RelayCommand((object state) => { ImportButton_Click(this, new RoutedEventArgs()); })));
-            
+
             return toolbarItems;
         }
 
@@ -368,7 +368,7 @@ namespace AtlasTexturePlugin
                         logger.LogError("Atlas textures cannot be greater than 16384 pixels in width or height.");
                     }
 
-                    if(!bFailed)
+                    if (!bFailed)
                     {
                         ResAssetEntry resEntry = App.AssetManager.GetResEntry(resRid);
                         ChunkAssetEntry chunkEntry = App.AssetManager.GetChunkEntry(texture.ChunkId);
@@ -418,7 +418,7 @@ namespace AtlasTexturePlugin
                         dwWidth = texture.Width,
                         dwMipMapCount = texture.MipCount,
                         dwPitchOrLinearSize = (int)texture.Data.Length,
-                        ddspf = {dwFourCC = 0x35545844}
+                        ddspf = { dwFourCC = 0x35545844 }
                     };
 
                     texture.Data.Position = 0;

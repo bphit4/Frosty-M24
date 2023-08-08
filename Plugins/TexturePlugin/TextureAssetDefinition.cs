@@ -24,10 +24,10 @@ namespace TexturePlugin
 
         public override void GetSupportedExportTypes(List<AssetExportType> exportTypes)
         {
-            exportTypes.Add(new AssetExportType("dds", "Direct Draw Surface"));
             exportTypes.Add(new AssetExportType("png", "Portable Network Graphics"));
             exportTypes.Add(new AssetExportType("tga", "Truevision TGA"));
             exportTypes.Add(new AssetExportType("hdr", "High Dynamic Range"));
+            exportTypes.Add(new AssetExportType("dds", "Direct Draw Surface"));
 
             base.GetSupportedExportTypes(exportTypes);
         }
@@ -78,7 +78,7 @@ namespace TexturePlugin
         {
             if (!base.Export(entry, path, filterType))
             {
-                if (filterType == "dds" || filterType == "png" || filterType == "tga" || filterType == "hdr")
+                if (filterType == "png" || filterType == "tga" || filterType == "hdr" || filterType == "dds")
                 {
                     EbxAsset asset = App.AssetManager.GetEbx(entry);
                     dynamic textureAsset = (dynamic)asset.RootObject;

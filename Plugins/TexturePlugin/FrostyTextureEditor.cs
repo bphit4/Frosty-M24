@@ -42,10 +42,10 @@ namespace TexturePlugin
 
     public enum ImageFormat
     {
-        DDS,
         PNG,
         TGA,
-        HDR
+        HDR,
+        DDS
     }
 
     public struct TextureImportOptions
@@ -182,7 +182,7 @@ namespace TexturePlugin
             {
                 ZoomSlider.ValueChanged += ZoomSlider_ValueChanged;
             }
- 
+
             Button zoomResetButton = GetTemplateChild("ZoomResetButton") as Button;
             if (zoomResetButton != null)
             {
@@ -328,7 +328,7 @@ namespace TexturePlugin
 
         public void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "DDS (*.dds)|*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr", "Texture");
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture");
             if (m_textureAsset.Type != TextureType.TT_2d)
             {
                 ofd.Multiselect = true;
@@ -764,7 +764,7 @@ namespace TexturePlugin
             ImageFormat format = ImageFormat.PNG;
             bool bResult = false;
 
-            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", "DDS (*.dds)|*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr", "Texture", AssetEntry.Filename, false);
+            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture", AssetEntry.Filename, false);
             while (true)
             {
                 string initialDir = sfd.InitialDirectory;
@@ -825,7 +825,7 @@ namespace TexturePlugin
 
             FrostyTaskWindow.Show("Exporting Texture", AssetEntry.Filename, (task) =>
             {
-                string[] filters = new string[] { "*.dds", "*.png", "*.tga", "*.hdr" };
+                string[] filters = new string[] { "*.png", "*.tga", "*.hdr", "*.dds" };
 
                 TextureExporter exporter = new TextureExporter();
                 exporter.Export(m_textureAsset, sfd.FileName, filters[sfd.FilterIndex - 1]);

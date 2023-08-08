@@ -102,7 +102,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <Reference Include="System.Core" />
@@ -243,6 +242,10 @@
     <ProjectReference Include="..\FrostyControls\FrostyControls.csproj">
       <Project>{51d3305b-48d0-4d4c-9d64-727185420eac}</Project>
       <Name>FrostyControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\TexturePlugin\TexturePlugin.csproj">
+      <Project>{a5c604c2-f88c-47d8-995d-fe15266edd0e}</Project>
+      <Name>TexturePlugin</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

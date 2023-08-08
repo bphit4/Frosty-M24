@@ -988,8 +988,11 @@ namespace FrostyEditor.Windows
                 return;
             }
 
-            LegacyFileEntry firstAsset = assets[0];
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Legacy file", "*." + firstAsset.Type + " (Legacy Files)|*." + firstAsset.Type, "FifaLegacy")
+            // Create a filter string based on all selected asset types.
+            string filter = string.Join(";", assets.Select(a => "*." + a.Type));
+            string description = string.Join(", ", assets.Select(a => "*." + a.Type)) + " (Legacy Files)";
+
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Legacy file", description + "|" + filter, "FifaLegacy")
             {
                 Multiselect = true // Allow multiple file selection
             };
@@ -1033,10 +1036,13 @@ namespace FrostyEditor.Windows
             if (legacyExplorer.SelectedAssets.Count == 0)
                 return;
 
-            LegacyFileEntry selectedAsset = (LegacyFileEntry)legacyExplorer.SelectedAssets[0];
-            if (selectedAsset != null)
+            IList<AssetEntry> assets = legacyExplorer.SelectedAssets;
+            string saveFolderPath = "";
+
+            if (assets.Count == 1) // Just one asset selected
             {
-                SaveFileDialog sfd = new SaveFileDialog
+                LegacyFileEntry selectedAsset = (LegacyFileEntry)assets[0];
+                Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog
                 {
                     Title = "Save Legacy File",
                     Filter = "*." + selectedAsset.Type + " (Legacy Files)|*." + selectedAsset.Type,
@@ -1045,27 +1051,45 @@ namespace FrostyEditor.Windows
 
                 if (sfd.ShowDialog() == true)
                 {
-                    IList<AssetEntry> assets = legacyExplorer.SelectedAssets;
-                    FrostyTaskWindow.Show("Exporting Legacy Assets", "", (task) =>
-                    {
-                        App.AssetManager.SendManagerCommand("legacy", "SetCacheModeEnabled", true);
-                        FileInfo fi = new FileInfo(sfd.FileName);
-
-                        int progress = 0;
-                        foreach (LegacyFileEntry asset in assets)
-                        {
-                            task.Update(asset.Name, (progress / (double)assets.Count) * 100.0);
-                            progress++;
-
-                            string outFileName = fi.Directory.FullName + "\\" + asset.Filename + "." + asset.Type;
-                            using (NativeWriter writer = new NativeWriter(new FileStream(outFileName, FileMode.Create)))
-                                writer.Write(new NativeReader(App.AssetManager.GetCustomAsset("legacy", asset)).ReadToEnd());
-                        }
-
-                        App.Logger.Log("Legacy files saved to {0}", fi.Directory.FullName);
-                        App.AssetManager.SendManagerCommand("legacy", "FlushCache");
-                    });
+                    saveFolderPath = new FileInfo(sfd.FileName).DirectoryName;
                 }
+            }
+            else // Multiple assets selected
+            {
+                Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog
+                {
+                    Title = "Select a Folder",
+                    CheckFileExists = false,
+                    FileName = "[Select Folder]",
+                    ValidateNames = false
+                };
+
+                if (ofd.ShowDialog() == true)
+                {
+                    saveFolderPath = System.IO.Path.GetDirectoryName(ofd.FileName);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(saveFolderPath))
+            {
+                FrostyTaskWindow.Show("Exporting Legacy Assets", "", (task) =>
+                {
+                    App.AssetManager.SendManagerCommand("legacy", "SetCacheModeEnabled", true);
+
+                    int progress = 0;
+                    foreach (LegacyFileEntry asset in assets)
+                    {
+                        task.Update(asset.Name, (progress / (double)assets.Count) * 100.0);
+                        progress++;
+
+                        string outFileName = saveFolderPath + "\\" + asset.Filename + "." + asset.Type;
+                        using (NativeWriter writer = new NativeWriter(new FileStream(outFileName, FileMode.Create)))
+                            writer.Write(new NativeReader(App.AssetManager.GetCustomAsset("legacy", asset)).ReadToEnd());
+                    }
+
+                    App.Logger.Log("Legacy files saved to {0}", saveFolderPath);
+                    App.AssetManager.SendManagerCommand("legacy", "FlushCache");
+                });
             }
         }
 
@@ -1109,8 +1133,18 @@ namespace FrostyEditor.Windows
                     foreach (var fileName in ofd.FileNames)
                     {
                         App.Logger.Log($"Attempting to import file: {fileName}");
-                        string assetName = Path.GetFileNameWithoutExtension(fileName);
-                        EbxAssetEntry matchingAsset = assets.FirstOrDefault(a => a.Name.EndsWith(assetName, StringComparison.OrdinalIgnoreCase)) as EbxAssetEntry;
+                        EbxAssetEntry matchingAsset;
+
+                        if (ofd.FileNames.Length == 1 && assets.Count == 1)
+                        {
+                            // If only one file and one asset, directly use the asset.
+                            matchingAsset = assets[0] as EbxAssetEntry;
+                        }
+                        else
+                        {
+                            string assetName = Path.GetFileNameWithoutExtension(fileName);
+                            matchingAsset = assets.FirstOrDefault(a => a.Name.EndsWith(assetName, StringComparison.OrdinalIgnoreCase)) as EbxAssetEntry;
+                        }
 
                         if (matchingAsset != null && assetDefinition.Import(matchingAsset, fileName, filters[ofd.FilterIndex - 1].Extension))
                         {
