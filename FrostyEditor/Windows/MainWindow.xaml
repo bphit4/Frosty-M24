@@ -654,6 +654,11 @@
                                                     <Image Source="/FrostyEditor;component/Images/OpenAsset.png"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
+                                            <MenuItem Header="Open Original" Click="contextMenuOpenOriginal_Click" Loaded="contextMenuOpenOriginal_Loaded">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/FrostyEditor;component/Images/OpenAsset.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                             <MenuItem Header="Revert" Click="contextMenuRevert_Click">
                                                 <MenuItem.Icon>
                                                     <Image Source="/FrostyEditor;component/Images/Revert.png"/>

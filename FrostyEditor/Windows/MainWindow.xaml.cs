@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
+using System.Xml.Serialization;
 using Frosty.Controls;
 using Frosty.Core;
 using Frosty.Core.Commands;
@@ -241,9 +242,18 @@ namespace FrostyEditor.Windows
                 {
                     AssetEntry ebx = App.AssetManager.GetEbxEntry(tabId) ?? App.AssetManager.GetCustomAssetEntry("legacy", tabId);
 
-                    state = "Viewing " + ebx.Filename;
-                    if (ebx.IsDirty && ProfilesLibrary.EnableExecution)
-                        state = "Editing " + ebx.Filename;
+                    var action = "Viewing";
+                    var filename = "a file";
+
+                    if (ebx != null)
+                    {
+                        filename = ebx.Filename;
+
+                        if (ebx.IsDirty && ProfilesLibrary.EnableExecution)
+                            action = "Editing";
+                    }
+
+                    state = action + " " + filename;
                 }
                 else
                     state = header;
@@ -714,8 +724,19 @@ namespace FrostyEditor.Windows
             return null;
         }
 
-        public void OpenAsset(AssetEntry asset, bool shouldCreateDefaultEditor = true)
+        public void OpenAsset(AssetEntry asset, bool shouldCreateDefaultEditor = true, bool openOriginal = false)
         {
+            var assetName = asset.Name;
+            var assetDisplayName = asset.DisplayName;
+
+            if (openOriginal == true)
+            {
+                var originalSuffix = " [ORIGINAL]";
+                assetName += originalSuffix;
+                assetDisplayName += originalSuffix;
+                assetDisplayName = assetDisplayName.Replace("*", "");   // don't show the original as modified.
+            }
+
             if (asset == null)
             {
                 return;
@@ -728,7 +749,7 @@ namespace FrostyEditor.Windows
 
             foreach (FrostyTabItem currentTi in TabControl.Items)
             {
-                if (currentTi.TabId == asset.Name)
+                if (currentTi.TabId == assetName)
                 {
                     currentTi.IsSelected = true;
                     return;
@@ -756,7 +777,7 @@ namespace FrostyEditor.Windows
 
             try
             {
-                editor.SetAsset(asset);
+                editor.SetAsset(asset, openOriginal);
             }
             catch (Exception)
             {
@@ -780,8 +801,8 @@ namespace FrostyEditor.Windows
 
             ti.Icon = (new AssetEntryToBitmapSourceConverter().Convert(asset, typeof(ImageSource), null, null) as ImageSource);
             ti.Content = editor;
-            ti.Header = asset.DisplayName;
-            ti.TabId = asset.Name;
+            ti.Header = assetDisplayName;
+            ti.TabId = assetName;
             ti.IsSelected = true;
             ti.CloseButtonVisible = true;
             ti.CloseButtonClick += (s, o) =>
@@ -863,7 +884,7 @@ namespace FrostyEditor.Windows
             {
                 if (item.Content is FrostyAssetEditor editor)
                 {
-                    if (editor.AssetEntry != null)
+                    if (editor.AssetEntry != null && !editor.IsReadOnly)
                         item.Header = editor.AssetEntry.DisplayName;
                 }
             }
@@ -950,6 +971,20 @@ namespace FrostyEditor.Windows
             {
                 OpenAsset(asset, m_currentExplorer == dataExplorer);
             }
+        }
+
+        private void contextMenuOpenOriginal_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var asset in m_currentExplorer.SelectedAssets)
+            {
+                OpenAsset(asset, m_currentExplorer == dataExplorer, true);
+            }
+        }
+
+        private void contextMenuOpenOriginal_Loaded(object sender, RoutedEventArgs e)
+        {
+            var selectionHasModifiedEntries = m_currentExplorer.SelectedAssets.ToList().Find(a => a.IsModified) != null;
+            ((MenuItem)sender).Visibility = selectionHasModifiedEntries ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void contextMenuRevert_Click(object sender, RoutedEventArgs e)

@@ -471,13 +471,22 @@ namespace Frosty.Core.Controls
         }
         public bool IsReadOnly
         {
-            get => _isReadOnly;
+            get => _isReadOnly || ForceReadOnly;
             set
             {
                 _isReadOnly = value;
                 NotifyPropertyChanged();
             }
         }
+
+        public bool ForceReadOnly {
+            get => _forceReadOnly;
+            set {
+                _forceReadOnly = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public bool IsHidden { get => _isHidden; set { _isHidden = value; NotifyPropertyChanged(); } }
         public ObservableCollection<FrostyPropertyGridItemData> Children
         {
@@ -555,6 +564,7 @@ namespace Frosty.Core.Controls
         private bool _isModified;
         private bool _isEnabled;
         private bool _isReadOnly;
+        private bool _forceReadOnly;
         private bool _isExpanded;
         private bool _isHidden;
         private FrostyPropertyGridItemFlags _flags;
@@ -1072,7 +1082,8 @@ namespace Frosty.Core.Controls
                     actualDefaultValue = pi.GetValue(actualDefaultValue);
 
                 FrostyPropertyGridItemData subItem = new FrostyPropertyGridItemData(name, pi.Name, pi.GetValue(actualObject), actualDefaultValue, parent, flags) { Binding = new PropertyValueBinding(pi, actualObject) };
-
+                if (ForceReadOnly)
+                    subItem.ForceReadOnly = true;
                 if (attributes.GetCustomAttribute<FrostySdk.Attributes.IsReadOnlyAttribute>() != null)
                     subItem.IsReadOnly = true;
                 if (attributes.GetCustomAttribute<FrostySdk.Attributes.DescriptionAttribute>() != null)
@@ -1509,6 +1520,14 @@ namespace Frosty.Core.Controls
         }
         #endregion
 
+        #region -- ReadOnly --
+        public static readonly DependencyProperty ReadOnlyProperty = DependencyProperty.Register("ReadOnly", typeof(bool), typeof(FrostyPropertyGrid), new UIPropertyMetadata(false));
+        public bool ReadOnly {
+            get => (bool)GetValue(ReadOnlyProperty);
+            set => SetValue(ReadOnlyProperty, value);
+        }
+        #endregion
+
         #endregion
 
         public object SelectedClass => Object;
@@ -1728,7 +1747,8 @@ namespace Frosty.Core.Controls
                 if (pi.GetValue(actualObject) != null) // Checks if property object is null.
                 {
                     FrostyPropertyGridItemData subItem = new FrostyPropertyGridItemData(name, pi.Name, pi.GetValue(actualObject), pi.GetValue(actualDefaultValue), rootChild, flags) { Binding = new PropertyValueBinding(pi, actualObject) };
-
+                    if (ReadOnly)
+                        subItem.ForceReadOnly = true;
                     if (attributes.GetCustomAttribute<FrostySdk.Attributes.IsReadOnlyAttribute>() != null)
                         subItem.IsReadOnly = true;
                     if (attributes.GetCustomAttribute<FrostySdk.Attributes.DescriptionAttribute>() != null)
