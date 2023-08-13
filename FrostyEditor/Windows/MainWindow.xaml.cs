@@ -278,18 +278,16 @@ namespace FrostyEditor.Windows
 
         private void UpdateWindowTitle()
         {
+            Title = "Frosty Editor: MMC Edition - " + Frosty.Core.App.Version;
+
             if (ProfilesLibrary.HasLoadedProfile)
             {
-                Title = "Frosty Editor - " + Frosty.Core.App.Version + " (" + ProfilesLibrary.DisplayName + ") ";
+                Title = Title + " (" + ProfilesLibrary.DisplayName + ") ";
 
                 if (ProfilesLibrary.EnableExecution)
                     Title += "[" + m_project.DisplayName + "]";
                 else
                     Title += "[Read Only]";
-            }
-            else
-            {
-                Title = "Frosty Editor - " + Frosty.Core.App.Version;
             }
         }
 

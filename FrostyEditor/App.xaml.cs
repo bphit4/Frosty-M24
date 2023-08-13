@@ -53,6 +53,7 @@ namespace FrostyEditor
         {
             Assembly entryAssembly = Assembly.GetEntryAssembly();
             Frosty.Core.App.Version = entryAssembly.GetName().Version.ToString();
+            Frosty.Core.App.AdditionalVersionInformation = entryAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
             Environment.CurrentDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
 
@@ -202,7 +203,7 @@ namespace FrostyEditor
 
             if (Config.Get<bool>("UpdateCheck", true) || Config.Get<bool>("UpdateCheckPrerelease", false))
             {
-                CheckVersion();
+                //CheckVersion();   // Disabling update check. Need to figure out how to handle updates.
             }
 
             // get startup profile (if one exists)

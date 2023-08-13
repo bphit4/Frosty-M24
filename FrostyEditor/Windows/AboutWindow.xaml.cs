@@ -11,7 +11,7 @@ namespace FrostyEditor.Windows
         public AboutWindow()
         {
             InitializeComponent();
-            versionTextBox.Text = "Version " + Frosty.Core.App.Version;
+            versionTextBox.Text = "Version " + Frosty.Core.App.Version + "\n" + Frosty.Core.App.AdditionalVersionInformation;
         }
 
         private void hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
