@@ -38,6 +38,8 @@ namespace Frosty.Core
 
         public static IEditorWindow EditorWindow => Application.Current.MainWindow as IEditorWindow;
 
+        public static object OptionsWindow { get; set; }
+
         public static void ClearProfileData()
         {
             // clear out all global managers

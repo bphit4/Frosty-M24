@@ -24,13 +24,24 @@ namespace TexturePlugin
 
         public override void GetSupportedExportTypes(List<AssetExportType> exportTypes)
         {
+            exportTypes.Add(new AssetExportType("dds", "Direct Draw Surface"));
             exportTypes.Add(new AssetExportType("png", "Portable Network Graphics"));
             exportTypes.Add(new AssetExportType("tga", "Truevision TGA"));
             exportTypes.Add(new AssetExportType("hdr", "High Dynamic Range"));
-            exportTypes.Add(new AssetExportType("dds", "Direct Draw Surface"));
 
             base.GetSupportedExportTypes(exportTypes);
         }
+
+        // Attempting to add import to ContextMenu-DataExplorer
+        //   public override void GetSupportedImportTypes(List<AssetImportType> importTypes)
+        //   {
+        //       importTypes.Add(new AssetImportType("dds", "Direct Draw Surface"));
+        //       importTypes.Add(new AssetImportType("png", "Portable Network Graphics"));
+        //       importTypes.Add(new AssetImportType("tga", "Truevision TGA"));
+        //       importTypes.Add(new AssetImportType("hdr", "High Dynamic Range"));
+        //
+        //       base.GetSupportedImportTypes(importTypes);
+        //   }
 
         public override ImageSource GetIcon()
         {

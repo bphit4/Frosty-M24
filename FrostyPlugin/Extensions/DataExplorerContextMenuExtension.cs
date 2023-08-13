@@ -1,4 +1,6 @@
-﻿using System.Windows.Media;
+﻿using FrostySdk.Managers.Entries;
+using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace Frosty.Core
 {
@@ -10,6 +12,8 @@ namespace Frosty.Core
         public DataExplorerContextMenuExtension()
         {
         }
+
+        public static IList<AssetEntry> SelectedAssets { get; set; }
 
         /// <summary>
         /// When implemented in a derived class, gets the name of the tab item this extension will create.

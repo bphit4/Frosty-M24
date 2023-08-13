@@ -68,6 +68,13 @@ namespace Frosty.Core.Windows
         [Editor(typeof(FrostyLocalizationLanguageDataEditor))]
         public CustomComboData<string, string> MaxCasFileSize { get; set; }
 
+        [Category("Editor")]
+        [DisplayName("Preferred Export Type")]
+        [Description("The preferred export type for textures.")]
+        [EbxFieldMeta(EbxFieldType.Struct)]
+        [Editor(typeof(FrostyCustomComboDataEditor<string, string>))]
+        public CustomComboData<string, string> PreferredExportType { get; set; }
+
         [Category("General")]
         [DisplayName("Disable Launch Process Check")]
         [Description("Disable the functionality to check if a process is already running when trying to launch")]
@@ -87,6 +94,10 @@ namespace Frosty.Core.Windows
             MaxCasFileSize = new CustomComboData<string, string>(sizes, sizes);
             MaxCasFileSize.SelectedIndex = sizes.IndexOf(Config.Get<string>("MaxCasFileSize", "512MB"));
 
+            List<string> exportTypes = new List<string>() { "PNG (*.png)|*.png", "TGA (*.tga)|*.tga", "HDR (*.hdr)|*.hdr", "DDS (*.dds)|*.dds" };
+            PreferredExportType = new CustomComboData<string, string>(exportTypes, exportTypes);
+            PreferredExportType.SelectedIndex = exportTypes.IndexOf(Config.Get<string>("PreferredExportType", "PNG (*.png)|*.png"));
+
             DisableLaunchProcessCheck = Config.Get<bool>("DisableLaunchProcessCheck", false);
         }
 
@@ -99,6 +110,8 @@ namespace Frosty.Core.Windows
             
             Config.Add("ApplyingThreadCount", ApplyingThreadCount);
             Config.Add("MaxCasFileSize", MaxCasFileSize.SelectedName);
+
+            Config.Add("PreferredExportType", PreferredExportType.SelectedName);
 
             Config.Add("DisableLaunchProcessCheck", DisableLaunchProcessCheck);
         }

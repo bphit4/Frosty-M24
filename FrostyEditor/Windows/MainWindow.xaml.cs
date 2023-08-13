@@ -1133,18 +1133,8 @@ namespace FrostyEditor.Windows
                     foreach (var fileName in ofd.FileNames)
                     {
                         App.Logger.Log($"Attempting to import file: {fileName}");
-                        EbxAssetEntry matchingAsset;
-
-                        if (ofd.FileNames.Length == 1 && assets.Count == 1)
-                        {
-                            // If only one file and one asset, directly use the asset.
-                            matchingAsset = assets[0] as EbxAssetEntry;
-                        }
-                        else
-                        {
-                            string assetName = Path.GetFileNameWithoutExtension(fileName);
-                            matchingAsset = assets.FirstOrDefault(a => a.Name.EndsWith(assetName, StringComparison.OrdinalIgnoreCase)) as EbxAssetEntry;
-                        }
+                        string assetName = Path.GetFileNameWithoutExtension(fileName);
+                        EbxAssetEntry matchingAsset = assets.FirstOrDefault(a => a.Name.EndsWith(assetName, StringComparison.OrdinalIgnoreCase)) as EbxAssetEntry;
 
                         if (matchingAsset != null && assetDefinition.Import(matchingAsset, fileName, filters[ofd.FilterIndex - 1].Extension))
                         {
