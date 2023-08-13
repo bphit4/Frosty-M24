@@ -178,6 +178,11 @@ namespace Frosty.Core.Controls
             return 0;
         }
 
+        protected virtual EbxAsset LoadAsset(EbxAssetEntry entry)
+        {
+            return App.AssetManager.GetEbx(entry);
+        }
+
         protected virtual EbxAsset LoadAsset(EbxAssetEntry entry, bool getUnmodifiedData = false) 
         {
             return App.AssetManager.GetEbx(entry, getUnmodifiedData);
