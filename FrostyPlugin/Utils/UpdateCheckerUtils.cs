@@ -39,8 +39,8 @@ namespace Frosty.Core
         public static bool CheckVersion(bool checkPrerelease, Version localVersion)
         {
             Release release = checkPrerelease
-                ? GetLatestRelease("https://api.github.com/repos/CadeEvs/FrostyToolsuite/releases")
-                : GetLatestRelease("https://api.github.com/repos/CadeEvs/FrostyToolsuite/releases/latest", false);
+                ? GetLatestRelease("https://api.github.com/repos/bphit4/Frosty-M24/releases")
+                : GetLatestRelease("https://api.github.com/repos/bphit4/Frosty-M24/releases/latest", false);
 
             bool isLocalPrerelease = false;
 #if FROSTY_ALPHA
