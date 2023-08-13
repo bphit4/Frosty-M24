@@ -82,6 +82,12 @@ namespace Frosty.Core.Controls
         }
         #endregion
 
+        private bool isReadOnly = false;
+        public bool IsReadOnly {
+            get => isReadOnly;
+            private set => isReadOnly = value;
+        }
+
         #endregion
 
         protected event RoutedEventHandler onAssetModified;
@@ -142,13 +148,13 @@ namespace Frosty.Core.Controls
             asset.RemoveObject(obj);
         }
 
-        public int SetAsset(AssetEntry entry)
+        public int SetAsset(AssetEntry entry, bool getUnmodifiedData = false)
         {
             if (entry is EbxAssetEntry)
             {
                 FrostyTaskWindow.Show("Opening Asset", "", (task) =>
                 {
-                    asset = LoadAsset(entry as EbxAssetEntry);
+                    asset = LoadAsset(entry as EbxAssetEntry, getUnmodifiedData);
 
                     int totalCount = asset.Dependencies.Count();
                     int index = 0;
@@ -168,12 +174,13 @@ namespace Frosty.Core.Controls
 
             // now set entry
             AssetEntry = entry;
+            IsReadOnly = getUnmodifiedData;
             return 0;
         }
 
-        protected virtual EbxAsset LoadAsset(EbxAssetEntry entry) 
+        protected virtual EbxAsset LoadAsset(EbxAssetEntry entry, bool getUnmodifiedData = false) 
         {
-            return App.AssetManager.GetEbx(entry);
+            return App.AssetManager.GetEbx(entry, getUnmodifiedData);
         }
 
         protected virtual void InvokeOnAssetModified()

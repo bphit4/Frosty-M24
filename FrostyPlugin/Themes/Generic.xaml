@@ -1149,7 +1149,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:FrostyAssetEditor}">
                     <ctrl:FrostyDockablePanel Title="Properties" Icon="/FrostyEditor;component/Images/Properties.png">
-                        <local:FrostyPropertyGrid x:Name="PART_AssetPropertyGrid" Asset="{Binding Asset, RelativeSource={RelativeSource TemplatedParent}}" Modified="{Binding AssetModified, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        <local:FrostyPropertyGrid x:Name="PART_AssetPropertyGrid" Asset="{Binding Asset, RelativeSource={RelativeSource TemplatedParent}}" Modified="{Binding AssetModified, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ReadOnly="{Binding IsReadOnly, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"/>
                     </ctrl:FrostyDockablePanel>
                 </ControlTemplate>
             </Setter.Value>
