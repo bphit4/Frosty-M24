@@ -328,7 +328,7 @@ namespace TexturePlugin
 
         public void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "All (*.png,*.tga,*.hdr,*.dds)|*.png;*.tga;*.hdr;*.dds|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture");
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture");
             if (m_textureAsset.Type != TextureType.TT_2d)
             {
                 ofd.Multiselect = true;
@@ -764,22 +764,7 @@ namespace TexturePlugin
             ImageFormat format = ImageFormat.PNG;
             bool bResult = false;
 
-            string preferredFilter;
-            switch (Config.Get("PreferredExportType", "PNG (*.png)|*.png"))
-            {
-                case "PNG (*.png)|*.png": preferredFilter = "PNG (*.png)|*.png"; break;
-                case "TGA (*.tga)|*.tga": preferredFilter = "TGA (*.tga)|*.tga"; break;
-                case "HDR (*.hdr)|*.hdr": preferredFilter = "HDR (*.hdr)|*.hdr"; break;
-                case "DDS (*.dds)|*.dds": preferredFilter = "DDS (*.dds)|*.dds"; break;
-                default: preferredFilter = "PNG (*.png)|*.png"; break; // Default value
-            }
-
-            string filter = preferredFilter + "|PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds";
-
-            filter = filter.Replace("|" + preferredFilter, "");
-
-            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", filter, "Texture", AssetEntry.Filename, false);
-
+            FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture", AssetEntry.Filename, false);
             while (true)
             {
                 string initialDir = sfd.InitialDirectory;
