@@ -15,6 +15,7 @@ namespace Frosty.Core.Controls
 
         private string key;
         private OpenFileDialog ofd;
+        public int filterIndex;
 
         public FrostyOpenFileDialog(string title, string filter, string inKey)
         {

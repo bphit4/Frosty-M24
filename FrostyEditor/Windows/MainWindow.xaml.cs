@@ -1010,7 +1010,6 @@ namespace FrostyEditor.Windows
                 legacyExplorer.RefreshAll();
             }
         }
-
         private void contextMenuImportAsset_Click(object sender, RoutedEventArgs e)
         {
             IList<LegacyFileEntry> assets = legacyExplorer.SelectedAssets.Cast<LegacyFileEntry>().ToList();
@@ -1027,7 +1026,7 @@ namespace FrostyEditor.Windows
 
             FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Open Legacy file", description + "|" + filter, "FifaLegacy")
             {
-                Multiselect = true // Allow multiple file selection
+                Multiselect = assets.Count > 1 // Allow multiple file selection only if more than one asset is selected
             };
 
             if (ofd.ShowDialog())
@@ -1038,9 +1037,10 @@ namespace FrostyEditor.Windows
                 {
                     string fileKey = Path.GetFileNameWithoutExtension(fileName).ToLower() + "." + Path.GetExtension(fileName).TrimStart('.').ToLower();
 
-                    if (assetDict.ContainsKey(fileKey))
+                    // If there's only one asset, skip the name matching
+                    if (assets.Count == 1 || assetDict.ContainsKey(fileKey))
                     {
-                        LegacyFileEntry asset = assetDict[fileKey];
+                        LegacyFileEntry asset = assets.Count == 1 ? assets[0] : assetDict[fileKey];
 
                         App.Logger.Log("[Core] Attempting to import file: {0}", fileName);
 
