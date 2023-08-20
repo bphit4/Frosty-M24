@@ -124,7 +124,7 @@ namespace FrostyModManager
 
             if (Config.Get<bool>("UpdateCheck", true) || Config.Get<bool>("UpdateCheckPrerelease", false))
             {
-                CheckVersion();
+                //CheckVersion();   // Disabling update check. Need to figure out how to handle updates.
             }
 
             // get startup profile (if one exists)
