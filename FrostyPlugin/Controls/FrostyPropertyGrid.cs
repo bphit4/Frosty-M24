@@ -512,6 +512,8 @@ namespace Frosty.Core.Controls
         public List<EditorMetaDataAttribute> MetaData { get; private set; } = new List<EditorMetaDataAttribute>();
         public List<Attribute> Attributes { get; private set; } = new List<Attribute>();
         public FrostyPropertyGridItemFlags Flags => _flags;
+        public RelayCommand ExpandAllCommand { get; private set; }
+        public RelayCommand CollapseAllCommand { get; private set; }
         public bool HasItems
         {
             get
@@ -1237,6 +1239,19 @@ namespace Frosty.Core.Controls
                 cm.Items.Add(mi);
             }
 
+            // Add Expand All and Collapse All menu items for all levels
+            cm.Items.Add(new Separator());
+
+            // Add Expand All menu item
+            mi = new MenuItem { Header = "Expand All" };
+            mi.Click += (sender, e) => ExpandAll(item);
+            cm.Items.Add(mi);
+
+            // Add Collapse All menu item
+            mi = new MenuItem { Header = "Collapse All" };
+            mi.Click += (sender, e) => CollapseAll(item);
+            cm.Items.Add(mi);
+
             if (item.IsArrayChild)
             {
                 cm.Items.Add(new Separator());
@@ -1325,6 +1340,61 @@ namespace Frosty.Core.Controls
         /// <summary>
         /// Inserts a new array element before the selected item
         /// </summary>
+        /// 
+
+        private void ExpandAll(FrostyPropertyGridItemData itemData)
+        {
+            if (itemData == null)
+                return;
+
+            itemData.IsExpanded = true;
+
+            // Iterate through the child items and expand them
+            foreach (var child in itemData.Children)
+            {
+                ExpandAll(child);
+            }
+        }
+
+        public void ExpandAll(object obj)
+        {
+            var itemData = obj as FrostyPropertyGridItemData;
+
+            if (itemData == null)
+                return;
+
+            foreach (var child in itemData.Children)
+            {
+                ExpandAll(child);
+            }
+        }
+
+        private void CollapseAll(FrostyPropertyGridItemData itemData)
+        {
+            if (itemData == null)
+                return;
+
+            itemData.IsExpanded = false;
+
+            foreach (var child in itemData.Children)
+            {
+                CollapseAll(child);
+            }
+        }
+
+        public void CollapseAll(object obj)
+        {
+            var itemData = obj as FrostyPropertyGridItemData;
+
+            if (itemData == null)
+                return;
+
+            foreach (var child in itemData.Children)
+            {
+                CollapseAll(child);
+            }
+        }
+
         private void ArrayInsertBeforeMenuItem_Click(object sender, RoutedEventArgs e)
         {
             FrostyPropertyGridItemData item = (FrostyPropertyGridItemData)DataContext;
