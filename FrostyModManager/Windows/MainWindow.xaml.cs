@@ -1827,5 +1827,102 @@ namespace FrostyModManager
         {
             ((ListView)sender).UnselectAll();
         }
+        private void RestoreMadden_Click(object sender, RoutedEventArgs e)
+        {
+            string pathFile = "selectedFolder.txt";
+            string selectedFolder = "";
+
+            // Check if a saved folder location exists
+            if (File.Exists(pathFile))
+            {
+                selectedFolder = File.ReadAllText(pathFile);
+
+                // Verify if the saved folder location is valid
+                if (!Directory.Exists(selectedFolder))
+                {
+                    selectedFolder = ""; // Reset the selected folder if it's not valid
+                }
+            }
+
+            // Prompt the user to select the game folder if one doesn't exist or the saved folder location can't be found
+            if (string.IsNullOrEmpty(selectedFolder))
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.ValidateNames = false;
+                openFileDialog.CheckFileExists = false;
+                openFileDialog.CheckPathExists = true;
+                openFileDialog.FileName = "Folder Selection.";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    selectedFolder = Path.GetDirectoryName(openFileDialog.FileName);
+
+                    // Save the selected folder location to a text file
+                    File.WriteAllText(pathFile, selectedFolder);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(selectedFolder))
+            {
+                // Look for the specified folder and files and delete them if found
+                string[] itemsToDelete = { "ModData", "tmp", "CryptBase.dll", "Madden24.old" };
+                bool foundAndDeleted = false;
+                foreach (string item in itemsToDelete)
+                {
+                    string itemPath = Path.Combine(selectedFolder, item);
+                    if (Directory.Exists(itemPath) || File.Exists(itemPath))
+                    {
+                        if (item == "ModData")
+                        {
+                            Directory.Delete(itemPath, true);
+                        }
+                        else
+                        {
+                            File.Delete(itemPath);
+                        }
+                        foundAndDeleted = true;
+                    }
+                }
+
+                // Check for EAAntiCheat.GameServiceLauncher_Orig.exe and perform required actions
+                string origFileName = "EAAntiCheat.GameServiceLauncher_Orig.exe";
+                string newFileName = "EAAntiCheat.GameServiceLauncher.exe";
+                string origFilePath = Path.Combine(selectedFolder, origFileName);
+                string newFilePath = Path.Combine(selectedFolder, newFileName);
+
+                if (File.Exists(origFilePath))
+                {
+                    if (File.Exists(newFilePath))
+                    {
+                        File.Delete(newFilePath);
+                    }
+                    File.Move(origFilePath, newFilePath);
+                }
+
+                // Check for Madden24.orig.exe and perform required actions
+                string origMaddenFileName = "Madden24.orig.exe";
+                string newMaddenFileName = "Madden24.exe";
+                string origMaddenFilePath = Path.Combine(selectedFolder, origMaddenFileName);
+                string newMaddenFilePath = Path.Combine(selectedFolder, newMaddenFileName);
+
+                if (File.Exists(origMaddenFilePath))
+                {
+                    if (File.Exists(newMaddenFilePath))
+                    {
+                        File.Delete(newMaddenFilePath);
+                    }
+                    File.Move(origMaddenFilePath, newMaddenFilePath);
+                }
+
+                // Display a message based on whether the specified items were found and deleted or not
+                string message = foundAndDeleted ? "Madden NFL 24 has been restored to Base Game." : "Madden NFL 24 is already Factory Version.";
+                MessageBox.Show(message);
+            }
+            else
+            {
+                MessageBox.Show("Game folder selection was canceled or invalid. Please try again.");
+            }
+        }
+
     }
 }

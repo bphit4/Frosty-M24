@@ -47,7 +47,7 @@ namespace Frosty.Core.Windows
         [DisplayName("Check for Updates")]
         [Description("Check Github for Frosty updates on startup")]
         [EbxFieldMeta(EbxFieldType.Boolean)]
-        public bool UpdateCheck { get; set; } = true;
+        public bool UpdateCheck { get; set; } = false;
 
         [Category("Update Checking")]
         [DisplayName("Check for Prerelease Updates")]

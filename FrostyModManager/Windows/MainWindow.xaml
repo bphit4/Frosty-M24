@@ -168,7 +168,7 @@
                     <MenuItem x:Name="aboutMenuItem" Header="About Frosty Mod Manager" Click="aboutMenuItem_Click"/>
                 </MenuItem>
             </Menu>
-
+            <MenuItem x:Name="RestoreMadden" Header="Restore Madden 24" Height="22" Click="RestoreMadden_Click" Foreground="White" Margin="146,0,0,0" Width="125" VerticalAlignment="Center" HorizontalAlignment="Left" Padding="-26,0,-49,0"/>
             <!-- Toolbar -->
             <Grid Grid.Row="1" Background="{StaticResource ListBackground}">
                 <Grid.ColumnDefinitions>
