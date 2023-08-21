@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -1249,10 +1250,10 @@ namespace FrostyEditor.Windows
                 List<AssetImportType> filters = new List<AssetImportType>();
                 assetDefinition.GetSupportedImportTypes(filters);
 
-                string filterString = "";
+                StringBuilder filterStringBuilder = new StringBuilder();
                 foreach (AssetImportType filter in filters)
-                    filterString += "|" + filter.FilterString;
-                filterString = filterString.Trim('|');
+                    filterStringBuilder.Append("|").Append(filter.FilterString);
+                string filterString = filterStringBuilder.ToString().TrimStart('|');
 
                 FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Asset", filterString, assetDefinition.GetType().Name)
                 {
@@ -1261,15 +1262,18 @@ namespace FrostyEditor.Windows
                 if (ofd.ShowDialog())
                 {
                     App.Logger.Log("File dialog opened successfully.");
-                    foreach (var fileName in ofd.FileNames)
+                    bool singleFileImport = ofd.FileNames.Length == 1; // Check if it's a single file import
+
+                    foreach (var fileName in ofd.FileNames) // Replaced Parallel.ForEach with a standard loop
                     {
                         App.Logger.Log($"Attempting to import file: {fileName}");
                         string assetName = Path.GetFileNameWithoutExtension(fileName);
-                        EbxAssetEntry matchingAsset = assets.FirstOrDefault(a => a.Name.EndsWith(assetName, StringComparison.OrdinalIgnoreCase)) as EbxAssetEntry;
+                        EbxAssetEntry matchingAsset = singleFileImport ? firstEntry : assets.FirstOrDefault(a => a.Name.EndsWith(assetName, StringComparison.OrdinalIgnoreCase)) as EbxAssetEntry;
 
                         if (matchingAsset != null && assetDefinition.Import(matchingAsset, fileName, filters[ofd.FilterIndex - 1].Extension))
                         {
-                            dataExplorer.RefreshItems();
+                            // Refresh on UI thread if necessary
+                            // Application.Current.Dispatcher.Invoke(() => dataExplorer.RefreshItems());
                             App.Logger.Log("Imported {0} into {1}", fileName, matchingAsset.Name);
                         }
                         else
@@ -1301,10 +1305,11 @@ namespace FrostyEditor.Windows
             List<AssetExportType> filters = new List<AssetExportType>();
             assetDefinition.GetSupportedExportTypes(filters);
 
-            string filterString = "";
+            StringBuilder filterStringBuilder = new StringBuilder();
             foreach (AssetExportType filter in filters)
-                filterString += "|" + filter.FilterString;
-            filterString = filterString.Trim('|');
+                filterStringBuilder.Append("|").Append(filter.FilterString);
+            string filterString = filterStringBuilder.ToString().TrimStart('|');
+
 
             FrostySaveFileDialog sfd = new FrostySaveFileDialog("Export Asset", filterString, assetDefinition.GetType().Name, entry.Filename);
             if (sfd.ShowDialog())
