@@ -170,49 +170,78 @@ namespace FrostyEditor.Windows
                     }
                 }
 
-                // create and add menu item to top level menu
-                MenuItem menuExtItem = new MenuItem
+                Control existingMenuExtItem = foundMenuItem.Items.Cast<Control>()
+                    .Where(menuItem => menuItem.Tag != null)
+                    .FirstOrDefault(menuItem => 
+                        menuExtension.MenuItemName.Equals(
+                            (menuItem.Tag as MenuExtension).MenuItemName, StringComparison.OrdinalIgnoreCase
+                        )
+                    );
+                if (existingMenuExtItem == null)
                 {
-                    Header = menuExtension.MenuItemName,
-                    Icon = new Image() { Source = menuExtension.Icon },
-                    Command = menuExtension.MenuItemClicked,
-                    Tag = menuExtension
-                };
-                foundMenuItem.Items.Add(menuExtItem);
+                    // create and add menu item to top level menu
+                    MenuItem menuExtItem = new MenuItem
+                    {
+                        Header = menuExtension.MenuItemName,
+                        Icon = new Image() { Source = menuExtension.Icon },
+                        Command = menuExtension.MenuItemClicked,
+                        Tag = menuExtension
+                    };
+                    foundMenuItem.Items.Add(menuExtItem);
+                }
             }
         }
         private void LoadDataExplorerMenuItemExtensions()
         {
-            if (App.PluginManager.DataExplorerContextMenuExtensions.Count() > 0)
-            {
-                dataExplorer.AssetContextMenu.Items.Add(new Separator());
-            }
+            bool dataExplorerMenuItemsAdded = false;
             
             foreach (DataExplorerContextMenuExtension contextItemExtension in App.PluginManager.DataExplorerContextMenuExtensions)
             {
-                MenuItem contextMenuItem = new MenuItem
+                Control existingItem = dataExplorer.AssetContextMenu.Items.Cast<Control>()
+                    .Where(menuItem => menuItem.Tag != null)
+                    .FirstOrDefault(menuItem => 
+                        contextItemExtension.ContextItemName.Equals(
+                            (menuItem.Tag as DataExplorerContextMenuExtension).ContextItemName, StringComparison.OrdinalIgnoreCase
+                        )
+                    );
+                if (existingItem == null)
                 {
-                    Header = contextItemExtension.ContextItemName,
-                    Icon = new Image() { Source = contextItemExtension.Icon },
-                    Command = contextItemExtension.ContextItemClicked,
-                    Tag = contextItemExtension
-                };
-                dataExplorer.AssetContextMenu.Items.Add(contextMenuItem);
+                    MenuItem contextMenuItem = new MenuItem
+                    {
+                        Header = contextItemExtension.ContextItemName,
+                        Icon = new Image() { Source = contextItemExtension.Icon },
+                        Command = contextItemExtension.ContextItemClicked,
+                        Tag = contextItemExtension
+                    };
+
+                    if (!dataExplorerMenuItemsAdded)
+                    {
+                        dataExplorerMenuItemsAdded = true;
+                        dataExplorer.AssetContextMenu.Items.Add(new Separator());
+                    }
+
+                    dataExplorer.AssetContextMenu.Items.Add(contextMenuItem);
+                }
             }
         }
         private void LoadTabExtensions()
         {
             foreach (TabExtension tabExtension in App.PluginManager.TabExtensions)
             {
-                FrostyTabItem tabExtItem = new FrostyTabItem
+                FrostyTabItem existingItem = miscTabControl.Items.Cast<FrostyTabItem>().FirstOrDefault(menuItem => tabExtension.TabItemName.Equals(menuItem.Header as string, StringComparison.OrdinalIgnoreCase));
+                if (existingItem == null)
                 {
-                    Header = tabExtension.TabItemName,
-                    Content = tabExtension.TabContent,
-                    Icon = tabExtension.TabItemIcon,
-                    CloseButtonVisible = false,
-                    Tag = tabExtension
-                };
-                miscTabControl.Items.Add(tabExtItem);
+                    FrostyTabItem tabExtItem = new FrostyTabItem
+                    {
+                        Header = tabExtension.TabItemName,
+                        Content = tabExtension.TabContent,
+                        Icon = tabExtension.TabItemIcon,
+                        CloseButtonVisible = false,
+                        Tag = tabExtension
+                    };
+
+                    miscTabControl.Items.Add(tabExtItem);
+                }
             }
         }
         #endregion
@@ -336,7 +365,6 @@ namespace FrostyEditor.Windows
                 if (!string.IsNullOrEmpty(selectedProfileName) && SelectProfile(selectedProfileName))
                 {
                     NewProject();
-                    
                     UpdateUI(true);
                 }
             }
@@ -465,6 +493,17 @@ namespace FrostyEditor.Windows
         {
             NewProject();
         }
+        
+        private void reselectProfileMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            PromptToSaveDirtyProject();
+            string selectedProfileName = FrostyProfileSelectWindow.Show();
+            if (!string.IsNullOrEmpty(selectedProfileName) && SelectProfile(selectedProfileName))
+            {
+                NewProject();
+                UpdateUI(true);
+            }
+        }
 
         private static bool SelectProfile(string profile)
         {
@@ -499,11 +538,9 @@ namespace FrostyEditor.Windows
                 LaunchButton.IsEnabled = true;
             }
         }
-        
-        private void NewProject()
-        {
-            m_autoSaveTimer?.Stop();
 
+        private void PromptToSaveDirtyProject()
+        {
             if (m_project.IsDirty)
             {
                 MessageBoxResult result = FrostyMessageBox.Show("Do you wish to save changes to " + m_project.DisplayName + "?", "Frosty Editor", MessageBoxButton.YesNoCancel);
@@ -519,6 +556,12 @@ namespace FrostyEditor.Windows
                     }
                 }
             }
+        }
+        
+        private void NewProject()
+        {
+            m_autoSaveTimer?.Stop();
+            PromptToSaveDirtyProject();
 
             // close all open tabs
             RemoveAllTabs();
