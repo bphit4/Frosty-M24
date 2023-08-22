@@ -521,6 +521,12 @@ namespace FrostySdk
 
             private static bool bInitialized = false;
 
+            public static void Clear()
+            {
+                typeInfos.Clear();
+                typeInfosByHash.Clear();
+            }
+
             public static bool ReadCache()
             {
                 if (!File.Exists($"Caches/{ProfilesLibrary.CacheName}_typeinfo.cache"))
@@ -677,7 +683,7 @@ namespace FrostySdk
         private static readonly List<Guid> m_constructingGuids = new List<Guid>();
 
         private static readonly Dictionary<Guid, Type> m_guidTypeMapping = new Dictionary<Guid, Type>();
-        
+
         public static void Initialize(bool loadSdk = true)
         {
             if (loadSdk)
@@ -704,6 +710,17 @@ namespace FrostySdk
             AssemblyName name = new AssemblyName(ModuleName);
             m_assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
             m_moduleBuilder = m_assemblyBuilder.DefineDynamicModule(ModuleName);
+        }
+
+        public static void Clear()
+        {
+            Reflection.Clear();
+            m_constructingTypes.Clear();
+            m_constructors.Clear();
+            m_constructingGuids.Clear();
+            m_guidTypeMapping.Clear();
+
+            Initialize();
         }
 
         public static uint GetSdkVersion()

@@ -48,6 +48,7 @@ namespace Frosty.Core
             ResourceManager = null;
             FileSystemManager = null;
 
+            TypeLibrary.Clear();
             PluginManager.Clear();
             
             GC.Collect();

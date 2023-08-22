@@ -72,6 +72,8 @@
                             <Image Source="/FrostyEditor;component/Images/Compile.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <Separator />
+                    <MenuItem x:Name="ReselectProfileMenuItem" Header="Reselect Profile" Height="22" Click="reselectProfileMenuItem_Click" />
                     <Separator/>
                     <MenuItem x:Name="ExitMenuItem" Header="Exit" InputGestureText="Alt+F4" Height="22" Click="exitMenuItem_Click">
                         <MenuItem.Icon>
