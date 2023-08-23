@@ -304,6 +304,15 @@ namespace FrostyEditor.Windows
             {
                 InitFifaMenu();
             }
+
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                RestoreMadden.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                RestoreMadden.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void InitFifaMenu()
