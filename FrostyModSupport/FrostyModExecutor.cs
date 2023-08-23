@@ -2056,6 +2056,13 @@ namespace Frosty.ModSupport
                 // copy over new CryptBase
                 CopyFileIfRequired("ThirdParty/CryptBase.dll", m_fs.BasePath + "CryptBase.dll");
             }
+
+            // M24 dataPath argument hijack
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                CopyFileIfRequired("ThirdParty/dpapi.dll", m_fs.BasePath + "dpapi.dll");
+            }
+
             CopyFileIfRequired(m_fs.BasePath + "user.cfg", modDataPath + "user.cfg");
 
             // FIFA games require a fifaconfig workaround
@@ -2077,11 +2084,19 @@ namespace Frosty.ModSupport
             // launch the game (redirecting to the modPath directory)
             Logger.Log("Launching Game");
 
+            string args = $"-dataPath \"{modDataPath.Trim('\\')}\" {additionalArgs}";
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                // M24 crashes if dataPath argument is present. dpapi.dll takes care of it by looking at the datapath file.
+                File.WriteAllText(m_fs.BasePath + "datapath", modDataPath.Trim('\\'));
+                args = "";
+            }
+
             try
             {
                 //KillEADesktop();
                 //ModifyInstallerData($"-dataPath \"{modDataPath.Trim('\\')}\" {additionalArgs}");
-                ExecuteProcess($"{m_fs.BasePath + ProfilesLibrary.ProfileName}.exe", $"-dataPath \"{modDataPath.Trim('\\')}\" {additionalArgs}");
+                ExecuteProcess($"{m_fs.BasePath + ProfilesLibrary.ProfileName}.exe", args);
                 //WaitForGame();
                 //CleanUpInstalledData();
             }

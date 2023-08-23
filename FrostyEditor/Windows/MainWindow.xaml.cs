@@ -304,6 +304,15 @@ namespace FrostyEditor.Windows
             {
                 InitFifaMenu();
             }
+
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                RestoreMadden.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                RestoreMadden.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void InitFifaMenu()
@@ -1004,7 +1013,7 @@ namespace FrostyEditor.Windows
             if (!string.IsNullOrEmpty(selectedFolder))
             {
                 // Look for the specified folder and files and delete them if found
-                string[] itemsToDelete = { "ModData", "tmp", "CryptBase.dll", "Madden24.old" };
+                string[] itemsToDelete = { "ModData", "tmp", "CryptBase.dll", "Madden24.old", "dpapi.dll", "datapath", "datapath.old" };
                 bool foundAndDeleted = false;
                 foreach (string item in itemsToDelete)
                 {
