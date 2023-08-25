@@ -849,7 +849,6 @@ namespace FrostyModManager
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Close();
-            //Environment.Exit(0); // Force the application to exit completely
         }
 
 
