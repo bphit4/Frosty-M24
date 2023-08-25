@@ -318,7 +318,7 @@ namespace FrostyModManager
             }
 
             Config.Save();
-            Title = "Frosty Mod Manager - " + Frosty.Core.App.Version + " (" + ProfilesLibrary.DisplayName + ")";
+            Title = "Frosty Mod Manager: MMC Edition - " + Frosty.Core.App.Version + " (" + ProfilesLibrary.DisplayName + ")";
 
             FrostyTaskWindow.Show("Loading Mods", "", (task) =>
             {

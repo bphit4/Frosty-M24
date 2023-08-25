@@ -14,7 +14,7 @@
         Icon="/FrostyEditor;component/AppIcon.ico"
         Height="720" Width="1280"
         FrostyLoaded="FrostyWindow_Loaded" WindowState="Maximized"
-        Title="Frosty Editor"
+        Title="Frosty Editor: MMC Edition"
         Closing="FrostyWindow_Closing">
 
     <ctrl2:FrostyWindow.Resources>
