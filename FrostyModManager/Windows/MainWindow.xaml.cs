@@ -307,6 +307,8 @@ namespace FrostyModManager
                     Close();
                     return;
                 }
+
+                App.NotificationManager.RemoveAllNotifications();
             }
             else
             {
@@ -672,7 +674,6 @@ namespace FrostyModManager
         private void FrostyWindow_Closing(object sender, CancelEventArgs e)
         {
             Config.Save();
-            Environment.Exit(0); // Force the application to exit completely
         }
 
 
@@ -848,7 +849,7 @@ namespace FrostyModManager
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Close();
-            Environment.Exit(0); // Force the application to exit completely
+            //Environment.Exit(0); // Force the application to exit completely
         }
 
 
