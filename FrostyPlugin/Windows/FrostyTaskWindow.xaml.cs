@@ -119,7 +119,7 @@ namespace Frosty.Core.Windows
                 _callback(this);
             });
 
-            Application.Current.MainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+             Application.Current.MainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
 
             Close();
         }

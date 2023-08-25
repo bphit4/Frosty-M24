@@ -307,6 +307,8 @@ namespace FrostyModManager
                     Close();
                     return;
                 }
+
+                App.NotificationManager.RemoveAllNotifications();
             }
             else
             {
@@ -316,7 +318,7 @@ namespace FrostyModManager
             }
 
             Config.Save();
-            Title = "Frosty Mod Manager - " + Frosty.Core.App.Version + " (" + ProfilesLibrary.DisplayName + ")";
+            Title = "Frosty Mod Manager: MMC Edition - " + Frosty.Core.App.Version + " (" + ProfilesLibrary.DisplayName + ")";
 
             FrostyTaskWindow.Show("Loading Mods", "", (task) =>
             {
@@ -672,7 +674,6 @@ namespace FrostyModManager
         private void FrostyWindow_Closing(object sender, CancelEventArgs e)
         {
             Config.Save();
-            Environment.Exit(0); // Force the application to exit completely
         }
 
 
@@ -848,7 +849,6 @@ namespace FrostyModManager
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Close();
-            Environment.Exit(0); // Force the application to exit completely
         }
 
 
