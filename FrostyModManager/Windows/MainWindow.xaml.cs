@@ -670,7 +670,11 @@ namespace FrostyModManager
         }
 
         private void FrostyWindow_Closing(object sender, CancelEventArgs e)
-            => Config.Save();
+        {
+            Config.Save();
+            Environment.Exit(0); // Force the application to exit completely
+        }
+
 
         private bool AddPack(string packName)
         {
@@ -842,7 +846,11 @@ namespace FrostyModManager
         }
 
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
-            => Close();
+        {
+            Close();
+            Environment.Exit(0); // Force the application to exit completely
+        }
+
 
         private void availableModsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
