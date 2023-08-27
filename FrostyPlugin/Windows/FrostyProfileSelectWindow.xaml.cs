@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,7 +14,7 @@ namespace Frosty.Core.Windows
 {
     public partial class FrostyProfileSelectWindow
     {
-        private readonly List<FrostyConfiguration> configurations = new List<FrostyConfiguration>();
+        private readonly ObservableCollection<FrostyConfiguration> configurations = new ObservableCollection<FrostyConfiguration>();
         private string selectedProfileName;
         
         public FrostyProfileSelectWindow()
@@ -62,20 +63,32 @@ namespace Frosty.Core.Windows
                 Close();
             }
         }
-        
-        private async void ScanGames()
-        {
-            await Task.Run((() =>
-            {
-                using (RegistryKey lmKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node"))
-                {
-                    int totalCount = 0;
 
-                    IterateSubKeys(lmKey, ref totalCount);
-                }
-            }));
+        private async Task ScanGames()
+        {
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (RegistryKey lmKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node"))
+                    {
+                        if (lmKey == null)
+                        {
+                            // Log an error or notify the user
+                            return;
+                        }
+
+                        int totalCount = 0;
+                        IterateSubKeys(lmKey, ref totalCount);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and notify the user
+            }
         }
-        
+
         private void IterateSubKeys(RegistryKey subKey, ref int totalCount)
         {
             foreach (string subKeyName in subKey.GetSubKeyNames())
@@ -107,16 +120,26 @@ namespace Frosty.Core.Windows
 
                         if (ProfilesLibrary.HasProfile(nameWithoutExt))
                         {
+                            bool exists = false;
                             foreach (FrostyConfiguration config in configurations)
                             {
                                 if (config.ProfileName == fi.Name.Remove(fi.Name.Length - 4))
-                                    return;
+                                {
+                                    exists = true;
+                                    break;
+                                }
                             }
 
-                            Config.AddGame(fi.Name.Remove(fi.Name.Length - 4), fi.DirectoryName);
-                            configurations.Add(new FrostyConfiguration(fi.Name.Remove(fi.Name.Length - 4)));
+                            if (!exists)
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    Config.AddGame(fi.Name.Remove(fi.Name.Length - 4), fi.DirectoryName);
+                                    configurations.Add(new FrostyConfiguration(fi.Name.Remove(fi.Name.Length - 4)));
+                                });
 
-                            totalCount++;
+                                totalCount++;
+                            }
                         }
                     }
                 }
@@ -137,9 +160,13 @@ namespace Frosty.Core.Windows
 
         private void RefreshButton_OnClicked(object sender, RoutedEventArgs e)
         {
-            ScanGames();
+            ScanGames().ContinueWith(t =>
+            {
+                // Refresh the configuration list after scanning is done
+                RefreshConfigurationList();
+            });
         }
-        
+
         private void AddConfigurationButton_OnClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog

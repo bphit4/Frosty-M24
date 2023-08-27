@@ -379,7 +379,7 @@ namespace MeshSetPlugin
                 ProfileVersion.Madden22, ProfileVersion.Fifa22,
                 ProfileVersion.Battlefield2042, ProfileVersion.Madden23,
                 ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
-                ProfileVersion.PGATour, ProfileVersion.Madden24) && meshAsset != null)
+                ProfileVersion.PGATour) && meshAsset != null)
             {
                 int procIndex = 0;
                 dynamic skinnedProcAnim = meshAsset.SkinnedProceduralAnimation;
