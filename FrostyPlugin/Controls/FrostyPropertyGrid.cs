@@ -622,19 +622,6 @@ namespace Frosty.Core.Controls
 
         public bool FilterPropertyName(string filterText, List<object> refObjects, bool doNotHideSubObjects = false)
         {
-            if (_value is PointerRef pr)
-            {
-                if (pr.Type == PointerRefType.Internal)
-                {
-                    if (GetCustomAttribute<IsReferenceAttribute>() == null)
-                    {
-                        if (refObjects.Contains(pr.Internal))
-                            return true;
-                        refObjects.Add(pr.Internal);
-                    }
-                }
-            }
-
             bool retVal = true;
             foreach (var item in Children)
             {
@@ -642,10 +629,53 @@ namespace Frosty.Core.Controls
                 if (item.IsArrayChild)
                     name = "";
 
-                item.IsHidden = !doNotHideSubObjects && name.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) == -1;
+                // Check if the name matches the filter text
+                bool nameMatch = name.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1;
+
+                // Check if the value matches the filter text (new code)
+                bool valueMatch = false;
+                if (item.Value != null)
+                {
+                    if (item.Value is string strValue)
+                    {
+                        valueMatch = strValue.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1;
+                    }
+                    else if (item.Value is IDictionary dictionary)
+                    {
+                        foreach (var key in dictionary.Keys)
+                        {
+                            if (key.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1)
+                            {
+                                valueMatch = true;
+                                break;
+                            }
+                        }
+                    }
+                    else if (item.Value is IList list)
+                    {
+                        foreach (var elem in list)
+                        {
+                            if (elem.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1)
+                            {
+                                valueMatch = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        valueMatch = item.Value.ToString().IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1;
+                    }
+                }
+
+                // Hide or show based on either name or value match (updated code)
+                item.IsHidden = !doNotHideSubObjects && !nameMatch && !valueMatch;
+
+                // Recursive filter for children
                 if (!item.FilterPropertyName(filterText, refObjects, !item.IsHidden) || !item.IsHidden)
                     retVal = false;
             }
+
             if (!retVal)
             {
                 IsHidden = retVal;
