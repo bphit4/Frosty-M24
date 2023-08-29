@@ -96,7 +96,12 @@ namespace FrostyEditor.Windows
             CommandBindings.Add(new CommandBinding(focusAssetFilterCmd, (s, e) => dataExplorer.FocusFilter()));
 
             CommandBindings.Add(new CommandBinding(launchGameCmd, launchButton_Click));
-
+            InputBindings.Add(new KeyBinding
+            {
+                Command = new RelayCommand(o => RemoveAllTabs()),
+                Key = Key.D,
+                Modifiers = ModifierKeys.Control
+            });
 
             Bookmarks.BookmarkDb.ContextChanged += BookmarkDb_ContextChanged;
             BookmarkContextPicker.ItemsSource = Bookmarks.BookmarkDb.Contexts.Values;
@@ -1794,6 +1799,19 @@ namespace FrostyEditor.Windows
                 }
             }
             return null;
+        }
+
+        private void closeSoloDocumentMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            // Get the currently selected tab from the TabControl
+            FrostyTabItem selectedTab = TabControl.SelectedItem as FrostyTabItem;
+
+            // Check if a tab is selected
+            if (selectedTab != null)
+            {
+                // Close the selected tab
+                RemoveTab(selectedTab);
+            }
         }
 
         private void closeAllDocumentsMenuItem_Click(object sender, RoutedEventArgs e)
