@@ -63,6 +63,9 @@ namespace FrostyEditor.Windows
             explorerTabContent.HeaderControl = explorerTabControl;
             tabContent.HeaderControl = TabControl;
             miscTabContent.HeaderControl = miscTabControl;
+            RoutedCommand closeTabCmd = new RoutedCommand();
+            closeTabCmd.InputGestures.Add(new KeyGesture(Key.W, ModifierKeys.Control));
+            this.CommandBindings.Add(new CommandBinding(closeTabCmd, CloseCurrentTab));
 
             UpdateWindowTitle();
 
@@ -761,7 +764,8 @@ namespace FrostyEditor.Windows
             ti.CloseButtonClick += (o, e2) => { RemoveTab(ti); };
             ti.MiddleMouseButtonClick += (s, o) => { RemoveTab(ti); };
             ti.IsSelected = true;
-            editor.CommandBindings.Add(new CommandBinding(closeCmd, (o, e) => { RemoveTab(ti); }));
+            ti.Focus();
+            lastActiveTab = ti;
 
             AddTab(ti);
         }
@@ -857,6 +861,8 @@ namespace FrostyEditor.Windows
             ti.Header = assetDisplayName;
             ti.TabId = assetName;
             ti.IsSelected = true;
+            ti.Focus();
+            lastActiveTab = ti;
             ti.CloseButtonVisible = true;
             ti.CloseButtonClick += (s, o) =>
             {
@@ -866,10 +872,11 @@ namespace FrostyEditor.Windows
             {
                 ShutdownEditorAndRemoveTab(editor, ti);
             };
-            editor.CommandBindings.Add(new CommandBinding(closeCmd, (o, e) => { ShutdownEditorAndRemoveTab(editor, ti); }));
 
             AddTab(ti);
         }
+        
+        private FrostyTabItem lastActiveTab;
 
         private void AddTab(FrostyTabItem ti)
         {
@@ -899,19 +906,34 @@ namespace FrostyEditor.Windows
 
         private void RemoveTab(FrostyTabItem ti)
         {
-            // execute closed on FrostyBaseEditor and FrostyAssetEditor
             FrostyBaseEditor editor = ti.Content as FrostyBaseEditor;
             editor?.Closed();
             FrostyAssetEditor assetEditor = ti.Content as FrostyAssetEditor;
             assetEditor?.Closed();
 
+            // Remove the selected tab
             TabControl.Items.Remove(ti);
-            if (TabControl.Items.Count == 1)
-            {
-                FrostyTabItem item = TabControl.Items[0] as FrostyTabItem;
 
-                item.Visibility = Visibility.Visible;
-                item.IsSelected = true;
+            // Check if there are any other tabs left
+            if (TabControl.Items.Count > 1)
+            {
+                // If lastActiveTab is null, it means this was the first tab.
+                // In that case, make the new first tab active.
+                if (lastActiveTab == null)
+                {
+                    FrostyTabItem item = TabControl.Items[0] as FrostyTabItem;
+                    item.Visibility = Visibility.Visible;
+                    item.IsSelected = true;
+                }
+                else
+                {
+                    // Make the last active tab the new active tab
+                    lastActiveTab.IsSelected = true;
+                }
+            }
+            else
+            {
+                lastActiveTab = null; // No more tabs, set to null
             }
         }
 
@@ -930,6 +952,25 @@ namespace FrostyEditor.Windows
                 }
             }
         }
+
+        private void CloseCurrentTab(object sender, ExecutedRoutedEventArgs e)
+        {
+            App.Logger.Log("CloseCurrentTab called.");
+
+            // Get the currently selected tab from the TabControl
+            FrostyTabItem selectedTab = TabControl.SelectedItem as FrostyTabItem;
+
+            if (selectedTab != null)
+            {
+                App.Logger.Log($"Closing tab: {selectedTab.Header}");
+                RemoveTab(selectedTab); // RemoveTab takes care of all the cleanup
+            }
+            else
+            {
+                App.Logger.Log("No active tab to close.");
+            }
+        }
+
 
         private void RefreshTabs()
         {
