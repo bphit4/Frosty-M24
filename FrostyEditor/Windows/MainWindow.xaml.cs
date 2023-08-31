@@ -1371,7 +1371,7 @@ namespace FrostyEditor.Windows
                         if (matchingAsset != null && assetDefinition.Import(matchingAsset, fileName, filters[ofd.FilterIndex - 1].Extension))
                         {
                             // Refresh on UI thread if necessary
-                            // Application.Current.Dispatcher.Invoke(() => dataExplorer.RefreshItems());
+                            Application.Current.Dispatcher.Invoke(() => dataExplorer.RefreshItems());
                             App.Logger.Log("Imported {0} into {1}", fileName, matchingAsset.Name);
                         }
                         else

@@ -24,7 +24,7 @@ using System.Windows;
 
 [assembly: PluginDisplayName("Sound Editor")]
 [assembly: PluginAuthor("GalaxyMan2015 & wannkunstbeikor")]
-[assembly: PluginVersion("1.0.0.1")]
+[assembly: PluginVersion("1.0.0.2")]
 
 [assembly: RegisterOptionsExtension(typeof(SoundOptions))]
 

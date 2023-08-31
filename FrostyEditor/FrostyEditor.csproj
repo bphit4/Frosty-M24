@@ -94,6 +94,9 @@
     <AssemblyOriginatorKeyFile>FrostyEditor.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Xceed.Products.Wpf.Toolkit.AvalonDock">
+      <Version>4.5.23158.1451</Version>
+    </PackageReference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>ThirdParty\Newtonsoft.Json.dll</HintPath>
@@ -304,6 +307,7 @@
   <ItemGroup>
     <Resource Include="Images\Colorizer.png" />
     <Resource Include="Images\blueprintbundlefiletype.png" />
+    <Resource Include="Images\eyedropper.png" />
     <Content Include="Resources\Meshes\Flag.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

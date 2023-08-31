@@ -132,6 +132,15 @@
                VerticalAlignment="Center"
                Margin="20 0 0 0"></Label>
 
+        <Button x:Name="btnEyedropper"
+        Grid.Row="2"
+        Grid.Column="1"
+        Margin="12 8"
+        Cursor="Hand"
+        Click="btnEyedropper_Click">
+            <Image Source="/FrostyEditor;component/Images/eyedropper.png" Width="24" Height="24"/>
+        </Button>
+
         <Button x:Name="btnConvert"
                 Background="#DA0037"
                 Content="Convert"
