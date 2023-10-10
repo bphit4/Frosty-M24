@@ -723,28 +723,33 @@
 
     <!-- Scrollbar -->
     <Style TargetType="{x:Type ScrollBar}">
-        <Setter Property="Stylus.IsPressAndHoldEnabled"
-                Value="false" />
-        <Setter Property="Stylus.IsFlicksEnabled"
-                Value="false" />
-        <Setter Property="Width"
-                Value="14" />
-        <Setter Property="MinWidth"
-                Value="14" />
+        <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false" />
+        <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+        <Setter Property="Width" Value="14" />
+        <Setter Property="MinWidth" Value="14" />
+    <Setter Property="SmallChange" Value="30"/>
+    <Setter Property="LargeChange" Value="50"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ScrollBar}">
-                    <Border Grid.Row="1"
-                            Background="{StaticResource ScrollbarBackground}">
+                    <Border Grid.Row="1" Background="#2f2f2f">
+                    <!-- Add a Rectangle for background color -->
+                    <Grid>
+                        <Rectangle Fill="#2f2f2f"/>
                         <Track x:Name="PART_Track"
                                IsDirectionReversed="True"
                                IsEnabled="{TemplateBinding IsMouseOver}">
-                            <Track.Resources>
-                                <!-- Thumb's minimum height is half of this metric -->
-                                <sys:Double x:Key="{x:Static SystemParameters.VerticalScrollBarButtonHeightKey}">
-                                    100
-                                </sys:Double>
-                            </Track.Resources>
+
+                            <!-- Add IncreaseRepeatButton -->
+                            <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.LineDownCommand" Interval="50" Background="#2f2f2f"/>
+                            </Track.IncreaseRepeatButton>
+                            <!-- Add DecreaseRepeatButton -->
+                            <Track.DecreaseRepeatButton>
+                            <RepeatButton Command="ScrollBar.LineUpCommand" 
+                                          Interval="50"
+                                          Background="#2f2f2f"/>
+                            </Track.DecreaseRepeatButton>
                             <Track.Thumb>
                                 <Thumb MinHeight="30">
                                     <Thumb.Template>
@@ -753,7 +758,7 @@
                                                     Background="{StaticResource ControlBackground}"
                                                     CornerRadius="3"
                                                     Margin="4" />
-
+                                            <!-- ... -->
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver"
                                                          Value="True">
@@ -773,6 +778,7 @@
                                 </Thumb>
                             </Track.Thumb>
                         </Track>
+                    </Grid>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
