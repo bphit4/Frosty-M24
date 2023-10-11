@@ -514,6 +514,9 @@ namespace Frosty.Core.Controls
         public FrostyPropertyGridItemFlags Flags => _flags;
         public RelayCommand ExpandAllCommand { get; private set; }
         public RelayCommand CollapseAllCommand { get; private set; }
+        public int ExpansionDepth { get; set; } = 0;
+        public int CurrentExpansionLevel { get; set; } = 0;
+
         public bool HasItems
         {
             get
@@ -1282,6 +1285,18 @@ namespace Frosty.Core.Controls
             mi.Click += (sender, e) => CollapseAll(item);
             cm.Items.Add(mi);
 
+            cm.Items.Add(new Separator());
+
+            // Add Expand All One Level menu item
+            MenuItem miExpandAllOneLevel = new MenuItem { Header = "Expand All One Level" };
+            miExpandAllOneLevel.Click += (sender, e) => ExpandAllOneLevel(item);
+            cm.Items.Add(miExpandAllOneLevel);
+
+            // Add Collapse All One Level menu item
+            MenuItem miCollapseAllOneLevel = new MenuItem { Header = "Collapse All One Level" };
+            miCollapseAllOneLevel.Click += (sender, e) => CollapseAllOneLevel(item);
+            cm.Items.Add(miCollapseAllOneLevel);
+
             if (item.IsArrayChild)
             {
                 cm.Items.Add(new Separator());
@@ -1399,6 +1414,25 @@ namespace Frosty.Core.Controls
             }
         }
 
+        private void ExpandAll(FrostyPropertyGridItemData itemData, int depth)
+        {
+            if (itemData == null || depth < 0)
+                return;
+
+            if (depth >= 0)
+            {
+                itemData.IsExpanded = true;
+            }
+
+            if (depth > 0)
+            {
+                foreach (var child in itemData.Children)
+                {
+                    ExpandAll(child, depth - 1);
+                }
+            }
+        }
+
         private void CollapseAll(FrostyPropertyGridItemData itemData)
         {
             if (itemData == null)
@@ -1422,6 +1456,77 @@ namespace Frosty.Core.Controls
             foreach (var child in itemData.Children)
             {
                 CollapseAll(child);
+            }
+        }
+
+        private void CollapseAll(FrostyPropertyGridItemData itemData, int depth)
+        {
+            if (itemData == null || depth < 0)
+                return;
+
+            if (depth >= 0)
+            {
+                itemData.IsExpanded = false;
+            }
+
+            if (depth > 0)
+            {
+                foreach (var child in itemData.Children)
+                {
+                    CollapseAll(child, depth - 1);
+                }
+            }
+        }
+
+        private void ExpandAllOneLevel(FrostyPropertyGridItemData itemData)
+        {
+            if (itemData == null)
+                return;
+
+            ExpandToDepth(itemData, 1);
+        }
+
+        private void ExpandToDepth(FrostyPropertyGridItemData itemData, int depth)
+        {
+            if (itemData == null || depth < 0)
+                return;
+
+            if (depth == 0)
+            {
+                itemData.IsExpanded = true;
+                return;
+            }
+
+            itemData.IsExpanded = true;
+            foreach (var child in itemData.Children)
+            {
+                ExpandToDepth(child, depth - 1);
+            }
+        }
+
+        private void CollapseAllOneLevel(FrostyPropertyGridItemData itemData)
+        {
+            if (itemData == null)
+                return;
+
+            CollapseToDepth(itemData, 1);
+        }
+
+        private void CollapseToDepth(FrostyPropertyGridItemData itemData, int depth)
+        {
+            if (itemData == null || depth < 0)
+                return;
+
+            if (depth == 0)
+            {
+                itemData.IsExpanded = false;
+                return;
+            }
+
+            itemData.IsExpanded = false;
+            foreach (var child in itemData.Children)
+            {
+                CollapseToDepth(child, depth - 1);
             }
         }
 
