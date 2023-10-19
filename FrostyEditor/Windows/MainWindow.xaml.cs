@@ -50,6 +50,7 @@ namespace FrostyEditor.Windows
         private FrostyDataExplorer m_currentExplorer;
 
         public ItemDoubleClickCommand BookmarkItemDoubleClickCommand { get; private set; }
+        private List<string> recentProjects = new List<string>();
 
         public MainWindow()
         {
@@ -94,6 +95,8 @@ namespace FrostyEditor.Windows
             CommandBindings.Add(new CommandBinding(addBookmarkCmd, BookmarkAddButton_Click));
             CommandBindings.Add(new CommandBinding(removeBookmarkCmd, BookmarkRemoveButton_Click));
             CommandBindings.Add(new CommandBinding(focusAssetFilterCmd, (s, e) => dataExplorer.FocusFilter()));
+
+            LoadRecentProjects();  // Add this line
 
             CommandBindings.Add(new CommandBinding(launchGameCmd, launchButton_Click));
             InputBindings.Add(new KeyBinding
@@ -688,15 +691,15 @@ namespace FrostyEditor.Windows
                 App.Logger.Log("Project saved to {0}", m_project.Filename);
             }
 
-            // load project
+            // Load project
             FrostyProject newProject = new FrostyProject();
             if (!newProject.Load(filename))
             {
-                if (ProfilesLibrary.DataVersion != newProject.gameVersion) //user loaded project for different game
+                if (ProfilesLibrary.DataVersion != newProject.gameVersion) // User loaded project for a different game
                 {
                     App.Logger.LogWarning("Project {0} is not for {1}.", filename, ProfilesLibrary.DisplayName);
                 }
-                else //corrupt or not a frosty project
+                else // Corrupt or not a Frosty project
                 {
                     App.Logger.LogWarning("Failed to load {0}", filename);
                 }
@@ -706,11 +709,12 @@ namespace FrostyEditor.Windows
 
             if (newProject != null)
             {
-                // close all open tabs
+                // Close all open tabs
                 RemoveAllTabs();
-                
+
                 m_project = newProject;
 
+                // Update UI
                 UpdateUI();
 
                 legacyExplorer.ShowOnlyModified = false;
@@ -725,15 +729,73 @@ namespace FrostyEditor.Windows
                 dataExplorer.ShowOnlyUnModified = false;
                 dataExplorer.ShowOnlyUnModified = false;
 
-                // report success
+                // Report success
                 App.Logger.Log("Loaded {0}", m_project.Filename);
                 App.NotificationManager.Show($"Loaded {m_project.Filename}");
 
+                // Update window title and Discord state
                 UpdateWindowTitle();
                 UpdateDiscordState();
+
+                // Remember this project
+                if (recentProjects.Contains(filename))
+                {
+                    recentProjects.Remove(filename);
+                }
+                recentProjects.Insert(0, filename);
+                if (recentProjects.Count > 10)
+                {
+                    recentProjects.RemoveAt(10);  // Remove the oldest project to keep the list size to 10
+                }
+                SaveRecentProjects();
+
             }
 
             m_autoSaveTimer?.Start();
+        }
+
+        private void RecentProjectsMenuItem_MouseEnter(object sender, MouseEventArgs e)
+        {
+            RecentProjectsContextMenu.Items.Clear();
+
+            // Assuming recentProjects is a List<string> containing the paths of recent projects
+            foreach (var projectPath in recentProjects)
+            {
+                var menuItem = new MenuItem
+                {
+                    Header = System.IO.Path.GetFileName(projectPath),  // Display only the filename
+                    Tag = projectPath  // Store the full path in the Tag property
+                };
+
+                menuItem.Click += (s, args) =>
+                {
+                    var selectedProjectPath = ((MenuItem)s).Tag as string;
+                    if (!string.IsNullOrEmpty(selectedProjectPath))
+                    {
+                        LoadProject(selectedProjectPath, false);
+                    }
+                };
+
+                RecentProjectsContextMenu.Items.Add(menuItem);
+            }
+
+            // Open the context menu manually since it's not directly attached to any MenuItem.
+            RecentProjectsContextMenu.PlacementTarget = sender as UIElement;
+            RecentProjectsContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Right;  // <-- Add this line
+            RecentProjectsContextMenu.IsOpen = true;
+        }
+
+        private void SaveRecentProjects()
+        {
+            File.WriteAllLines("recent_projects.txt", recentProjects);
+        }
+
+        private void LoadRecentProjects()
+        {
+            if (File.Exists("recent_projects.txt"))
+            {
+                recentProjects = File.ReadAllLines("recent_projects.txt").ToList();
+            }
         }
 
         private bool SaveProject(bool forceSaveAs)

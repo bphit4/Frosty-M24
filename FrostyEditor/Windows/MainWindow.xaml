@@ -56,6 +56,15 @@
                             <Image Source="/FrostyEditor;component/Images/Open.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <MenuItem Header="Open Recent Project" Height="22" x:Name="RecentProjectsMenuItem" MouseEnter="RecentProjectsMenuItem_MouseEnter">
+                        <MenuItem.ContextMenu>
+                            <ContextMenu x:Name="RecentProjectsContextMenu"></ContextMenu>
+                        </MenuItem.ContextMenu>
+                        <MenuItem.Icon>
+                            <Image Source="/FrostyEditor;component/Images/Open.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
                     <MenuItem x:Name="SaveModMenuItem" Header="Save" Height="22" InputGestureText="Ctrl+S" Click="saveModMenuItem_Click">
                         <MenuItem.Icon>
                             <Image Source="/FrostyEditor;component/Images/Save.png"/>
@@ -130,6 +139,7 @@
                             <Button Margin="4,0,0,0" Height="20" Width="20" ToolTip="Open Project" Click="openModMenuItem_Click">
                                 <Image Source="/FrostyEditor;component/Images/Open.png" Width="16"/>
                             </Button>
+
                             <Button Margin="4,0,0,0" Height="20" Width="20" ToolTip="Save Project" Click="saveModMenuItem_Click">
                                 <Image Source="/FrostyEditor;component/Images/Save.png" Width="16"/>
                             </Button>
