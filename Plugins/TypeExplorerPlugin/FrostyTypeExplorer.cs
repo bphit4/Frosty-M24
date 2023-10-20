@@ -11,6 +11,8 @@ using Frosty.Core.Controls;
 using System.Windows.Media;
 using FrostySdk;
 using FrostySdk.Attributes;
+using System.IO;
+using System.Text;
 
 namespace TypeExplorerPlugin
 {
@@ -41,6 +43,8 @@ namespace TypeExplorerPlugin
         private static readonly SolidColorBrush LiteralColor = new SolidColorBrush(Color.FromRgb(0xB5, 0xCE, 0xA8));
 
         private ILogger logger;
+        private Button exportToCsButton;
+        private Button batchExportAllToCsButton;
 
         public class TypeItem
         {
@@ -74,6 +78,8 @@ namespace TypeExplorerPlugin
             typeFilterTextBox = GetTemplateChild(PART_TypeFilter) as TextBox;
             typeFieldsTextBox = GetTemplateChild(PART_TypeFieldsTextBox) as RichTextBox;
             hideEmptyCheckBox = GetTemplateChild(PART_HideEmptyCheckBox) as CheckBox;
+            exportToCsButton = GetTemplateChild("ExportToCsButton") as Button;
+            batchExportAllToCsButton = GetTemplateChild("BatchExportAllToCsButton") as Button;
 
             Loaded += FrostyTypeExplorer_Loaded;
             typesListBox.SelectionChanged += TypesListBox_SelectionChanged;
@@ -81,6 +87,13 @@ namespace TypeExplorerPlugin
             typeFilterTextBox.KeyUp += TypeFilterTextBox_KeyUp;
             hideEmptyCheckBox.Checked += HideEmptyCheckBox_Checked;
             hideEmptyCheckBox.Unchecked += HideEmptyCheckBox_Unchecked;
+            exportToCsButton.Click += ExportToCsButton_Click;
+            batchExportAllToCsButton.Click += BatchExportAllToCsButton_Click;
+
+            // Set up right-click menu
+            typesListBox.MouseRightButtonUp += TypesListBox_MouseRightButtonUp;
+
+            typesListBox.SelectionMode = SelectionMode.Extended;
         }
 
         private void TypeFilterTextBox_KeyUp(object sender, KeyEventArgs e)
@@ -203,7 +216,25 @@ namespace TypeExplorerPlugin
                 paragraph.Inlines.Add(new Run("}") { Foreground = TextColor });
                 document.Blocks.Add(paragraph);
                 typeFieldsTextBox.Document = document;
+
+                ContextMenu contextMenu = new ContextMenu();
+
+                if (typesListBox.SelectedItems.Count == 1)
+                {
+                    MenuItem exportItem = new MenuItem { Header = "Export to .cs" };
+                    exportItem.Click += (s, args) => { ExportTypeToCs(typesListBox.SelectedItem as TypeItem); };
+                    contextMenu.Items.Add(exportItem);
+                }
+                else if (typesListBox.SelectedItems.Count > 1)
+                {
+                    MenuItem batchExportItem = new MenuItem { Header = "Batch Export Selected to .cs" };
+                    batchExportItem.Click += (s, args) => { BatchExportSelectedToCs(); };
+                    contextMenu.Items.Add(batchExportItem);
+                }
+
+                typesListBox.ContextMenu = contextMenu;
             }
+
             else
             {
                 typeFieldsTextBox.Document = new FlowDocument();
@@ -268,6 +299,154 @@ namespace TypeExplorerPlugin
             typesListBox.ItemsSource = TypeItems;
             typesListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Name", System.ComponentModel.ListSortDirection.Ascending));
             typesListBox.Items.Refresh();
+        }
+
+        private void ExportTypeToCs(TypeItem typeItem)
+        {
+            if (typeItem == null) return;
+
+            Type type = typeItem.Type;
+            StringBuilder csCode = new StringBuilder();
+
+            // Add class or enum definition
+            if (type.IsEnum)
+            {
+                csCode.AppendLine($"{type.Name}");
+                csCode.AppendLine("{");
+
+                var values = Enum.GetValues(type);
+                for (int i = 0; i < values.Length; i++)
+                {
+                    csCode.Append($"    {Enum.GetName(type, values.GetValue(i))} = {Convert.ToInt32(values.GetValue(i))}");
+                    csCode.AppendLine(i != values.Length - 1 ? "," : "");
+                }
+
+                csCode.AppendLine("}");
+            }
+            else
+            {
+                csCode.Append($"{type.Name}");
+
+                // Include base type if it exists and is not Object
+                if (type.BaseType != null && type.BaseType.Name != "Object")
+                {
+                    csCode.AppendLine($" : {type.BaseType.Name}");
+                }
+                else
+                {
+                    csCode.AppendLine();
+                }
+
+                csCode.AppendLine("{");
+
+                foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
+                {
+                    // Skip undesired properties
+                    if (prop.Name.StartsWith("__")) continue;
+
+                    // Convert System types to custom types
+                    string propType = prop.PropertyType.Name;
+                    if (propType == "String") propType = "CString";
+                    else if (propType == "Single") propType = "Float32";
+
+                    // Handle generic types
+                    if (propType.StartsWith("List`"))
+                    {
+                        Type listType = prop.PropertyType.GetGenericArguments()[0];
+                        if (listType.Name == "PointerRef")
+                        {
+                            propType = $"List<PointerRef<{prop.GetCustomAttribute<EbxFieldMetaAttribute>().BaseType?.Name}>>";
+                        }
+                        else
+                        {
+                            propType = $"List<{listType.Name}>";
+                        }
+                    }
+                    else if (propType == "PointerRef")
+                    {
+                        propType = $"PointerRef<{prop.GetCustomAttribute<EbxFieldMetaAttribute>().BaseType?.Name}>";
+                    }
+
+                    csCode.AppendLine($"    {propType} {prop.Name};");
+                }
+
+                csCode.AppendLine("}");
+            }
+
+            // Check and create the directory if it doesn't exist
+            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Type_Exports");
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            // Save to .cs file in the "Type_Exports" folder
+            using (StreamWriter writer = new StreamWriter(Path.Combine(folderPath, $"{typeItem.Name}.cs")))
+            {
+                writer.Write(csCode.ToString());
+            }
+        }
+
+        private void ExportToCsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (typesListBox.SelectedItems.Count == 1)
+            {
+                ExportTypeToCs(typesListBox.SelectedItem as TypeItem);
+            }
+            else if (typesListBox.SelectedItems.Count > 1)
+            {
+                BatchExportSelectedToCs();
+            }
+        }
+
+
+        private void BatchExportAllToCsButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (TypeItem typeItem in TypeItems)
+            {
+                ExportTypeToCs(typeItem);
+            }
+        }
+
+        private void BatchExportSelectedToCs()
+        {
+            // Log export initiation
+            logger.Log("Batch export initiated...");
+
+            int exportCount = 0;
+
+            foreach (var selectedItem in typesListBox.SelectedItems)
+            {
+                if (selectedItem is TypeItem typeItem)
+                {
+                    ExportTypeToCs(typeItem);
+                    exportCount++;
+                }
+            }
+
+            // Log successful export
+            logger.Log($"Batch export successful: {exportCount} files exported to some-folder-path");
+        }
+
+        private void TypesListBox_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ContextMenu contextMenu = new ContextMenu();
+
+            if (typesListBox.SelectedItems.Count == 1)
+            {
+                MenuItem exportItem = new MenuItem { Header = "Export to .cs" };
+                exportItem.Click += (s, args) => { ExportTypeToCs(typesListBox.SelectedItem as TypeItem); };
+                contextMenu.Items.Add(exportItem);
+            }
+            else if (typesListBox.SelectedItems.Count > 1)
+            {
+                MenuItem batchExportItem = new MenuItem { Header = "Batch Export Selected to .cs" };
+                batchExportItem.Click += (s, args) => { BatchExportSelectedToCs(); };
+                contextMenu.Items.Add(batchExportItem);
+            }
+
+            typesListBox.ContextMenu = contextMenu;
+            contextMenu.IsOpen = true;
         }
     }
 }

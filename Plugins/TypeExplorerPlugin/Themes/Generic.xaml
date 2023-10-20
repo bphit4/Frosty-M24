@@ -74,9 +74,18 @@
                             </Grid>
 
                             <GridSplitter HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="3" Background="Transparent"/>
-                            
+
                             <Grid Grid.Column="1" Background="{StaticResource WindowBackground}">
-                                <RichTextBox x:Name="PART_TypeFieldsTextBox" IsReadOnly="True" FontFamily="Consolas" />
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <!-- Updated button styles -->
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Background="{StaticResource WindowBackground}">
+                                    <Button x:Name="ExportToCsButton" Content="Export to .cs" Margin="4,2,4,2" VerticalContentAlignment="Center" Height="30" Width="150"/>
+                                    <Button x:Name="BatchExportAllToCsButton" Content="Batch Export All to .cs" Margin="4,2,4,2" VerticalContentAlignment="Center" Height="30" Width="200"/>
+                                </StackPanel>
+                                <RichTextBox Grid.Row="1" x:Name="PART_TypeFieldsTextBox" IsReadOnly="True" FontFamily="Consolas" />
                             </Grid>
                         </Grid>
                     </Grid>
