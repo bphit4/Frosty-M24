@@ -24,17 +24,22 @@ namespace FrostySdk.IO
         private AssetManager am;
         private List<object> objs = new List<object>();
         private Stream stream;
+        private Dictionary<string, List<object>> guidToFloatCurvesMapping;
 
         public EbxXmlWriter(Stream inStream, AssetManager inAm)
         {
             am = inAm;
             stream = inStream;
+            guidToFloatCurvesMapping = new Dictionary<string, List<object>>();
         }
+
+        private Dictionary<string, string> guidToXmlMapping;
 
         public void WriteObjects(IEnumerable<object> inObjs)
         {
             objs.Clear();
             objs.AddRange(inObjs);
+            guidToXmlMapping = new Dictionary<string, string>();  // Initialize the dictionary
 
             StringBuilder sb = new StringBuilder();
             foreach (object obj in objs)
@@ -55,12 +60,16 @@ namespace FrostySdk.IO
             Array.Sort(Properties, new PropertyComparer());
 
             string StrGuid = "";
+            string parentGuid = ""; // Initialize parentGuid
             FieldInfo FI = ObjType.GetField("__Guid", BindingFlags.NonPublic | BindingFlags.Instance);
-
             if (FI != null)
             {
                 AssetClassGuid Guid = (AssetClassGuid)FI.GetValue(Obj);
                 StrGuid = " Guid=\"" + Guid.ToString() + "\"";
+                parentGuid = Guid.ToString(); // Set the parentGuid
+
+                // Save the current XML string in the dictionary.
+                guidToXmlMapping[Guid.ToString()] = SB.ToString();
             }
 
             if (TotalCount != 0 && (Properties.Length > 0 || (ObjType.BaseType != typeof(object) && ObjType.BaseType != typeof(ValueType))))
@@ -73,12 +82,18 @@ namespace FrostySdk.IO
                     if (PI.GetCustomAttribute<IsTransientAttribute>() != null)
                         continue;
 
+                    if (PI.Name == "SomeSpecialProperty")
+                    {
+                        SB.AppendLine("".PadLeft(TabCount) + "<MyNewTag>");
+                        // Your logic here for the new tag
+                        SB.AppendLine("".PadLeft(TabCount) + "</MyNewTag>");
+                    }
+
                     SB.Append("".PadLeft(TabCount) + "<" + PI.Name + "[AddInfo]>");
 
                     object Value = PI.GetValue(Obj);
                     string Tmp = "";
-
-                    SB.Append(FieldToXml(Value, ref Tmp, TabCount));
+                    SB.Append(FieldToXml(Value, ref Tmp, TabCount, parentGuid));
 
                     SB.AppendLine("</" + PI.Name + ">");
                     SB = SB.Replace("[AddInfo]", Tmp);
@@ -95,10 +110,18 @@ namespace FrostySdk.IO
             return SB.ToString();
         }
 
-        private string FieldToXml(object Value, ref string AdditionalInfo, int TabCount = 0)
+        private string FieldToXml(object Value, ref string AdditionalInfo, int TabCount = 0, string parentGuid = null)
         {
             Type FieldType = Value.GetType();
             StringBuilder SB = new StringBuilder();
+
+            // Handle FloatCurve directly here
+            if (FieldType.Name == "FloatCurveType_Linear")
+            {
+                SB.Append(ClassToXml(Value, FieldType, TabCount + 4));
+                return SB.ToString();
+
+            }
 
             if (FieldType.Name == "List`1")
             {
@@ -130,6 +153,18 @@ namespace FrostySdk.IO
             {
                 if (FieldType.Namespace == "FrostySdk.Ebx" && FieldType.BaseType != typeof(Enum))
                 {
+                    // Check if this object is a nested object with a GUID that we've seen before.
+                    FieldInfo FI = FieldType.GetField("__Guid", BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (FI != null)
+                    {
+                        AssetClassGuid Guid = (AssetClassGuid)FI.GetValue(Value);
+                        if (guidToXmlMapping.TryGetValue(Guid.ToString(), out string existingXml))
+                        {
+                            SB.Append(existingXml);
+                            return SB.ToString();
+                        }
+                    }
+
                     if (FieldType == typeof(CString)) SB.Append(Value.ToString());
                     else if (FieldType == typeof(ResourceRef)) SB.Append(Value.ToString());
                     else if (FieldType == typeof(FileRef)) SB.Append(Value.ToString());
@@ -177,30 +212,12 @@ namespace FrostySdk.IO
                     else if (FieldType == typeof(uint))
                     {
                         uint value = (uint)Value;
-                        string val = Utils.GetString((int)value);
-
-                        if (!val.StartsWith("0x"))
-                        {
-                            SB.Append(val + " [" + value.ToString("X8") + "]");
-                        }
-                        else
-                        {
-                            SB.Append(val);
-                        }
+                        SB.Append(value.ToString());
                     }
                     else if (FieldType == typeof(int))
                     {
                         int value = (int)Value;
-                        string val = Utils.GetString(value);
-
-                        if (!val.StartsWith("0x"))
-                        {
-                            SB.Append(val + " [" + value.ToString("X8") + "]");
-                        }
-                        else
-                        {
-                            SB.Append(val);
-                        }
+                        SB.Append(value.ToString());
                     }
                     else if (FieldType == typeof(ulong)) SB.Append(((ulong)Value).ToString("X16"));
                     else if (FieldType == typeof(float)) SB.Append(((float)Value).ToString());
