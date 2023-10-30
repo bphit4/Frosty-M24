@@ -293,6 +293,26 @@ namespace FrostyModManager
             availableModsTabContent.HeaderControl = availableModsTabControl;
         }
 
+        private void InitializePriorityOrder()
+        {
+            int totalMods = appliedModsList.Items.Count;
+            for (int i = 0; i < totalMods; i++)
+            {
+                if (appliedModsList.Items[i] is FrostyAppliedMod mod)
+                {
+                    mod.PriorityOrder = totalMods - i;
+                }
+            }
+            // Set HighestPriority for all items
+            foreach (var item in appliedModsList.Items)
+            {
+                if (item is FrostyAppliedMod mod)
+                {
+                    mod.HighestPriority = totalMods;
+                }
+            }
+        }
+
         private void FrostyWindow_FrostyLoaded(object sender, EventArgs e)
         {
             (App.Logger as FrostyLogger).AddBinding(tb, TextBox.TextProperty);
@@ -449,6 +469,8 @@ namespace FrostyModManager
             }
 
             LoadedPluginsList.ItemsSource = App.PluginManager.LoadedPlugins;
+
+            InitializePriorityOrder();
         }
 
         private void addProfileButton_Click(object sender, RoutedEventArgs e)
@@ -1435,6 +1457,25 @@ namespace FrostyModManager
                 upButton.IsEnabled = false;
                 downButton.IsEnabled = false;
             }
+
+            // Update the PriorityOrder for each mod
+            int totalMods = appliedModsList.Items.Count;
+            for (int i = 0; i < totalMods; i++)
+            {
+                if (appliedModsList.Items[i] is FrostyAppliedMod mod)
+                {
+                    mod.PriorityOrder = totalMods - i;
+                }
+            }
+            // Set HighestPriority for all items
+            foreach (var item in appliedModsList.Items)
+            {
+                if (item is FrostyAppliedMod mod)
+                {
+                    mod.HighestPriority = totalMods;
+                }
+            }
+            appliedModsList.Items.Refresh();
         }
 
         private void availableModsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)

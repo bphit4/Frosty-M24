@@ -31,6 +31,7 @@ namespace FrostyModManager
         public IFrostyMod Mod { get; }
 
         public string BackupFileName { get; }
+        public int PriorityOrder { get; internal set; }
 
         public FrostyAppliedMod(IFrostyMod inMod, bool inIsEnabled = true)
         {
@@ -45,5 +46,24 @@ namespace FrostyModManager
             IsEnabled = inIsEnabled;
             IsFound = false;
         }
+        public int HighestPriority { get; internal set; }  // Add this line
+
+        public string PriorityOrderText {
+            get {
+                if (PriorityOrder == 1)
+                {
+                    return "Highest Priority  ";
+                }
+                else if (PriorityOrder == HighestPriority)
+                {
+                    return "Lowest Priority  ";
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
     }
 }
