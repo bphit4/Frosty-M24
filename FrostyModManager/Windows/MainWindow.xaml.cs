@@ -775,6 +775,8 @@ namespace FrostyModManager
                 }
             }
 
+            InitializePriorityOrder();
+
             availableModsList.SelectedItem = null;
             ICollectionView view = CollectionViewSource.GetDefaultView(availableModsList.ItemsSource);
             view.Refresh();
@@ -1489,6 +1491,25 @@ namespace FrostyModManager
 
             // focus on tab item
             appliedModsTabItem.IsSelected = true;
+
+            // Update the PriorityOrder for each mod
+            int totalMods = appliedModsList.Items.Count;
+            for (int i = 0; i < totalMods; i++)
+            {
+                if (appliedModsList.Items[i] is FrostyAppliedMod mod)
+                {
+                    mod.PriorityOrder = totalMods - i;
+                }
+            }
+            // Set HighestPriority for all items
+            foreach (var item in appliedModsList.Items)
+            {
+                if (item is FrostyAppliedMod mod)
+                {
+                    mod.HighestPriority = totalMods;
+                }
+            }
+            appliedModsList.Items.Refresh();
         }
 
         private void addModButton_Click(object sender, RoutedEventArgs e)
@@ -1500,6 +1521,25 @@ namespace FrostyModManager
 
             // focus on tab item
             appliedModsTabItem.IsSelected = true;
+
+            // Update the PriorityOrder for each mod
+            int totalMods = appliedModsList.Items.Count;
+            for (int i = 0; i < totalMods; i++)
+            {
+                if (appliedModsList.Items[i] is FrostyAppliedMod mod)
+                {
+                    mod.PriorityOrder = totalMods - i;
+                }
+            }
+            // Set HighestPriority for all items
+            foreach (var item in appliedModsList.Items)
+            {
+                if (item is FrostyAppliedMod mod)
+                {
+                    mod.HighestPriority = totalMods;
+                }
+            }
+            appliedModsList.Items.Refresh();
         }
 
         private void SelectedProfile_AppliedModsUpdated(object sender, RoutedEventArgs e)
