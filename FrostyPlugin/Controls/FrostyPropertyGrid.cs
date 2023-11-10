@@ -64,7 +64,7 @@ namespace Frosty.Core.Controls
     //                if (overrideAttr != null)
     //                    attr = overrideAttr;
     //            }
-                
+
     //            if (attr != null)
     //                return attr.Name;
     //            return value.GetType().Name;
@@ -402,30 +402,24 @@ namespace Frosty.Core.Controls
     {
         public static readonly FrostyPropertyGridItemData[] EmptyList = new FrostyPropertyGridItemData[0];
 
-        public string DisplayName
-        {
+        public string DisplayName {
             get => _displayName;
-            set
-            {
+            set {
                 _displayName = value;
                 NotifyPropertyChanged();
             }
         }
         public string Name { get => _internalName; private set => _internalName = value; }
         public string Description { get; set; }
-        public object Value
-        {
+        public object Value {
             get => _value;
-            set
-            {
+            set {
                 if (value != null && !value.Equals(_value))
                     ForceValue(value);
             }
         }
-        public string Path
-        {
-            get
-            {
+        public string Path {
+            get {
                 string retVal = _internalName;
                 if (Parent != null)
                     retVal = Parent.Path + "." + retVal;
@@ -434,25 +428,22 @@ namespace Frosty.Core.Controls
         }
         public bool IsCategory { get => _isCategory; set => _isCategory = value; }
         public bool IsExpanded { get => _isExpanded; set { _isExpanded = value; NotifyPropertyChanged(); } }
-        public bool IsModified
-        {
-            get
-            {
-                if (!_isEnabled||_isReadOnly)
+        public bool IsModified {
+            get {
+                if (!_isEnabled || _isReadOnly)
                     return false;
                 if (Value != null)
                 {
                     EbxFieldMetaAttribute meta = GetCustomAttribute<EbxFieldMetaAttribute>();
                     if (meta != null && meta.Type == EbxFieldType.Struct)
                         return Children.Any((FrostyPropertyGridItemData a) => a.IsModified);
-                    
+
                     if (Value is IList list)
                         return list.Count > 0;
                 }
                 return _isModified;
             }
-            set
-            {
+            set {
                 if (_isModified != value)
                 {
                     _isModified = value;
@@ -460,20 +451,16 @@ namespace Frosty.Core.Controls
                 }
             }
         }
-        public bool IsEnabled
-        {
+        public bool IsEnabled {
             get => _isEnabled;
-            set
-            {
+            set {
                 _isEnabled = value;
                 NotifyPropertyChanged();
             }
         }
-        public bool IsReadOnly
-        {
+        public bool IsReadOnly {
             get => _isReadOnly || ForceReadOnly;
-            set
-            {
+            set {
                 _isReadOnly = value;
                 NotifyPropertyChanged();
             }
@@ -488,15 +475,13 @@ namespace Frosty.Core.Controls
         }
 
         public bool IsHidden { get => _isHidden; set { _isHidden = value; NotifyPropertyChanged(); } }
-        public ObservableCollection<FrostyPropertyGridItemData> Children
-        {
-            get
-            {
+        public ObservableCollection<FrostyPropertyGridItemData> Children {
+            get {
                 if (_isCategory && _children == null)
                     _children = new ObservableCollection<FrostyPropertyGridItemData>();
                 else if ((_children == null || _children.Count == 0))
                 {
-                    if(_children == null)
+                    if (_children == null)
                         _children = new ObservableCollection<FrostyPropertyGridItemData>();
                     ProcessChildren();
                 }
@@ -517,10 +502,8 @@ namespace Frosty.Core.Controls
         public int ExpansionDepth { get; set; } = 0;
         public int CurrentExpansionLevel { get; set; } = 0;
 
-        public bool HasItems
-        {
-            get
-            {
+        public bool HasItems {
+            get {
                 if (_isCategory)
                     return true;
 
@@ -538,7 +521,7 @@ namespace Frosty.Core.Controls
                     {
                         return tmpValue.GetType().GetProperties().Length > 0;
                     }
-                    
+
                     if (tmpValue is IList list)
                     {
                         return GetCustomAttribute<HideChildrentAttribute>() == null && list.Count > 0;
@@ -688,59 +671,91 @@ namespace Frosty.Core.Controls
 
         public bool FilterGuid(string guid, List<object> refObjects, bool doNotHideSubObjects = false)
         {
-            if (_value is PointerRef pRef)
+            try
             {
-                if (pRef.Type == PointerRefType.Internal)
+                if (_value is PointerRef pRef)
                 {
-                    if (GetCustomAttribute<IsReferenceAttribute>() == null)
+                    if (pRef.Type == PointerRefType.Internal)
                     {
-                        if (refObjects.Contains(pRef.Internal))
-                            return true;
-                        refObjects.Add(pRef.Internal);
+                        if (GetCustomAttribute<IsReferenceAttribute>() == null)
+                        {
+                            if (refObjects.Contains(pRef.Internal))
+                                return true;
+                            refObjects.Add(pRef.Internal);
+                        }
                     }
                 }
-            }
 
-            bool retVal = true;
-            foreach (var item in Children)
-            {
-                item.IsHidden = !doNotHideSubObjects;
-                if (item.Value is PointerRef pr)
+                bool retVal = true;
+                foreach (var item in Children)
                 {
-                    if (pr.Type == PointerRefType.Internal)
+                    if (item == null)
                     {
-                        AssetClassGuid instGuid = ((dynamic)pr.Internal).GetInstanceGuid();
-                        string instGuidString = instGuid.ToString();
+                        continue; // Skip any null items in the Children collection
+                    }
 
-                        if (instGuidString.Equals(guid))
+                    item.IsHidden = !doNotHideSubObjects;
+                    if (item.Value is PointerRef pr)
+                    {
+                        if (pr.Type == PointerRefType.Internal)
+                        {
+                            if (pr.Internal == null)
+                            {
+                                continue; // Skip if pr.Internal is null
+                            }
+
+                            AssetClassGuid instGuid = ((dynamic)pr.Internal).GetInstanceGuid();
+                            string instGuidString = instGuid.ToString();
+
+                            if (instGuidString.Equals(guid))
+                                item.IsHidden = false;
+                        }
+                        else if (pr.Type == PointerRefType.External)
+                        {
+                            if (pr.External == null || pr.External.FileGuid == null || pr.External.ClassGuid == null)
+                            {
+                                continue; // Skip if pr.External or its properties are null
+                            }
+
+                            string fileGuidString = pr.External.FileGuid.ToString();
+                            string classGuidString = pr.External.ClassGuid.ToString();
+
+                            if (classGuidString.Equals(guid) || fileGuidString.Equals(guid))
+                                item.IsHidden = false;
+                        }
+                    }
+                    if (item.Value is AssetClassGuid acg)
+                    {
+                        if (acg.ExportedGuid == null)
+                        {
+                            continue; // Skip if acg.ExportedGuid is null
+                        }
+
+                        string exportedGuidString = acg.ExportedGuid.ToString();
+
+                        if (exportedGuidString.Equals(guid))
                             item.IsHidden = false;
                     }
-                    else if (pr.Type == PointerRefType.External)
-                    {
-                        string fileGuidString = pr.External.FileGuid.ToString();
-                        string classGuidString = pr.External.ClassGuid.ToString();
 
-                        if (classGuidString.Equals(guid) || fileGuidString.Equals(guid))
-                            item.IsHidden = false;
-                    }
+                    if (!item.FilterGuid(guid, refObjects, !item.IsHidden) || !item.IsHidden)
+                        retVal = false;
                 }
-                if (item.Value is AssetClassGuid acg)
+
+                if (!retVal)
                 {
-                    string exportedGuidString = acg.ExportedGuid.ToString();
-
-                    if (exportedGuidString.Equals(guid))
-                        item.IsHidden = false;
+                    IsHidden = false;
                 }
-
-                if (!item.FilterGuid(guid, refObjects, !item.IsHidden) || !item.IsHidden)
-                    retVal = false;
+                return retVal;
             }
-
-            if (!retVal)
+            catch (Exception ex)
             {
-                IsHidden = false;
+                // Handle the exception as needed, for example, log it, set a flag, etc.
+                // For now, we'll just write it to the console.
+                Console.WriteLine("An error occurred: " + ex.Message);
+                // Depending on the nature of your application, you might want to rethrow the exception
+                // or return a default value such as false.
+                return false;
             }
-            return retVal;
         }
 
         public void AddChild(object value, object defValue)
@@ -757,7 +772,7 @@ namespace Frosty.Core.Controls
 
             if (_children != null)
             {
-                FrostyPropertyGridItemData newItem = new FrostyPropertyGridItemData("[" + index + "]", "[" + index + "]", value, defValue, this, Flags) {Binding = new ArrayItemValueBinding(list, index)};
+                FrostyPropertyGridItemData newItem = new FrostyPropertyGridItemData("[" + index + "]", "[" + index + "]", value, defValue, this, Flags) { Binding = new ArrayItemValueBinding(list, index) };
                 newItem.Attributes.AddRange(Attributes);
 
                 _children.Add(newItem);
@@ -790,7 +805,7 @@ namespace Frosty.Core.Controls
 
             if (_children != null)
             {
-                FrostyPropertyGridItemData newItem = new FrostyPropertyGridItemData("[" + index + "]", "[" + index + "]", value, defValue, this, Flags) {Binding = new ArrayItemValueBinding(list, index)};
+                FrostyPropertyGridItemData newItem = new FrostyPropertyGridItemData("[" + index + "]", "[" + index + "]", value, defValue, this, Flags) { Binding = new ArrayItemValueBinding(list, index) };
                 newItem.Attributes.AddRange(Attributes);
 
                 if (index > _children.Count)
@@ -1012,7 +1027,7 @@ namespace Frosty.Core.Controls
                         if (listValue != null)
                             listDefValue = Activator.CreateInstance(listValue.GetType());
 
-                        FrostyPropertyGridItemData listItem = new FrostyPropertyGridItemData("[" + i + "]", "[" + i + "]", listValue, listDefValue, this, _flags) {Binding = new ArrayItemValueBinding(list, i)};
+                        FrostyPropertyGridItemData listItem = new FrostyPropertyGridItemData("[" + i + "]", "[" + i + "]", listValue, listDefValue, this, _flags) { Binding = new ArrayItemValueBinding(list, i) };
                         listItem.Attributes.AddRange(Attributes);
                         _children.Add(listItem);
                     }
@@ -1105,7 +1120,7 @@ namespace Frosty.Core.Controls
                 FrostyPropertyGridItemFlags flags = FrostyPropertyGridItemFlags.None;
                 if (attributes.GetCustomAttribute<IsReferenceAttribute>() != null)
                     flags |= FrostyPropertyGridItemFlags.IsReference;
-                
+
                 object actualObject = value;
                 object actualDefaultValue = defValue;
                 if (overrideType != null && overrideType.GetProperties().Contains(pi))
@@ -1301,11 +1316,11 @@ namespace Frosty.Core.Controls
             {
                 cm.Items.Add(new Separator());
 
-                mi = new MenuItem {Header = "Insert Before"};
+                mi = new MenuItem { Header = "Insert Before" };
                 mi.Click += ArrayInsertBeforeMenuItem_Click;
                 cm.Items.Add(mi);
 
-                mi = new MenuItem {Header = "Insert After"};
+                mi = new MenuItem { Header = "Insert After" };
                 mi.Click += ArrayInsertAfterMenuItem_Click;
                 cm.Items.Add(mi);
             }
@@ -1634,8 +1649,7 @@ namespace Frosty.Core.Controls
 
         #region -- Object --
         public static readonly DependencyProperty ObjectProperty = DependencyProperty.Register("Object", typeof(object), typeof(FrostyPropertyGrid), new FrameworkPropertyMetadata(null, OnObjectChanged));
-        public object Object
-        {
+        public object Object {
             get => GetValue(ObjectProperty);
             set => SetValue(ObjectProperty, value);
         }
@@ -1651,8 +1665,7 @@ namespace Frosty.Core.Controls
 
         #region -- Asset --
         public static readonly DependencyProperty AssetProperty = DependencyProperty.Register("Asset", typeof(EbxAsset), typeof(FrostyPropertyGrid), new FrameworkPropertyMetadata(null, OnAssetChanged));
-        public EbxAsset Asset
-        {
+        public EbxAsset Asset {
             get => (EbxAsset)GetValue(AssetProperty);
             set => SetValue(AssetProperty, value);
         }
@@ -1666,8 +1679,7 @@ namespace Frosty.Core.Controls
 
         #region -- Classes --
         public static readonly DependencyProperty ClassesProperty = DependencyProperty.Register("Classes", typeof(IEnumerable), typeof(FrostyPropertyGrid), new FrameworkPropertyMetadata(null, OnClassesChanged));
-        public IEnumerable Classes
-        {
+        public IEnumerable Classes {
             get => (IEnumerable)GetValue(ClassesProperty);
             set => SetValue(ClassesProperty, value);
         }
@@ -1682,8 +1694,7 @@ namespace Frosty.Core.Controls
 
         #region -- HeaderVisible --
         public static readonly DependencyProperty HeaderVisibleProperty = DependencyProperty.Register("HeaderVisible", typeof(bool), typeof(FrostyPropertyGrid), new FrameworkPropertyMetadata(false));
-        public bool HeaderVisible
-        {
+        public bool HeaderVisible {
             get => (bool)GetValue(HeaderVisibleProperty);
             set => SetValue(HeaderVisibleProperty, value);
         }
@@ -1691,8 +1702,7 @@ namespace Frosty.Core.Controls
 
         #region -- ClassViewVisible --
         public static readonly DependencyProperty ClassViewVisibleProperty = DependencyProperty.Register("ClassViewVisible", typeof(bool), typeof(FrostyPropertyGrid), new UIPropertyMetadata(true));
-        public bool ClassViewVisible
-        {
+        public bool ClassViewVisible {
             get => (bool)GetValue(ClassViewVisibleProperty);
             set => SetValue(ClassViewVisibleProperty, value);
         }
@@ -1700,8 +1710,7 @@ namespace Frosty.Core.Controls
 
         #region -- Modified --
         public static readonly DependencyProperty ModifiedProperty = DependencyProperty.Register("Modified", typeof(bool), typeof(FrostyPropertyGrid), new UIPropertyMetadata(false));
-        public bool Modified
-        {
+        public bool Modified {
             get => (bool)GetValue(ModifiedProperty);
             set => SetValue(ModifiedProperty, value);
         }
@@ -1709,8 +1718,7 @@ namespace Frosty.Core.Controls
 
         #region -- InitialWidth --
         public static readonly DependencyProperty InitialWidthProperty = DependencyProperty.Register("InitialWidth", typeof(GridLength), typeof(FrostyPropertyGrid), new UIPropertyMetadata(new GridLength(1.0, GridUnitType.Star)));
-        public GridLength InitialWidth
-        {
+        public GridLength InitialWidth {
             get => (GridLength)GetValue(InitialWidthProperty);
             set => SetValue(InitialWidthProperty, value);
         }
@@ -1718,10 +1726,16 @@ namespace Frosty.Core.Controls
 
         #region -- FilterText --
         public static readonly DependencyProperty FilterTextProperty = DependencyProperty.Register("FilterText", typeof(string), typeof(FrostyPropertyGrid), new UIPropertyMetadata(""));
-        public string FilterText
-        {
+        public string FilterText {
             get => (string)GetValue(FilterTextProperty);
-            set => SetValue(FilterTextProperty, value);
+            set {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(FilterText));
+                }
+
+                SetValue(FilterTextProperty, value);
+            }
         }
         #endregion
 
@@ -1752,27 +1766,21 @@ namespace Frosty.Core.Controls
         private IEnumerable classes;
 
         public static readonly DependencyProperty OnPreModifiedCommandProperty = DependencyProperty.Register("OnPreModifiedCommand", typeof(ICommand), typeof(FrostyPropertyGrid), new UIPropertyMetadata(null));
-        public ICommand OnPreModifiedCommand
-        {
-            get
-            {
+        public ICommand OnPreModifiedCommand {
+            get {
                 return (ICommand)GetValue(OnPreModifiedCommandProperty);
             }
-            set
-            {
+            set {
                 SetValue(OnPreModifiedCommandProperty, value);
             }
         }
 
         public static readonly DependencyProperty OnModifiedCommandProperty = DependencyProperty.Register("OnModifiedCommand", typeof(ICommand), typeof(FrostyPropertyGrid), new UIPropertyMetadata(null));
-        public ICommand OnModifiedCommand
-        {
-            get
-            {
+        public ICommand OnModifiedCommand {
+            get {
                 return (ICommand)GetValue(OnModifiedCommandProperty);
             }
-            set
-            {
+            set {
                 SetValue(OnModifiedCommandProperty, value);
             }
         }
@@ -1803,60 +1811,92 @@ namespace Frosty.Core.Controls
         }
 
         private async void FilterBox_LostFocus(object sender, RoutedEventArgs e)
-        {            
-            string filterText = filterBox.Text;
-            if (filterText == FilterText)
-                return;
-
-            filterBox.IsEnabled = false;
-            tv.IsEnabled = false;
-            filterProgressBar.Visibility = Visibility.Visible;
-            filterInProgressBorder.Visibility = Visibility.Visible;
-
-            await Task.Run(() =>
+        {
+            try
             {
-                List<object> refObjects = new List<object>();
+                string filterText = filterBox.Text;
+                if (filterText == FilterText)
+                    return;
 
-                if (filterText.StartsWith("guid:"))
+                filterBox.IsEnabled = false;
+                tv.IsEnabled = false;
+                filterProgressBar.Visibility = Visibility.Visible;
+                filterInProgressBorder.Visibility = Visibility.Visible;
+
+                await Task.Run(() =>
                 {
-                    string[] arr = filterText.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                    string guidValue = (arr.Length > 1) ? arr[1] : "0";
-
-                    foreach (var item in items)
+                    try
                     {
-                        if (item.FilterGuid(guidValue.ToLower(), refObjects))
-                            item.IsHidden = true;
+                        List<object> refObjects = new List<object>();
+
+                        if (filterText.StartsWith("guid:"))
+                        {
+                            string[] arr = filterText.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                            string guidValue = (arr.Length > 1) ? arr[1] : "0";
+
+                            foreach (var item in items)
+                            {
+                                if (item.FilterGuid(guidValue.ToLower(), refObjects))
+                                    item.IsHidden = true;
+                            }
+                        }
+                        else
+                        {
+                            foreach (var item in items)
+                            {
+                                if (item.FilterPropertyName(filterText, refObjects))
+                                    item.IsHidden = true;
+                            }
+                        }
                     }
-                }
-                else
-                {
-                    foreach (var item in items)
+                    catch (Exception ex)
                     {
-                        if (item.FilterPropertyName(filterText, refObjects))
-                            item.IsHidden = true;
+                        // Handle the exception as needed, for example, log it, set a flag, etc.
+                        // For now, we'll just write it to the console.
+                        Console.WriteLine("An error occurred during filtering: " + ex.Message);
                     }
-                }
-            });
+                });
 
-            FilterText = filterText;
-            filterBox.IsEnabled = true;
-            tv.IsEnabled = true;
-            filterProgressBar.Visibility = Visibility.Collapsed;
-            filterInProgressBorder.Visibility = Visibility.Collapsed;
+                FilterText = filterText;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception as needed, for example, log it, set a flag, etc.
+                // For now, we'll just write it to the console.
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+            finally
+            {
+                // Ensure these actions are always taken, even if an exception occurs.
+                filterBox.IsEnabled = true;
+                tv.IsEnabled = true;
+                filterProgressBar.Visibility = Visibility.Collapsed;
+                filterInProgressBorder.Visibility = Visibility.Collapsed;
 
-            GC.Collect();
+                GC.Collect();
+            }
         }
-
         private void FilterBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                filterBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                if (filterBox == null)
+                {
+                    throw new NullReferenceException("filterBox is null");
+                }
+                if (filterBox.IsFocused)
+                {
+                    filterBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                }
             }
         }
 
         public void SetClass(object obj)
         {
+            if (obj == null)
+            {
+                throw new ArgumentNullException("obj");
+            }
             Object = obj;
         }
 

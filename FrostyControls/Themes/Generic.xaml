@@ -732,116 +732,42 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ScrollBar}">
-                    <Border Grid.Row="1" Background="#2f2f2f">
-                        <Grid>
-                            <Rectangle Fill="#2f2f2f" />
-                            <Track x:Name="PART_Track" IsDirectionReversed="True" IsEnabled="{TemplateBinding IsMouseOver}">
-                                <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.LineUpCommand" Interval="0">
-                                        <RepeatButton.Style>
-                                            <Style TargetType="RepeatButton">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="RepeatButton">
-                                                            <Rectangle Fill="#2f2f2f"/>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </RepeatButton.Style>
-                                    </RepeatButton>
-                                </Track.DecreaseRepeatButton>
-                                <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.LineDownCommand" Interval="0">
-                                        <RepeatButton.Style>
-                                            <Style TargetType="RepeatButton">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="RepeatButton">
-                                                            <Rectangle Fill="#2f2f2f"/>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </RepeatButton.Style>
-                                    </RepeatButton>
-                                </Track.IncreaseRepeatButton>
-                                <Track.Thumb>
-                                    <Thumb MinHeight="30">
-                                        <Thumb.Template>
-                                            <ControlTemplate TargetType="{x:Type Thumb}">
-                                                <Border x:Name="border" Background="#4f4f4f" CornerRadius="3" Margin="4">
-                                                    <!-- Additional template content can go here -->
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background" TargetName="border" Value="#6f6f6f"/>
-                                                    </Trigger>
-                                                    <Trigger Property="IsDragging" Value="True">
-                                                        <Setter Property="Background" TargetName="border" Value="#8f8f8f"/>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Thumb.Template>
-                                    </Thumb>
-                                </Track.Thumb>
-                            </Track>
-                        </Grid>
+                    <Border Background="#2f2f2f">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageUpCommand" CommandTarget="{Binding ElementName=PART_Track}" Style="{StaticResource ScrollBarButtonStyle}"/>
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource ScrollBarThumbStyle}" MinHeight="30"/>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageDownCommand" CommandTarget="{Binding ElementName=PART_Track}" Style="{StaticResource ScrollBarButtonStyle}"/>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-
         <Style.Triggers>
-            <Trigger Property="Orientation"
-                     Value="Horizontal">
-                <Setter Property="Width"
-                        Value="Auto" />
-                <Setter Property="MinWidth"
-                        Value="0" />
-                <Setter Property="Height"
-                        Value="14" />
-                <Setter Property="MinHeight"
-                        Value="14" />
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Width" Value="Auto" />
+                <Setter Property="MinWidth" Value="0" />
+                <Setter Property="Height" Value="14" />
+                <Setter Property="MinHeight" Value="14" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ScrollBar}">
                             <Border Background="{StaticResource ScrollbarBackground}">
-                                <Track x:Name="PART_Track"
-                                       IsDirectionReversed="False"
-                                       IsEnabled="{TemplateBinding IsMouseOver}">
-                                    <Track.Resources>
-                                        <!-- Thumb's minimum height is half of this metric -->
-                                        <sys:Double x:Key="{x:Static SystemParameters.HorizontalScrollBarButtonWidthKey}">
-                                            100
-                                        </sys:Double>
-                                    </Track.Resources>
+                                <Track x:Name="PART_Track" IsDirectionReversed="False">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Command="ScrollBar.PageLeftCommand" CommandTarget="{Binding ElementName=PART_Track}" Style="{StaticResource ScrollBarButtonStyle}"/>
+                                    </Track.DecreaseRepeatButton>
                                     <Track.Thumb>
-                                        <Thumb>
-                                            <Thumb.Template>
-                                                <ControlTemplate TargetType="{x:Type Thumb}">
-                                                    <Border x:Name="border"
-                                                            Background="{StaticResource ControlBackground}"
-                                                            CornerRadius="3"
-                                                            Margin="4" />
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver"
-                                                                 Value="True">
-                                                            <Setter Property="Background"
-                                                                    TargetName="border"
-                                                                    Value="{StaticResource ControlHighlight}" />
-                                                        </Trigger>
-                                                        <Trigger Property="IsDragging"
-                                                                 Value="True">
-                                                            <Setter Property="Background"
-                                                                    TargetName="border"
-                                                                    Value="{StaticResource ControlPressed}" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Thumb.Template>
-                                        </Thumb>
+                                        <Thumb Style="{StaticResource ScrollBarThumbStyle}" MinWidth="20"/>
                                     </Track.Thumb>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="ScrollBar.PageRightCommand" CommandTarget="{Binding ElementName=PART_Track}" Style="{StaticResource ScrollBarButtonStyle}"/>
+                                    </Track.IncreaseRepeatButton>
                                 </Track>
                             </Border>
                         </ControlTemplate>
@@ -849,6 +775,31 @@
                 </Setter>
             </Trigger>
         </Style.Triggers>
+    </Style>
+    <!-- ScrollBarButton Style -->
+    <Style x:Key="ScrollBarButtonStyle" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ScrollBarThumb Style -->
+    <Style x:Key="ScrollBarThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="Background" Value="#4f4f4f"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="3" Margin="4"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <!-- Set the minimum height and width to ensure the thumb is always visible and usable -->
+        <Setter Property="MinHeight" Value="20"/>
+        <Setter Property="MinWidth" Value="20"/>
     </Style>
 
     <!-- ScrollViewer -->
