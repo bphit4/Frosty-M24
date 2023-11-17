@@ -23,7 +23,7 @@ using System.Windows;
 
 [assembly: PluginDisplayName("Bulk Exporter")]
 [assembly: PluginAuthor("GalaxyMan2015 & Mophead")]
-[assembly: PluginVersion("1.0.0.6")]
+[assembly: PluginVersion("1.0.0.7")]
 
 [assembly: RegisterMenuExtension(typeof(BulkExporting.EbxToXmlMenuExtension))]
 [assembly: RegisterMenuExtension(typeof(BulkExporting.EbxToBinMenuExtension))]
