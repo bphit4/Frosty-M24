@@ -717,11 +717,27 @@ namespace FrostyEditor.Windows
                 // Update UI
                 UpdateUI();
 
+                bool allFiles = Config.Get("ShowAllFiles", false);
+
                 legacyExplorer.ShowOnlyModified = false;
-                legacyExplorer.ShowOnlyModified = true;
+                if(allFiles)
+                {
+                    legacyExplorer.ShowOnlyModified = false;
+                }
+                else
+                {
+                    legacyExplorer.ShowOnlyModified = true;
+                }
 
                 dataExplorer.ShowOnlyModified = false;
-                dataExplorer.ShowOnlyModified = true;
+                if (allFiles)
+                {
+                    dataExplorer.ShowOnlyModified = false;
+                }
+                else
+                {
+                    dataExplorer.ShowOnlyModified = true;
+                }
 
                 legacyExplorer.ShowOnlyUnModified = false;
                 legacyExplorer.ShowOnlyUnModified = false;
