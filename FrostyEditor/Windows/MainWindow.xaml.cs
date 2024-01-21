@@ -316,9 +316,20 @@ namespace FrostyEditor.Windows
                 InitFifaMenu();
             }
 
+            // Only show option to delete ModData and launch if a profile is loaded
+            if (ProfilesLibrary.HasLoadedProfile)
+            {
+                LaunchDataDelete.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                LaunchDataDelete.Visibility = Visibility.Collapsed;
+            }
+
             if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
             {
                 RestoreMadden.Visibility = Visibility.Visible;
+                RestoreMadden.Margin = new Thickness(LaunchDataDelete.Margin.Left + LaunchDataDelete.Width, 0, 0, 0);
             }
             else
             {
@@ -1098,7 +1109,41 @@ namespace FrostyEditor.Windows
             AboutWindow win = new AboutWindow();
             win.ShowDialog();
         }
+        private void LaunchDataDelete_Click(object sender, RoutedEventArgs e)
+        {
+            string modDataPath = Config.Get<string>("GamePath", "", ConfigScope.Game, ProfilesLibrary.ProfileName) + "\\ModData";
 
+            if (!Directory.Exists(modDataPath))
+            {
+                // ModData folder doesn't exist, proceed with the default launch
+                launchButton_Click(sender, e);
+                return;
+            }
+
+            try
+            {
+                // Attempt to delete the ModData folder
+                Directory.Delete(modDataPath, true);
+
+                // ModData deleted successfully, proceed with the default launch
+                launchButton_Click(sender, e);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Handle UnauthorizedAccessException (e.g., folder access denied)
+                FrostyMessageBox.Show("Error deleting ModData!\nAccess to ModData folder denied. Try running Frosty as Administrator.", "Frosty Editor", MessageBoxButton.OK);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                // Handle DirectoryNotFoundException (e.g., folder not found)
+                FrostyMessageBox.Show("Error deleting ModData!\nModData folder not found.", "Frosty Editor", MessageBoxButton.OK);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                FrostyMessageBox.Show($"An unexpected error occurred: {ex.Message}", "Frosty Editor", MessageBoxButton.OK);
+            }
+        }
         private void RestoreMadden_Click(object sender, RoutedEventArgs e)
         {
             string pathFile = "selectedFolder.txt";

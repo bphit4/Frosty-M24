@@ -1916,6 +1916,42 @@ namespace FrostyModManager
         {
             ((ListView)sender).UnselectAll();
         }
+
+        private void LaunchDataDelete_Click(object sender, RoutedEventArgs e)
+        {
+            string modDataPath = Config.Get<string>("GamePath", "", ConfigScope.Game, ProfilesLibrary.ProfileName) + "\\ModData";
+
+            if (!Directory.Exists(modDataPath))
+            {
+                // ModData folder doesn't exist, proceed with the default launch
+                launchButton_Click(sender, e);
+                return;
+            }
+
+            try
+            {
+                // Attempt to delete the ModData folder
+                Directory.Delete(modDataPath, true);
+
+                // ModData deleted successfully, proceed with the default launch
+                launchButton_Click(sender, e);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Handle UnauthorizedAccessException (e.g., folder access denied)
+                FrostyMessageBox.Show("Error deleting ModData!\nAccess to ModData folder denied. Try running Frosty as Administrator.", "Frosty Mod Manager", MessageBoxButton.OK);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                // Handle DirectoryNotFoundException (e.g., folder not found)
+                FrostyMessageBox.Show("Error deleting ModData!\nModData folder not found.", "Frosty Mod Manager", MessageBoxButton.OK);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                FrostyMessageBox.Show($"An unexpected error occurred: {ex.Message}", "Frosty Mod Manager", MessageBoxButton.OK);
+            }
+        }
         private void RestoreMadden_Click(object sender, RoutedEventArgs e)
         {
             string pathFile = "selectedFolder.txt";
