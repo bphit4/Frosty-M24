@@ -798,6 +798,10 @@
                                                     <Image Grid.Column="1" Source="{Binding Path=ModIcon}" Margin="8,0,0,0" Width="16" RenderOptions.BitmapScalingMode="Fant"/>
                                                     <TextBlock Grid.Column="2" Text="{Binding Path=ModName}" Margin="8,0,0,0" VerticalAlignment="Center"/>
                                                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <TextBlock Text="Vers: " VerticalAlignment="Center"/>
+                                                            <TextBlock Text="{Binding Path=ModVersion}" Margin="0,0,18,0" VerticalAlignment="Center"/>
+                                                        </StackPanel>
                                                         <TextBlock Text="{Binding Path=PriorityOrderText}" VerticalAlignment="Center" Foreground="White" />
                                                         <Border BorderThickness="1" BorderBrush="LightGray" Padding="6,2,6,2">
                                                             <TextBlock Text="{Binding Path=PriorityOrder}" VerticalAlignment="Center" FontWeight="Bold" Foreground="White"/>

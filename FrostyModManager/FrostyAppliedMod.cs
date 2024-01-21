@@ -64,6 +64,13 @@ namespace FrostyModManager
                 }
             }
         }
-
+        public string ModVersion {
+            get {
+                if (Mod != null && Mod.ModDetails != null)
+                    return Mod.ModDetails.Version;  // Assuming ModDetails has a Version property
+                else
+                    return "N/A";
+            }
+        }
     }
 }
