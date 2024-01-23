@@ -776,8 +776,7 @@ namespace MeshSetPlugin.Resources
                     m_unknownHash3 = reader.ReadUInt(); // some other hash
                 }
 
-                //reader.Pad(16);
-                reader.Pad(32);
+                reader.Pad(16);
                 reader.Pad(32);
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.DeadSpace))
                 {
