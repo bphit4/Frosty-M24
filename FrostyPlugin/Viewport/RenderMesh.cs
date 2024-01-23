@@ -1087,7 +1087,7 @@ namespace Frosty.Core.Viewport
             }
             if (NormTexture == null)
             {
-                NormTexture = state.TextureLibrary.LoadTextureAsset(App.AssetManager.GetEbxEntry(ProfilesLibrary.DefaultNormals).Guid);
+                //NormTexture = state.TextureLibrary.LoadTextureAsset(App.AssetManager.GetEbxEntry(ProfilesLibrary.DefaultNormals).Guid);
             }
             if (MaskTexture == null)
             {
