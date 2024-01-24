@@ -927,6 +927,11 @@ namespace MeshSetPlugin.Resources
 
                 writer.Write(m_unk2);
 
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+                {
+                    writer.Write(m_unknownm24);
+                }
+
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound))
                 {
                     writer.Write(0L);
@@ -1102,6 +1107,7 @@ namespace MeshSetPlugin.Resources
                 }
 
                 writer.WritePadding(16);
+                writer.WritePadding(32);
                 writer.Write(m_boundingBox);
             }
             else
@@ -1732,6 +1738,11 @@ namespace MeshSetPlugin.Resources
                 writer.Write(0L);
             }
 
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                writer.Write(m_unknownm24);
+            }
+
             writer.Write(m_chunkId);
             writer.Write(m_inlineDataOffset);
 
@@ -2348,6 +2359,11 @@ namespace MeshSetPlugin.Resources
                 {
                     writer.Write(m_unknownUInts[i]);
                 }
+            }
+            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                writer.Write((byte)m_meshType);
+                writer.Write(m_unknownm24);
             }
             else
             {
