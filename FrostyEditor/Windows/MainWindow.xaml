@@ -119,7 +119,9 @@
                     <MenuItem x:Name="AboutMenuItem" Header="About Frosty Editor" Click="aboutMenuItem_Click"/>
                 </MenuItem>
             </Menu>
+            <MenuItem x:Name="LaunchDataDelete" Header="Delete ModData and Launch" Height="22" Visibility="Collapsed" Click="LaunchDataDelete_Click" Foreground="White" Margin="331,0,0,0" Width="174" VerticalAlignment="Center" HorizontalAlignment="Left" Padding="-26,0,-49,0"/>
             <MenuItem x:Name="RestoreMadden" Header="Restore Madden 24" Height="22" Visibility="Collapsed" Click="RestoreMadden_Click" Foreground="White" Margin="331,0,0,0" Width="125" VerticalAlignment="Center" HorizontalAlignment="Left" Padding="-26,0,-49,0"/>
+
         </Grid>
 
         <Grid Grid.Row="1" Background="{StaticResource ListBackground}">
