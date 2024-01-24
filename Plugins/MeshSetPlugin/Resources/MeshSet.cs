@@ -522,6 +522,7 @@ namespace MeshSetPlugin.Resources
         private byte m_bonesPerVertex;
         private ushort m_unk1;
         private uint m_unk2;
+        private byte[] m_unknownm24;
 
         private bool m_hasUnknown;
         private bool m_hasUnknown2;
@@ -578,6 +579,11 @@ namespace MeshSetPlugin.Resources
                 m_vertexCount = reader.ReadUInt();
 
                 m_unk2 = reader.ReadUInt();
+
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+                {
+                    m_unknownm24 = reader.ReadBytes(16);
+                }
 
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
                 {
@@ -771,6 +777,7 @@ namespace MeshSetPlugin.Resources
                 }
 
                 reader.Pad(16);
+                reader.Pad(32);
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.DeadSpace))
                 {
                     reader.ReadBytes(16);
@@ -919,6 +926,11 @@ namespace MeshSetPlugin.Resources
                 writer.Write(m_vertexCount);
 
                 writer.Write(m_unk2);
+
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+                {
+                    writer.Write(m_unknownm24);
+                }
 
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound))
                 {
@@ -1095,6 +1107,7 @@ namespace MeshSetPlugin.Resources
                 }
 
                 writer.WritePadding(16);
+                writer.WritePadding(32);
                 writer.Write(m_boundingBox);
             }
             else
@@ -1252,7 +1265,7 @@ namespace MeshSetPlugin.Resources
         private uint m_inlineDataOffset;
         private byte[] m_adjacencyData;
         private bool m_hasBoneShortNames;
-
+        private byte[] m_unknownm24;
         public MeshSetLod(NativeReader reader, AssetManager am, ref int sectionIndex)
         {
             m_meshType = (MeshType)reader.ReadUInt();
@@ -1325,6 +1338,11 @@ namespace MeshSetPlugin.Resources
                 {
                     reader.ReadUInt();
                 }
+            }
+
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                m_unknownm24 = reader.ReadBytes(12);
             }
 
             m_chunkId = reader.ReadGuid();
@@ -1720,6 +1738,11 @@ namespace MeshSetPlugin.Resources
                 writer.Write(0L);
             }
 
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                writer.Write(m_unknownm24);
+            }
+
             writer.Write(m_chunkId);
             writer.Write(m_inlineDataOffset);
 
@@ -1874,6 +1897,7 @@ namespace MeshSetPlugin.Resources
         private string m_name;
         private uint m_nameHash;
         private MeshType m_meshType;
+        private byte[] m_unknownm24; 
         private byte m_unk;
         private MeshSetLayoutFlags m_flags;
         private ushort[] m_lodFadeDistanceFactors = new ushort[MaxLodCount * 2];
@@ -1935,6 +1959,11 @@ namespace MeshSetPlugin.Resources
                 {
                     m_unknownUInts[i] = reader.ReadUInt();
                 }
+            }
+            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                m_meshType = (MeshType)reader.ReadByte();
+                m_unknownm24 = reader.ReadBytes(19);
             }
             else
             {
@@ -2330,6 +2359,11 @@ namespace MeshSetPlugin.Resources
                 {
                     writer.Write(m_unknownUInts[i]);
                 }
+            }
+            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
+            {
+                writer.Write((byte)m_meshType);
+                writer.Write(m_unknownm24);
             }
             else
             {
