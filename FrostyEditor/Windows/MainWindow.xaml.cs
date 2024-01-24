@@ -392,7 +392,25 @@ namespace FrostyEditor.Windows
             }
             else
             {
-                string selectedProfileName = FrostyProfileSelectWindow.Show();
+                bool useDefaultProfile = Config.Get<bool>("UseDefaultProfile", false);
+
+                string selectedProfileName;
+
+                if (useDefaultProfile)
+                {
+                    selectedProfileName = Config.Get<string>("DefaultProfile", "None");
+                    if(selectedProfileName == "None")
+                    {
+                        // No default profile stored, prompt user to select a profile
+                        selectedProfileName = FrostyProfileSelectWindow.Show();
+                    }
+                }
+                else
+                {
+                    // Don't use default profile, prompt user to select a profile
+                    selectedProfileName = FrostyProfileSelectWindow.Show();
+                }
+
                 if (!string.IsNullOrEmpty(selectedProfileName) && SelectProfile(selectedProfileName))
                 {
                     NewProject();

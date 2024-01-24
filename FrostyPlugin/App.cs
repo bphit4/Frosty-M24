@@ -69,7 +69,14 @@ namespace Frosty.Core
                 FrostyMessageBox.Show("The selected profile is a read-only profile, and therefore cannot be loaded in the mod manager", "Frosty Mod Manager");
                 return false;
             }
-            
+
+            // store as default profile if option is enabled
+            bool useDefaultProfile = Config.Get<bool>("UseDefaultProfile", false);
+            if (useDefaultProfile)
+            {
+                Config.Add("DefaultProfile", profile);
+            }
+
             // open profile task window
             return FrostyProfileTaskWindow.Show(Application.Current.MainWindow);
         }
