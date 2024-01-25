@@ -15,6 +15,7 @@ using FrostySdk.IO;
 using Frosty.ModSupport;
 using FrostyModManager.Controls;
 using FrostyModManager.Compression;
+using FrostyModManager.Windows;
 using System.Text;
 using System.ComponentModel;
 using Frosty.Hash;
@@ -317,7 +318,25 @@ namespace FrostyModManager
         {
             (App.Logger as FrostyLogger).AddBinding(tb, TextBox.TextProperty);
 
-            string selectedProfileName = FrostyProfileSelectWindow.Show();
+            string selectedProfileName;
+
+            bool useDefaultProfile = Config.Get<bool>("UseDefaultProfile", false);
+
+            if (useDefaultProfile)
+            {
+                selectedProfileName = Config.Get<string>("DefaultProfile", "None");
+                if (selectedProfileName == "None")
+                {
+                    // No default profile stored, prompt user to select a profile
+                    selectedProfileName = FrostyProfileSelectWindow.Show();
+                }
+            }
+            else
+            {
+                // Don't use default profile, prompt user to select a profile
+                selectedProfileName = FrostyProfileSelectWindow.Show();
+            }
+
             if (!string.IsNullOrEmpty(selectedProfileName))
             {
                 Frosty.Core.App.ClearProfileData();
@@ -1759,11 +1778,12 @@ namespace FrostyModManager
 
         private void launchConfigurationWindow_Click(object sender, RoutedEventArgs e)
         {
+            Config.Remove("DefaultProfile");
             Config.Save();
 
-            Windows.PrelaunchWindow2 SelectConfiguration = new Windows.PrelaunchWindow2();
-            App.Current.MainWindow = SelectConfiguration;
-            SelectConfiguration.Show();
+            SplashWindow splashWin = new SplashWindow();
+            App.Current.MainWindow = splashWin;
+            splashWin.Show();
             Close();
         }
 

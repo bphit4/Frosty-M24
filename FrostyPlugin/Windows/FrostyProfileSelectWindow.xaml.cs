@@ -57,6 +57,8 @@ namespace Frosty.Core.Windows
             if (ConfigurationListView.SelectedIndex == -1)
                 return;
 
+            
+
             if (ConfigurationListView.SelectedItem is FrostyConfiguration configuration)
             {
                 selectedProfileName = configuration.ProfileName;
