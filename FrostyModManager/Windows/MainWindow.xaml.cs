@@ -446,6 +446,11 @@ namespace FrostyModManager
                 AddPack("Default");
             packsComboBox.ItemsSource = packs;
 
+            if(App.ImportModImmediately)
+            {
+                InstallMods(new string[] { App.LaunchArgs });
+            }
+
             if (App.LaunchGameImmediately)
             {
                 int index = packs.FindIndex((FrostyPack a) => a.Name.Equals(App.LaunchProfile, StringComparison.OrdinalIgnoreCase));

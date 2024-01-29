@@ -36,6 +36,11 @@ namespace FrostyModManager
             set => launchGameImmediately = value;
         }
 
+        public static bool ImportModImmediately {
+            get => importModImmediately;
+            set => importModImmediately = value;
+        }
+
         public static string LaunchProfile { get; private set; }
         public static string LaunchArgs { get; private set; }
 
@@ -49,6 +54,7 @@ namespace FrostyModManager
         private Config ini = new Config();
 
         private static bool launchGameImmediately;
+        private static bool importModImmediately;
 
         public App()
         {
@@ -114,11 +120,14 @@ namespace FrostyModManager
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
-        {
+        {         
             if (!File.Exists($"{Frosty.Core.App.GlobalSettingsPath}/manager_config.json"))
             {
                 Config.UpgradeConfigs();
             }
+
+            string executablePath = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            Directory.SetCurrentDirectory(executablePath);
 
             Config.Load();
 
@@ -161,6 +170,11 @@ namespace FrostyModManager
                         arg = e.Args[i];
                         sb.Append(arg + " ");
                     }
+                }
+                else if (arg.Contains(".fbmod"))
+                {
+                    sb.Append(arg);
+                    ImportModImmediately = true;
                 }
             }
 
