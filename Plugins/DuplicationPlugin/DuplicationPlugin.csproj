@@ -58,6 +58,7 @@
     </ProjectReference>
     <ProjectReference Include="..\AtlasTexturePlugin\AtlasTexturePlugin.csproj" />
     <ProjectReference Include="..\MeshSetPlugin\MeshSetPlugin.csproj" />
+    <ProjectReference Include="..\SvgImagePlugin\SvgImagePlugin.csproj" />
   </ItemGroup>
 
   <ItemGroup>

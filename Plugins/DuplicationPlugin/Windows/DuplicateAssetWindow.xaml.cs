@@ -4,12 +4,12 @@ using Frosty.Core.Windows;
 using FrostySdk;
 using FrostySdk.Attributes;
 using FrostySdk.Managers;
+using FrostySdk.Managers.Entries;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using FrostySdk.Managers.Entries;
 
 namespace DuplicationPlugin.Windows
 {
