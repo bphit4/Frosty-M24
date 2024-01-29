@@ -90,11 +90,30 @@ namespace FrostyModManager
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             Exception exp = e.Exception;
+            string message;
+
+            if(exp is AggregateException)
+            {
+                message = "One or more errors occurred. Please ensure all applied mods are up to date or compatible with the latest game version.";
+            }
+            else if (exp is UnauthorizedAccessException)
+            {
+                message = "Access to a file or directory is denied. Please ensure to run the Mod Manager as Administrator.";
+            }
+            else
+            {
+                message = exp.Message;
+            }
 
             using (NativeWriter writer = new NativeWriter(new FileStream("crashlog.txt", FileMode.Create)))
                 writer.WriteLine($"{exp.Message}\r\n\r\n{exp.StackTrace}");
 
+            #if FROSTY_DEVELOPER
             FrostyExceptionBox.Show(exp, "Frosty Mod Manager");
+            #else
+            FrostyMessageBox.Show(message, "Frosty Mod Manager");
+            #endif
+
             Environment.Exit(0);
         }
 

@@ -103,7 +103,7 @@ namespace FrostyEditor
             using (NativeWriter writer = new NativeWriter(new FileStream("crashlog.txt", FileMode.Create)))
                 writer.WriteLine($"{exp.Message}\r\n\r\n{exp.StackTrace}");
 
-            FrostyExceptionBox.Show(exp, "Frosty Editor");
+            FrostyMessageBox.Show(exp.Message, "Frosty Editor");
             Environment.Exit(0);
         }
 
