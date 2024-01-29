@@ -94,7 +94,12 @@ namespace FrostyModManager
             using (NativeWriter writer = new NativeWriter(new FileStream("crashlog.txt", FileMode.Create)))
                 writer.WriteLine($"{exp.Message}\r\n\r\n{exp.StackTrace}");
 
+            #if FROSTY_DEVELOPER
             FrostyExceptionBox.Show(exp, "Frosty Mod Manager");
+            #else
+            FrostyMessageBox.Show(exp.Message, "Frosty Mod Manager");
+            #endif
+
             Environment.Exit(0);
         }
 
