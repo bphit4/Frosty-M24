@@ -10,7 +10,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FrostyControls;component/Themes/Generic.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-    
+
     <!-- BundleEditor -->
     <Style TargetType="{x:Type local:BundleEditor}">
         <Setter Property="Template">
@@ -37,12 +37,12 @@
                                         <ComboBoxItem Content="Shared Bundles"/>
                                     </ComboBox>
                                 </Grid>
-                                
+
                                 <Grid Grid.Row="1" Background="{StaticResource WindowBackground}">
                                     <ctrl:FrostyWatermarkTextBox x:Name="PART_BundleFilterTextBox" Margin="1,0,1,1" WatermarkText="Filter" BorderThickness="1"/>
                                 </Grid>
-                                
-                                <ListBox Grid.Row="2" x:Name="PART_BundlesListBox" SelectionMode="Extended">
+
+                                <ListBox Grid.Row="2" x:Name="PART_BundlesListBox">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" Foreground="{StaticResource FontColor}" FontFamily="MS Reference Sans Serif"/>
@@ -58,23 +58,34 @@
                         <ctrl:FrostyDockablePanel Grid.Column="1" TitleBarVisible="False">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="26"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- Adjusted to 'Auto' -->
                                     <RowDefinition Height="22"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                
-                                <Border Background="{StaticResource ControlBackground}" Margin="1">
-                                    <StackPanel Orientation="Horizontal" Margin="6,0" DockPanel.Dock="Left">
-                                        <Button Content="Add to Bundle" Command="{Binding Path=AddToBundleCommand, RelativeSource={RelativeSource AncestorType={x:Type local:BundleEditor}}}"/>
+
+                                <Border Background="{StaticResource ControlBackground}" Margin="1" Grid.Row="0">
+                                    <StackPanel Orientation="Horizontal" Margin="6,0">
+                                        <Border Margin="2" BorderBrush="Gray" BorderThickness="1" CornerRadius="2">
+                                            <Button Content="Add to Bundle" 
+                            Command="{Binding Path=AddToBundleCommand, RelativeSource={RelativeSource AncestorType={x:Type local:BundleEditor}}}"
+                            Margin="3" Padding="5,3" Height="Auto" />
+                                            <!-- Adjusted Padding and Height -->
+                                        </Border>
+                                        <Border Margin="2" BorderBrush="Gray" BorderThickness="1" CornerRadius="2">
+                                            <Button Content="Remove From Bundle" 
+                            Command="{Binding Path=RemoveFromBundleCommand, RelativeSource={RelativeSource AncestorType={x:Type local:BundleEditor}}}"
+                            Margin="3" Padding="5,3" Height="Auto" />
+                                            <!-- Adjusted Padding and Height -->
+                                        </Border>
                                     </StackPanel>
                                 </Border>
 
                                 <TextBox x:Name="PART_SuperBundleTextBox" Grid.Row="1" Margin="1,0,1,0" VerticalContentAlignment="Center" Height="22" BorderThickness="1" FontFamily="MS Reference Sans Serif" IsReadOnly="True"/>
 
-                                <core:FrostyDataExplorer x:Name="PART_DataExplorer" Grid.Row="2" MultiSelect="True"/>
+                                <core:FrostyDataExplorer x:Name="PART_DataExplorer" Grid.Row="2"/>
                             </Grid>
                         </ctrl:FrostyDockablePanel>
-                        
 
                     </Grid>
                 </ControlTemplate>
@@ -106,5 +117,5 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
 </ResourceDictionary>

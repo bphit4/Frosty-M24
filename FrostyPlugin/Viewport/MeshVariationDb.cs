@@ -26,12 +26,13 @@ namespace Frosty.Core.Viewport
             MaterialVariationClassGuid = MaterialVariation.External.ClassGuid;
 
             // @hack
-            if (!ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield1, ProfileVersion.Anthem,
-                ProfileVersion.Battlefield5, ProfileVersion.Fifa20,
-                ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.NeedForSpeedHeat,
-                ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
+            if (ProfilesLibrary.DataVersion != (int)ProfileVersion.Battlefield1 && ProfilesLibrary.DataVersion != (int)ProfileVersion.Anthem && ProfilesLibrary.DataVersion != (int)ProfileVersion.Battlefield5 && ProfilesLibrary.DataVersion != (int)ProfileVersion.Fifa20
+             && ProfilesLibrary.DataVersion != (int)ProfileVersion.Fifa21
+             && ProfilesLibrary.DataVersion != (int)ProfileVersion.Fifa22
+             && ProfilesLibrary.DataVersion != (int)ProfileVersion.Madden22
+             && ProfilesLibrary.DataVersion != (int)ProfileVersion.Madden23
+             && ProfilesLibrary.DataVersion != (int)ProfileVersion.Madden24
+             && ProfilesLibrary.DataVersion != (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville && ProfilesLibrary.DataVersion != (int)ProfileVersion.NeedForSpeedHeat)
             {
                 TextureParameters = ebxEntry.TextureParameters;
             }
@@ -128,17 +129,12 @@ namespace Frosty.Core.Viewport
 
         private static Dictionary<Guid, MeshVariationDbEntry> modifiedentries = new Dictionary<Guid, MeshVariationDbEntry>();
 
-        public static void LoadVariations(FrostyTaskWindow task)
+        public static void LoadVariations(FrostyTaskWindow task = null)
         {
             int mvdbVersion = 1;
 
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa19 , ProfileVersion.Madden20,
-                ProfileVersion.Fifa20, ProfileVersion.PlantsVsZombiesBattleforNeighborville,
-                ProfileVersion.NeedForSpeedHeat,
-                ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
+            if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa19 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa21 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa22 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden22 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden23 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden24 || ProfilesLibrary.DataVersion == (int)ProfileVersion.PGATour || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville || ProfilesLibrary.DataVersion == (int)ProfileVersion.NeedForSpeedHeat)
             {
                 IsLoaded = true;
                 return;
@@ -148,14 +144,14 @@ namespace Frosty.Core.Viewport
             uint index = 0;
 
             entries.Clear();
-            task.Update("Loading variation databases");
+            task?.Update("Loading Variation Databases");
 
-            string cache = System.AppDomain.CurrentDomain.BaseDirectory + @"\Caches\" + ProfilesLibrary.CacheName + "_mvdb.cache";
+            string cache = System.AppDomain.CurrentDomain.BaseDirectory + @"\Caches\" + Enum.GetName(typeof(ProfileVersion), ProfilesLibrary.DataVersion) + "_mvdb.cache";
             bool generateMVDB = true;
 
             if (File.Exists(cache))
             {
-                using (NativeReader reader = new NativeReader(new FileStream(System.AppDomain.CurrentDomain.BaseDirectory + @"\Caches\" + ProfilesLibrary.CacheName + "_mvdb.cache", FileMode.Open)))
+                using (NativeReader reader = new NativeReader(new FileStream(System.AppDomain.CurrentDomain.BaseDirectory + @"\Caches\" + Enum.GetName(typeof(ProfileVersion), ProfilesLibrary.DataVersion) + "_mvdb.cache", FileMode.Open)))
                 {
                     if (reader.ReadInt() == mvdbVersion)
                     {
@@ -207,7 +203,7 @@ namespace Frosty.Core.Viewport
                             entries.Add(guid, mvEntry);
                         }
                     }
-                    
+
                 }
             }
             if (generateMVDB)
@@ -215,7 +211,7 @@ namespace Frosty.Core.Viewport
                 foreach (EbxAssetEntry ebx in App.AssetManager.EnumerateEbx("MeshVariationDatabase"))
                 {
                     uint progress = (uint)((index / (float)totalCount) * 100);
-                    task.Update(progress: progress);
+                    task?.Update(progress: progress);
                     if (ebx.IsAdded)
                         continue;
                     EbxAsset asset = App.AssetManager.GetEbx(ebx, true);
@@ -244,7 +240,7 @@ namespace Frosty.Core.Viewport
                     index++;
                 }
 
-                using (NativeWriter writer = new NativeWriter(new FileStream(System.AppDomain.CurrentDomain.BaseDirectory + @"\Caches\" + ProfilesLibrary.CacheName + "_mvdb.cache", FileMode.Create)))
+                using (NativeWriter writer = new NativeWriter(new FileStream(System.AppDomain.CurrentDomain.BaseDirectory + @"\Caches\" + Enum.GetName(typeof(ProfileVersion), ProfilesLibrary.DataVersion) + "_mvdb.cache", FileMode.Create)))
                 {
                     writer.Write(mvdbVersion);
                     writer.Write(entries.Count);
@@ -295,12 +291,7 @@ namespace Frosty.Core.Viewport
         public static void LoadModifiedVariations()
         {
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa19, ProfileVersion.Madden20,
-                ProfileVersion.Fifa20, ProfileVersion.PlantsVsZombiesBattleforNeighborville,
-                ProfileVersion.NeedForSpeedHeat,
-                ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
+            if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa19 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa21 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa22 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden22 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden23 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden24 || ProfilesLibrary.DataVersion == (int)ProfileVersion.PGATour || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville || ProfilesLibrary.DataVersion == (int)ProfileVersion.NeedForSpeedHeat)
             {
                 IsLoaded = true;
                 return;
@@ -350,7 +341,7 @@ namespace Frosty.Core.Viewport
                     return modifiedDBEntry;
 
                 MeshVariationDbEntry originalDBEntry = entries[meshGuid];
-                foreach(uint key in originalDBEntry.Variations.Keys)
+                foreach (uint key in originalDBEntry.Variations.Keys)
                 {
                     if (!modifiedDBEntry.Variations.ContainsKey(key))
                         modifiedDBEntry.Variations.Add(key, originalDBEntry.Variations[key]);
@@ -365,8 +356,17 @@ namespace Frosty.Core.Viewport
             return entry == null ? null : GetVariations(entry.Guid);
         }
 
-        public static IEnumerable<MeshVariation> FindVariations(uint hash)
+        public static IEnumerable<MeshVariation> FindVariations(uint hash, bool excludeModified = false)
         {
+            if (!excludeModified)
+            {
+                foreach (MeshVariationDbEntry entry in ModifiedEntries.Values)
+                {
+                    if (entry.ContainsVariation(hash))
+                        yield return entry.GetVariation(hash);
+                }
+            }
+
             foreach (MeshVariationDbEntry entry in entries.Values)
             {
                 if (entry.ContainsVariation(hash))
