@@ -1397,6 +1397,10 @@ namespace FrostyModManager
                         errors.Add(new ImportErrorInfo { error = e.Message, filename = fi.Name });
                         File.Delete(fi.FullName);
                     }
+                    catch (IOException)
+                    {
+                        throw new IOException("Stream was too long. Ensure that you have extracted the mod before attempting to import.");
+                    }
                 }
             });
 
