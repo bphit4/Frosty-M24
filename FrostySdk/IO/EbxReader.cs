@@ -66,6 +66,7 @@ namespace FrostySdk.IO
         Version2 = 0x0FB2D1CE,
         Version4 = 0x0FB4D1CE,
         Version6 = 0x46464952, // RIFF LE
+        Version8 = 0x46464952,
     }
 
     internal enum RiffEbxSection
@@ -566,7 +567,22 @@ namespace FrostySdk.IO
 
         public static EbxReader CreateReader(Stream inStream, FileSystemManager fs = null, bool patched = false)
         {
-            return ProfilesLibrary.EbxVersion == 6 ? new EbxReaderRiff(inStream, fs, patched) : (ProfilesLibrary.EbxVersion & 1) != 0 ? new EbxReaderV2(inStream, fs, patched) : new EbxReader(inStream);
+            if (ProfilesLibrary.EbxVersion == 6)
+            {
+                return new EbxReaderRiff(inStream, fs, patched);
+            }
+            else if ((ProfilesLibrary.EbxVersion & 1) != 0 && ProfilesLibrary.EbxVersion != 8) // Check for other odd versions excluding 8
+            {
+                return new EbxReaderV2(inStream, fs, patched);
+            }
+            else if (ProfilesLibrary.EbxVersion == 8) // Add the new condition for version 8
+            {
+                return new EbxReaderRiffPGA(inStream, fs, patched); // Assuming EbxReaderRiffPGA is the class for version 8
+            }
+            else
+            {
+                return new EbxReader(inStream);
+            }
         }
 
         public Guid FileGuid => fileGuid;

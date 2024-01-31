@@ -105,6 +105,7 @@
     <Compile Include="IO\BitReader.cs" />
     <Compile Include="IO\CasReader.cs" />
     <Compile Include="IO\CatReader.cs" />
+    <Compile Include="IO\EbxReaderRiffPGA.cs" />
     <Compile Include="IO\DbReader.cs" />
     <Compile Include="IO\DbWriter.cs" />
     <Compile Include="IO\EbxReader.cs" />
