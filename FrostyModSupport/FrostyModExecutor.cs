@@ -148,7 +148,7 @@ namespace Frosty.ModSupport
         }
         private class FrostySymLinkException : Exception
         {
-            public override string Message => "One ore more symbolic links could not be created, please restart tool as Administrator and ensure your storage drive is formatted to NTFS (not exFAT).";
+            public override string Message => "One or more symbolic links could not be created. Please make sure you are running the tool as Administrator and ensure your storage drive is formatted as NTFS (NOT exFAT).";
         }
 
         [JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
@@ -1288,16 +1288,23 @@ namespace Frosty.ModSupport
                 int currentMod = 0;
                 foreach (FrostyMod mod in modList)
                 {
-                    Logger.Log($"Loading Mods ({mod.ModDetails?.Title ?? mod.Filename.Replace(".fbmod", "")})");
-                    if (mod.NewFormat)
+                    try
                     {
-                        ProcessModResources(mod);
+                        Logger.Log($"Loading Mods ({mod.ModDetails?.Title ?? mod.Filename.Replace(".fbmod", "")})");
+                        if (mod.NewFormat)
+                        {
+                            ProcessModResources(mod);
+                        }
+                        else
+                        {
+                            ProcessLegacyModResources(mod.Path);
+                        }
+                        ReportProgress(currentMod++, modList.Count);
                     }
-                    else
+                    catch (AggregateException)
                     {
-                        ProcessLegacyModResources(mod.Path);
+                        throw new Exception($"One or more errors occurred while attempting to load the following mod: {mod.ModDetails?.Title ?? mod.Filename.Replace(".fbmod", "")}\n\nPlease ensure that this mod is up to date or compatible with the latest game version.");
                     }
-                    ReportProgress(currentMod++, modList.Count);
                 }
 
                 Logger.Log("Applying Handlers");
