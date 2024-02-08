@@ -16,9 +16,11 @@ namespace Frosty.Core.Windows
         private IEnumerable itemsSource = null;
         public bool includeSubDirectories { get; set; } = false;
         public bool exportModifiedOnly { get; set; } = false;
+        public bool exportUnmodifiedOnly { get; set; } = false;
 
         public List<string> types = new List<string>()
         {
+            "SkinnedMeshAsset",
             "RigidMeshAsset",
             "CompositeMeshAsset",
             "TextureAsset",
@@ -46,36 +48,21 @@ namespace Frosty.Core.Windows
                 stopWatch.Start();
 
                 List<EbxAssetEntry> entries = new List<EbxAssetEntry>();
-                if (includeSubDirectories)
+                foreach (EbxAssetEntry entry in itemsSource)
                 {
-                    foreach (EbxAssetEntry entry in itemsSource)
+                    bool pathMatches = includeSubDirectories ? entry.Path.ToLower().Contains(fullPath.ToLower()) : entry.Path.Equals(fullPath, StringComparison.OrdinalIgnoreCase);
+                    bool typeMatches = types.Contains(entry.Type);
+                    bool shouldExport = false;
+
+                    // Adjusted logic to export all assets if neither checkbox is checked
+                    if ((exportModifiedOnly && entry.IsModified) || (exportUnmodifiedOnly && !entry.IsModified) || (!exportModifiedOnly && !exportUnmodifiedOnly))
                     {
-                        if (entry.Path.ToLower().Contains(fullPath.ToLower()))
-                        {
-                            if (types.Contains(entry.Type))
-                            {
-                                if (!exportModifiedOnly || entry.IsModified)
-                                {
-                                    entries.Add(entry);
-                                }
-                            }
-                        }
+                        shouldExport = true;
                     }
-                }
-                else
-                {
-                    foreach (EbxAssetEntry entry in itemsSource)
+
+                    if (pathMatches && typeMatches && shouldExport)
                     {
-                        if (entry.Path.Equals(fullPath, StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (types.Contains(entry.Type))
-                            {
-                                if (!exportModifiedOnly || entry.IsModified)
-                                {
-                                    entries.Add(entry);
-                                }
-                            }
-                        }
+                        entries.Add(entry);
                     }
                 }
 
@@ -85,11 +72,9 @@ namespace Frosty.Core.Windows
                 while (entries.Count > 0 && i < entries.Count)
                 {
                     int originalCount = entries.Count;
-                    // use the first instance of a given AssetDefinition to export all instances of that AssetDefinition in the array
                     AssetDefinition assetDefinition = App.PluginManager.GetAssetDefinition(entries[i].Type) ?? new AssetDefinition();
                     List<EbxAssetEntry> leftOverEntries = assetDefinition.BatchExport(entries, path, stopWatch);
 
-                    // If we somehow failed to export any entries, add 1 to i to avoid an infinite loop
                     if (leftOverEntries.Count == originalCount)
                     {
                         Console.WriteLine("Failed to export a group of asset definitions.");
@@ -105,7 +90,7 @@ namespace Frosty.Core.Windows
                 int totalExported = initialCount - finalCount;
 
                 var ts = stopWatch.Elapsed;
-                string elapsedTime = $"{ts.Seconds}.{ts.Milliseconds}";
+                string elapsedTime = String.Format("{0}.{1}", ts.Seconds, ts.Milliseconds);
 
                 App.Logger.Log("Successfully exported {0} assets in {1} seconds.", totalExported, elapsedTime);
             }

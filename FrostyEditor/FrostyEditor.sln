@@ -97,6 +97,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimationEditorPlugin", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EbxBulkExportPlugin", "..\Plugins\ExportBulkPlugin\EbxBulkExportPlugin.csproj", "{C44BEF6B-0E59-4E04-9691-052FE7B6CB6E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueprintEditorPlugin", "..\Plugins\FrostyBlueprintEditor\BlueprintEditorPlugin.csproj", "{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheBundleManager", "..\Plugins\BundleManagerMenuExtension\TheBundleManager.csproj", "{B36988EB-7E42-41DE-845E-3E4FCDB593FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Developer - Debug|x64 = Developer - Debug|x64
@@ -536,6 +540,26 @@ Global
 		{C44BEF6B-0E59-4E04-9691-052FE7B6CB6E}.Release - Final|x64.Build.0 = Release - Final|x64
 		{C44BEF6B-0E59-4E04-9691-052FE7B6CB6E}.Release|x64.ActiveCfg = Release - Alpha|x64
 		{C44BEF6B-0E59-4E04-9691-052FE7B6CB6E}.Release|x64.Build.0 = Release - Alpha|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Developer - Debug|x64.ActiveCfg = Developer - Debug|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Developer - Debug|x64.Build.0 = Developer - Debug|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release - Alpha|x64.ActiveCfg = Release - Alpha|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release - Alpha|x64.Build.0 = Release - Alpha|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release - Beta|x64.ActiveCfg = Release - Beta|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release - Beta|x64.Build.0 = Release - Beta|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release - Final|x64.ActiveCfg = Release - Final|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release - Final|x64.Build.0 = Release - Final|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release|x64.ActiveCfg = Release - Alpha|x64
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1}.Release|x64.Build.0 = Release - Alpha|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Developer - Debug|x64.ActiveCfg = Developer - Debug|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Developer - Debug|x64.Build.0 = Developer - Debug|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release - Alpha|x64.ActiveCfg = Release - Alpha|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release - Alpha|x64.Build.0 = Release - Alpha|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release - Beta|x64.ActiveCfg = Release - Beta|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release - Beta|x64.Build.0 = Release - Beta|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release - Final|x64.ActiveCfg = Release - Final|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release - Final|x64.Build.0 = Release - Final|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release|x64.ActiveCfg = Release - Alpha|x64
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release|x64.Build.0 = Release - Alpha|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -576,6 +600,8 @@ Global
 		{7F280BF3-F794-4715-9D32-770D36454B8C} = {492048B6-848D-4675-A9BF-34A4751303F2}
 		{CE312C84-2677-433C-B4B1-352BD16E7590} = {492048B6-848D-4675-A9BF-34A4751303F2}
 		{C44BEF6B-0E59-4E04-9691-052FE7B6CB6E} = {492048B6-848D-4675-A9BF-34A4751303F2}
+		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1} = {492048B6-848D-4675-A9BF-34A4751303F2}
+		{B36988EB-7E42-41DE-845E-3E4FCDB593FB} = {492048B6-848D-4675-A9BF-34A4751303F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C0B22EF1-4C3F-45B9-9F08-9793ED912199}
