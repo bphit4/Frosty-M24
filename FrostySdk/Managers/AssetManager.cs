@@ -1185,7 +1185,18 @@ namespace FrostySdk.Managers
             => m_bundles.FindIndex((BundleEntry be) => be.Name.Equals(name));
 
         public BundleEntry GetBundleEntry(int bundleId)
-            => bundleId >= m_bundles.Count ? null : m_bundles[bundleId];
+        {
+            // Check if bundleId is within the valid range
+            if (bundleId >= 0 && bundleId < m_bundles.Count)
+            {
+                return m_bundles[bundleId];
+            }
+            else
+            {
+                // Return null or handle the invalid index appropriately
+                return null;
+            }
+        }
 
         public AssetEntry GetCustomAssetEntry(string type, string key)
             => !m_customAssetManagers.ContainsKey(type) ? null : m_customAssetManagers[type].GetAssetEntry(key);
