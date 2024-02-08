@@ -1326,6 +1326,13 @@ namespace FrostyModManager
                                 if (fi.Extension == ".archive")
                                     continue;
 
+                                // If filename begins with CAREER- or ROSTER- or CAREERDRAFT- then it goes into the saves folder.
+                                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24) && (fi.Name.StartsWith("CAREER-") || fi.Name.StartsWith("ROSTER-") || fi.Name.StartsWith("CAREERDRAFT-")))
+                                {
+                                    errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "This is a Madden save file, it should be placed in your Madden saves folder." });
+                                    continue;
+                                }
+
                                 errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "File is not a valid Frosty Mod." });
                                 continue;
                             }
