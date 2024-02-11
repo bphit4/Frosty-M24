@@ -220,10 +220,12 @@ namespace Frosty.Core.Legacy
                 writer.Write(data);
 
             App.AssetManager.RevertAsset(lfe);
-
+            Guid originalChunkId = lfe.ChunkId;
             ChunkAssetEntry orig = App.AssetManager.GetChunkEntry(lfe.ChunkId);
 
-            Guid guid = App.AssetManager.AddChunk(data, GenerateDeterministicGuid(lfe));
+            App.AssetManager.ModifyChunk(originalChunkId, data);
+
+            Guid guid = originalChunkId; 
             foreach (LegacyFileEntry.ChunkCollectorInstance inst in lfe.CollectorInstances)
             {
                 // add new chunk
