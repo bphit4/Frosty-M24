@@ -122,6 +122,21 @@ namespace Frosty.Core.Windows
             // check to make sure SDK is up to date
             if (TypeLibrary.GetSdkVersion() != App.FileSystemManager.Head)
             {
+                // If Mod Manager and Madden 24, then if the config option agrees, show a message informing the user that they need to download the latest tool from MMC and link there.
+                if (!App.IsEditor)
+                {
+                    if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24) && !Config.Get<bool>("AllowM24SdkUpdate", false))
+                    {
+                        MessageBoxResult discResult = FrostyMessageBox.Show("The Madden NFL 24 SDK is out of date. Please ensure that your game is up to date and that you are using the latest version of the Mod Manager from the MMC Discord.\n\nWould you like to go to the MMC Discord now?", "Frosty Mod Manager", MessageBoxButton.YesNo);
+
+                        if (discResult == MessageBoxResult.Yes)
+                        {
+                            System.Diagnostics.Process.Start("https://discord.gg/maddenmoddingcommunity");
+                        }
+                        Environment.Exit(0);
+                    }
+                }
+                
                 // requires updating
                 if (UpdateSdk())
                 {
