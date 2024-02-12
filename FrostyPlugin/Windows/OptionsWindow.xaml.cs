@@ -342,6 +342,12 @@ namespace Frosty.Core.Windows
         public bool RememberChoice { get; set; } = false;
 
         [Category("Manager")]
+        [DisplayName("Allow Manual M24 SDK Update")]
+        [Description("If true, the option to update the Madden 24 SDK when out of date will be available.")]
+        [EbxFieldMeta(EbxFieldType.Boolean)]
+        public bool AllowM24SDKUpdate { get; set; } = false;
+
+        [Category("Manager")]
         [DisplayName("Command Line Arguments")]
         [Description("Command line arguments to run on launch.")]
         [EbxFieldMeta(EbxFieldType.Boolean)]
@@ -352,6 +358,7 @@ namespace Frosty.Core.Windows
             base.Load();
             
             RememberChoice = Config.Get<bool>("UseDefaultProfile", false);
+            AllowM24SDKUpdate = Config.Get<bool>("AllowM24SdkUpdate", false);
             CommandLineArgs = Config.Get<string>("CommandLineArgs", "", ConfigScope.Game);
         }
 
@@ -360,6 +367,7 @@ namespace Frosty.Core.Windows
             base.Save();
             
             Config.Add("UseDefaultProfile", RememberChoice);
+            Config.Add("AllowM24SdkUpdate", AllowM24SDKUpdate);
             Config.Add("CommandLineArgs", CommandLineArgs, ConfigScope.Game);
 
             if (RememberChoice)
