@@ -2015,5 +2015,23 @@ namespace FrostyEditor.Windows
                 Clipboard.SetText(paths.ToString().TrimEnd());
             }
         }
+
+        // Copy legacy asset's chunk ID to clipboard
+        private void contextMenuCopyChunk_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedAssets = m_currentExplorer.SelectedAssets;
+            if (selectedAssets != null && selectedAssets.Count > 0)
+            {
+                StringBuilder chunkIds = new StringBuilder();
+                foreach (var asset in selectedAssets)
+                {
+                    if (asset is LegacyFileEntry legacyAsset)
+                    {
+                        chunkIds.AppendLine(legacyAsset.ChunkId.ToString());
+                    }
+                }
+                Clipboard.SetText(chunkIds.ToString().TrimEnd());
+            }
+        }
     }
 }
