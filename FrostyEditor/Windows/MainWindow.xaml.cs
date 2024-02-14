@@ -552,13 +552,6 @@ namespace FrostyEditor.Windows
             // Create a new instance of the program and exit the current instance
             System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
             Close();
-
-            string selectedProfileName = FrostyProfileSelectWindow.Show();
-            if (!string.IsNullOrEmpty(selectedProfileName) && SelectProfile(selectedProfileName))
-            {
-                NewProject();
-                UpdateUI(true);
-            }
         }
 
         private static bool SelectProfile(string profile)
