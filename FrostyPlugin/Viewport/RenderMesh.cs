@@ -590,7 +590,7 @@ namespace Frosty.Core.Viewport
 
                     // MEA Only
                     else if (ProfilesLibrary.DataVersion == (int)ProfileVersion.MassEffectAndromeda)
-                    {
+                    { 
                         if (paramName.Equals("MP_Light", StringComparison.OrdinalIgnoreCase))
                         {
                             Vector4 v = AdditionalParams[0];
@@ -1085,22 +1085,10 @@ namespace Frosty.Core.Viewport
                 if (ProfilesLibrary.DataVersion == (int)ProfileVersion.StarWarsBattlefrontII || ProfilesLibrary.DataVersion == (int)ProfileVersion.StarWarsSquadrons)
                     AdditionalParams[3] = new Vector4(1.0f, AdditionalParams[3].Y, 0, 0);
             }
-
-            if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden24 || ProfilesLibrary.DataVersion == (int)ProfileVersion.PGATour)
+            if (NormTexture == null)
             {
-                if (NormTexture == null)
-                {
-                    //NormTexture = state.TextureLibrary.LoadTextureAsset(App.AssetManager.GetEbxEntry(ProfilesLibrary.DefaultNormals).Guid);
-                }
+                //NormTexture = state.TextureLibrary.LoadTextureAsset(App.AssetManager.GetEbxEntry(ProfilesLibrary.DefaultNormals).Guid);
             }
-            else
-            {
-                if (NormTexture == null)
-                {
-                    NormTexture = state.TextureLibrary.LoadTextureAsset(App.AssetManager.GetEbxEntry(ProfilesLibrary.DefaultNormals).Guid);
-                }
-            }
-
             if (MaskTexture == null)
             {
                 MaskTexture = state.TextureLibrary.LoadTextureAsset(App.AssetManager.GetEbxEntry(ProfilesLibrary.DefaultMask).Guid);
@@ -1162,7 +1150,7 @@ namespace Frosty.Core.Viewport
                 while (writer.Position < size)
                     writer.Write((byte)0x00);
 
-                outData = writer.ToByteArray(); ;
+                outData = writer.ToByteArray();;
             }
 
             if (section.PixelParameters != null && size == section.PixelParameters.Description.SizeInBytes)
@@ -1421,7 +1409,7 @@ namespace Frosty.Core.Viewport
                                 case ShaderParameterType.Float: defValue = "0"; break;
                                 case ShaderParameterType.Float2: defValue = "0,0"; break;
                                 case ShaderParameterType.Float3: defValue = "0,0,0"; break;
-                                case ShaderParameterType.Float4: defValue = "0,0,0,0"; break;
+                                case ShaderParameterType.Float4: defValue = "0,0,0,0";  break;
                             }
 
                             if (paramNode.Attributes["defaultValue"] != null)
@@ -1658,7 +1646,7 @@ namespace Frosty.Core.Viewport
                 foreach (ShaderParameter param in permutation.PixelTextures)
                 {
                     string textureFormat = "";
-                    switch (param.Type)
+                    switch(param.Type)
                     {
                         case ShaderParameterType.Tex2d: textureFormat = "Texture2D"; break;
                         case ShaderParameterType.Tex2dArray: textureFormat = "Texture2DArray"; break;
@@ -1730,7 +1718,7 @@ namespace Frosty.Core.Viewport
                 geomDecl.Streams[elem.StreamIndex].VertexStride += (byte)elem.Size;
 
                 if (elem.StreamIndex > geomDecl.StreamCount - 1)
-                    geomDecl.StreamCount = (byte)(elem.StreamIndex + 1);
+                    geomDecl.StreamCount = (byte)(elem.StreamIndex + 1);                
             }
 
             ShaderPermutation permutation = new ShaderPermutation(perm, geomDecl, filename, this);

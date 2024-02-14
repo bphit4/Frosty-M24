@@ -777,11 +777,7 @@ namespace MeshSetPlugin.Resources
                 }
 
                 reader.Pad(16);
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24, ProfileVersion.PGATour))
-                {
-                    reader.Pad(32);
-                }
-
+                reader.Pad(32);
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.DeadSpace))
                 {
                     reader.ReadBytes(16);
@@ -1111,12 +1107,7 @@ namespace MeshSetPlugin.Resources
                 }
 
                 writer.WritePadding(16);
-
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24, ProfileVersion.PGATour))
-                {
-                    writer.WritePadding(32);
-                }
-
+                writer.WritePadding(32);
                 writer.Write(m_boundingBox);
             }
             else
@@ -1340,7 +1331,7 @@ namespace MeshSetPlugin.Resources
                 m_adjacencyData = new byte[m_adjacencyBufferSize];
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace   ))
             {
                 reader.ReadLong();
                 if (ProfilesLibrary.IsLoaded(ProfileVersion.DeadSpace))
@@ -1906,7 +1897,7 @@ namespace MeshSetPlugin.Resources
         private string m_name;
         private uint m_nameHash;
         private MeshType m_meshType;
-        private byte[] m_unknownm24;
+        private byte[] m_unknownm24; 
         private byte m_unk;
         private MeshSetLayoutFlags m_flags;
         private ushort[] m_lodFadeDistanceFactors = new ushort[MaxLodCount * 2];
