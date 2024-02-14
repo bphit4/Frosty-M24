@@ -546,6 +546,13 @@ namespace FrostyEditor.Windows
         private void reselectProfileMenuItem_Click(object sender, RoutedEventArgs e)
         {
             PromptToSaveDirtyProject();
+            Config.Remove("DefaultProfile");
+            Config.Save();
+
+            // Create a new instance of the program and exit the current instance
+            System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+            Close();
+
             string selectedProfileName = FrostyProfileSelectWindow.Show();
             if (!string.IsNullOrEmpty(selectedProfileName) && SelectProfile(selectedProfileName))
             {
