@@ -101,6 +101,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueprintEditorPlugin", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheBundleManager", "..\Plugins\BundleManagerMenuExtension\TheBundleManager.csproj", "{B36988EB-7E42-41DE-845E-3E4FCDB593FB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MathExtender", "..\Plugins\FrostyMathEntityExtender\MathExtender.csproj", "{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Developer - Debug|x64 = Developer - Debug|x64
@@ -560,6 +562,16 @@ Global
 		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release - Final|x64.Build.0 = Release - Final|x64
 		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release|x64.ActiveCfg = Release - Alpha|x64
 		{B36988EB-7E42-41DE-845E-3E4FCDB593FB}.Release|x64.Build.0 = Release - Alpha|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Developer - Debug|x64.ActiveCfg = Developer - Debug|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Developer - Debug|x64.Build.0 = Developer - Debug|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release - Alpha|x64.ActiveCfg = Release - Alpha|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release - Alpha|x64.Build.0 = Release - Alpha|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release - Beta|x64.ActiveCfg = Release - Beta|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release - Beta|x64.Build.0 = Release - Beta|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release - Final|x64.ActiveCfg = Release - Final|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release - Final|x64.Build.0 = Release - Final|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release|x64.ActiveCfg = Release - Alpha|x64
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9}.Release|x64.Build.0 = Release - Alpha|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -602,6 +614,7 @@ Global
 		{C44BEF6B-0E59-4E04-9691-052FE7B6CB6E} = {492048B6-848D-4675-A9BF-34A4751303F2}
 		{75ED4032-D8CF-4F8A-832A-CE4F4F8166F1} = {492048B6-848D-4675-A9BF-34A4751303F2}
 		{B36988EB-7E42-41DE-845E-3E4FCDB593FB} = {492048B6-848D-4675-A9BF-34A4751303F2}
+		{1F1938AF-194C-4623-8DF2-C5E64BD8E3F9} = {492048B6-848D-4675-A9BF-34A4751303F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C0B22EF1-4C3F-45B9-9F08-9793ED912199}
