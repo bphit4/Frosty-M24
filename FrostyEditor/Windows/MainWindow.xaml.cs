@@ -415,6 +415,11 @@ namespace FrostyEditor.Windows
                 {
                     NewProject();
                     UpdateUI(true);
+                    if (useDefaultProfile)
+                    {
+                        // Set current profile to default in config
+                        Config.Add("DefaultProfile", selectedProfileName);
+                    }
                 }
             }
         }
