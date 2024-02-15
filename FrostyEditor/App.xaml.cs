@@ -206,21 +206,6 @@ namespace FrostyEditor
                 //CheckVersion();   // Disabling update check. Need to figure out how to handle updates.
             }
 
-            // get startup profile (if one exists)
-            if (Config.Get<bool>("UseDefaultProfile", false))
-            {
-                string prof = Config.Get<string>("DefaultProfile", null);
-                if (!string.IsNullOrEmpty(prof))
-                {
-                    m_defaultConfig = new FrostyConfiguration(prof);
-                }
-                else
-                {
-                    Config.Add("UseDefaultProfile", false);
-                    Config.Save();
-                }
-            }
-
             //check args to see if it is loading a project
             if (e.Args.Length > 0) {
                 string arg = e.Args[0];
