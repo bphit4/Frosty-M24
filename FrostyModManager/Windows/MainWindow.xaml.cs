@@ -518,6 +518,7 @@ namespace FrostyModManager
 
             selectedPack.AppliedModsUpdated += SelectedProfile_AppliedModsUpdated;
             selectedPack.Refresh();
+            updateAppliedModButtons();
 
             Config.Add("SelectedPack", selectedPack.Name, ConfigScope.Game);
         }
