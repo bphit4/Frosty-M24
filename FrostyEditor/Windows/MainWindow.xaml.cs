@@ -546,12 +546,12 @@ namespace FrostyEditor.Windows
         private void reselectProfileMenuItem_Click(object sender, RoutedEventArgs e)
         {
             PromptToSaveDirtyProject();
-            string selectedProfileName = FrostyProfileSelectWindow.Show();
-            if (!string.IsNullOrEmpty(selectedProfileName) && SelectProfile(selectedProfileName))
-            {
-                NewProject();
-                UpdateUI(true);
-            }
+            Config.Remove("DefaultProfile");
+            Config.Save();
+
+            // Create a new instance of the program and exit the current instance
+            System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+            Close();
         }
 
         private static bool SelectProfile(string profile)
