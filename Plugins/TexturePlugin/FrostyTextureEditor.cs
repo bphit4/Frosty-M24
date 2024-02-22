@@ -683,80 +683,59 @@ namespace TexturePlugin
 
         private void UpdateControls()
         {
-            float newWidth = m_textureAsset.Width;
-            float newHeight = m_textureAsset.Height;
+            // Determine the aspect ratio of the texture
+            float aspectRatio = (float)m_textureAsset.Width / m_textureAsset.Height;
 
-            if (m_textureAsset.Width == 4096 && m_textureAsset.Height == 8192)
+            // Calculate the maximum dimensions for display based on the viewer size or a predefined limit
+            int maxDisplayWidth = 2048; // You can adjust this value based on your application's needs
+            int maxDisplayHeight = (int)(maxDisplayWidth / aspectRatio);
+            if (maxDisplayHeight > 2048) // Ensure we don't exceed a reasonable height for display
             {
-                if (newWidth > 4096)
-                {
-                    newWidth = 4096;
-                    newHeight = (newHeight * (newWidth / m_textureAsset.Width));
-                }
-                if (newHeight > 4096)
-                {
-                    newHeight = 4096;
-                    newWidth = (newWidth * (newHeight / m_textureAsset.Height));
-                }
-            }
-            else
-            {
-                if (newWidth > 2048)
-                {
-                    newWidth = 2048;
-                    newHeight = (newHeight * (newWidth / m_textureAsset.Width));
-                }
-                if (newHeight > 2048)
-                {
-                    newHeight = 2048;
-                    newWidth = (newWidth * (newHeight / m_textureAsset.Height));
-                }
+                maxDisplayHeight = 2048;
+                maxDisplayWidth = (int)(maxDisplayHeight * aspectRatio);
             }
 
-            m_renderer.Width = newWidth;
-            m_renderer.Height = newHeight;
+            // Set the renderer's dimensions
+            // If the actual texture dimensions are smaller than the max, use the actual dimensions
+            m_renderer.Width = Math.Min(m_textureAsset.Width, maxDisplayWidth);
+            m_renderer.Height = Math.Min(m_textureAsset.Height, maxDisplayHeight);
 
+            // Update the texture format display
             string pf = m_textureAsset.PixelFormat;
             if (pf.StartsWith("BC") && m_textureAsset.Flags.HasFlag(TextureFlags.SrgbGamma))
+            {
                 pf = pf.Replace("UNORM", "SRGB");
-
+            }
             m_textureFormatText.Text = pf;
-            //textureGroupText.Content = textureAsset.TextureGroup;
-            //debugTextBox.Text = textureAsset.ToDebugString();
 
-            ushort width = m_textureAsset.Width;
-            ushort height = m_textureAsset.Height;
-
+            // Always try to display the highest resolution mip level initially
             m_mipsComboBox.Items.Clear();
+            ushort width = m_textureAsset.Width, height = m_textureAsset.Height;
             for (int i = 0; i < m_textureAsset.MipCount; i++)
             {
-                m_mipsComboBox.Items.Add(string.Format("{0}x{1}", width, height));
-
+                m_mipsComboBox.Items.Add($"{width}x{height}");
                 width >>= 1;
                 height >>= 1;
             }
-            m_mipsComboBox.SelectedIndex = 0;
+            m_mipsComboBox.SelectedIndex = 0; // Select the highest resolution mip
 
+            // Update the slice selection for 3D textures and cubemaps
+            UpdateSliceComboBox();
+        }
+
+        private void UpdateSliceComboBox()
+        {
+            // This method separates the slice combo box population logic for clarity
+            m_sliceComboBox.ItemsSource = null;
             if (m_textureAsset.Depth > 1)
             {
-                m_sliceComboBox.ItemsSource = null;
-                if (m_textureAsset.Type == TextureType.TT_Cube)
-                {
-                    // give cube maps actual names for the slices
-                    string[] cubeItems = new string[] { "X+", "X-", "Y+", "Y-", "Z+", "Z-" };
-                    m_sliceComboBox.ItemsSource = cubeItems;
-                }
-                else
-                {
-                    // other textures just have numbered slices
-                    string[] sliceItems = new string[m_textureAsset.Depth];
-                    for (int i = 0; i < m_textureAsset.Depth; i++)
-                        sliceItems[i] = i.ToString();
-                    m_sliceComboBox.ItemsSource = sliceItems;
-                }
+                string[] sliceItems = m_textureAsset.Type == TextureType.TT_Cube
+                    ? new[] { "X+", "X-", "Y+", "Y-", "Z+", "Z-" }
+                    : Enumerable.Range(0, m_textureAsset.Depth).Select(i => i.ToString()).ToArray();
+
+                m_sliceComboBox.ItemsSource = sliceItems;
                 m_sliceComboBox.SelectedIndex = 0;
             }
-
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)

@@ -277,6 +277,15 @@ namespace FrostySdk.IO
             }
             return null;
         }
+        public dynamic GetObject(AssetClassGuid guid)
+        {
+            foreach (dynamic obj in Objects)
+            {
+                if (obj.GetInstanceGuid() == guid)
+                    return obj;
+            }
+            return null;
+        }
 
         public bool AddDependency(Guid guid)
         {
