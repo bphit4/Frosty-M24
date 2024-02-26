@@ -15,6 +15,7 @@ using System.Windows.Data;
 using FrostySdk.Managers.Entries;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using Frosty.Core.Windows;
+using System.Threading.Tasks;
 
 namespace Frosty.Core.Controls
 {
@@ -22,30 +23,26 @@ namespace Frosty.Core.Controls
     {
 
         public static readonly DependencyProperty ItemContainerStyleProperty = ItemsControl.ItemContainerStyleProperty.AddOwner(typeof(PlainView));
-        public Style ItemContainerStyle
-        {
+        public Style ItemContainerStyle {
             get => (Style)GetValue(ItemContainerStyleProperty);
             set => SetValue(ItemContainerStyleProperty, value);
         }
 
         public static readonly DependencyProperty ItemTemplateProperty = ItemsControl.ItemTemplateProperty.AddOwner(typeof(PlainView));
-        public DataTemplate ItemTemplate
-        {
+        public DataTemplate ItemTemplate {
             get => (DataTemplate)GetValue(ItemTemplateProperty);
             set => SetValue(ItemTemplateProperty, value);
         }
 
         public static readonly DependencyProperty ItemWidthProperty = WrapPanel.ItemWidthProperty.AddOwner(typeof(PlainView));
-        public double ItemWidth
-        {
+        public double ItemWidth {
             get => (double)GetValue(ItemWidthProperty);
             set => SetValue(ItemWidthProperty, value);
         }
 
 
         public static readonly DependencyProperty ItemHeightProperty = WrapPanel.ItemHeightProperty.AddOwner(typeof(PlainView));
-        public double ItemHeight
-        {
+        public double ItemHeight {
             get => (double)GetValue(ItemHeightProperty);
             set => SetValue(ItemHeightProperty, value);
         }
@@ -73,8 +70,7 @@ namespace Frosty.Core.Controls
         public bool IsSelected { get; set; }
         public bool IsRoot { get; }
 
-        public bool IsExpanded 
-        { 
+        public bool IsExpanded {
             get => expanded && Children.Count != 0;
             set => expanded = value;
         }
@@ -148,24 +144,27 @@ namespace Frosty.Core.Controls
 
         #region -- ItemsSource --
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(null, OnItemsSourceChanged));
-        public IEnumerable ItemsSource
-        {
+        public IEnumerable ItemsSource {
             get => (IEnumerable)GetValue(ItemsSourceProperty);
-            set => SetValue(ItemsSourceProperty, value);
+            set {
+                 SetValue(ItemsSourceProperty, value);
+                UpdateTotalAssetsCountAsync(); // Method to update the total count
+            }
         }
         private static void OnItemsSourceChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             FrostyDataExplorer ctrl = o as FrostyDataExplorer;
+            ctrl.PopulateAssetTypesComboBox(); // Refresh the asset types dropdown
             ctrl.m_assetPathMapping.Clear();
             ctrl.SelectedAsset = null;
             ctrl.UpdateTreeView();
+            ctrl.UpdateTotalAssetsCountAsync();
         }
         #endregion
 
         #region -- ShowOnlyModified --
         public static readonly DependencyProperty ShowOnlyModifiedProperty = DependencyProperty.Register(nameof(ShowOnlyModified), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(false, OnShowOnlyModifiedChanged));
-        public bool ShowOnlyModified
-        {
+        public bool ShowOnlyModified {
             get => (bool)GetValue(ShowOnlyModifiedProperty);
             set => SetValue(ShowOnlyModifiedProperty, value);
         }
@@ -173,6 +172,7 @@ namespace Frosty.Core.Controls
         {
             FrostyDataExplorer ctrl = o as FrostyDataExplorer;
             ctrl.UpdateTreeView();
+            ctrl.UpdateTotalAssetsCountAsync();
         }
         #endregion
         public static readonly DependencyProperty ShowOnlyUnModifiedProperty = DependencyProperty.Register(nameof(ShowOnlyUnModified), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(false, OnShowOnlyUnModifiedChanged));
@@ -184,12 +184,26 @@ namespace Frosty.Core.Controls
         {
             FrostyDataExplorer ctrl = o as FrostyDataExplorer;
             ctrl.UpdateTreeView();
+            ctrl.UpdateTotalAssetsCountAsync();
+        }
+
+        public static readonly DependencyProperty ShowOnlyUnsavedModifiedProperty = DependencyProperty.Register(nameof(ShowOnlyUnsavedModified), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(false, OnShowOnlyUnsavedModifiedChanged));
+
+        public bool ShowOnlyUnsavedModified {
+            get => (bool)GetValue(ShowOnlyUnsavedModifiedProperty);
+            set => SetValue(ShowOnlyUnsavedModifiedProperty, value);
+        }
+
+        private static void OnShowOnlyUnsavedModifiedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            FrostyDataExplorer ctrl = d as FrostyDataExplorer;
+            ctrl.UpdateTreeView();
+            ctrl.UpdateTotalAssetsCountAsync();
         }
 
         #region -- MultiSelect --
         public static readonly DependencyProperty MultiSelectProperty = DependencyProperty.Register(nameof(MultiSelect), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(null));
-        public bool MultiSelect
-        {
+        public bool MultiSelect {
             get => (bool)GetValue(MultiSelectProperty);
             set => SetValue(MultiSelectProperty, value);
         }
@@ -197,8 +211,7 @@ namespace Frosty.Core.Controls
 
         #region -- SelectedAsset --
         public static readonly DependencyProperty SelectedAssetProperty = DependencyProperty.Register(nameof(SelectedAsset), typeof(AssetEntry), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(null));
-        public AssetEntry SelectedAsset
-        {
+        public AssetEntry SelectedAsset {
             get => (AssetEntry)GetValue(SelectedAssetProperty);
             set => SetValue(SelectedAssetProperty, value);
         }
@@ -206,8 +219,7 @@ namespace Frosty.Core.Controls
 
         #region -- SelectedAssets --
         public static readonly DependencyProperty SelectedAssetsProperty = DependencyProperty.Register(nameof(SelectedAssets), typeof(IList<AssetEntry>), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(null));
-        public IList<AssetEntry> SelectedAssets
-        {
+        public IList<AssetEntry> SelectedAssets {
             get => (IList<AssetEntry>)GetValue(SelectedAssetsProperty);
             set => SetValue(SelectedAssetsProperty, value);
         }
@@ -215,8 +227,7 @@ namespace Frosty.Core.Controls
 
         #region -- AssetContextMenu --
         public static readonly DependencyProperty AssetContextMenuProperty = DependencyProperty.Register(nameof(AssetContextMenu), typeof(ContextMenu), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(null));
-        public ContextMenu AssetContextMenu
-        {
+        public ContextMenu AssetContextMenu {
             get => (ContextMenu)GetValue(AssetContextMenuProperty);
             set => SetValue(AssetContextMenuProperty, value);
         }
@@ -224,8 +235,7 @@ namespace Frosty.Core.Controls
 
         #region -- ToolbarVisible --
         public static readonly DependencyProperty ToolbarVisibleProperty = DependencyProperty.Register(nameof(ToolbarVisible), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(true));
-        public bool ToolbarVisible
-        {
+        public bool ToolbarVisible {
             get => (bool)GetValue(ToolbarVisibleProperty);
             set => SetValue(ToolbarVisibleProperty, value);
         }
@@ -233,8 +243,7 @@ namespace Frosty.Core.Controls
 
         #region -- AssetListVisible --
         public static readonly DependencyProperty AssetListVisibleProperty = DependencyProperty.Register(nameof(AssetListVisible), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(true));
-        public bool AssetListVisible
-        {
+        public bool AssetListVisible {
             get => (bool)GetValue(AssetListVisibleProperty);
             set => SetValue(AssetListVisibleProperty, value);
         }
@@ -242,8 +251,7 @@ namespace Frosty.Core.Controls
 
         #region -- BookmarkContext --
         public static readonly DependencyProperty BookmarkContextProperty = DependencyProperty.Register(nameof(BookmarkContext), typeof(string), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata("", OnBookmarkContextChanged));
-        public string BookmarkContext
-        {
+        public string BookmarkContext {
             get => (string)GetValue(BookmarkContextProperty);
             set => SetValue(BookmarkContextProperty, value);
         }
@@ -256,8 +264,7 @@ namespace Frosty.Core.Controls
 
         #region -- InitialHeight --
         public static readonly DependencyProperty InitialHeightProperty = DependencyProperty.Register(nameof(InitialHeight), typeof(GridLength), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(new GridLength(1, GridUnitType.Star)));
-        public GridLength InitialHeight
-        {
+        public GridLength InitialHeight {
             get => (GridLength)GetValue(InitialHeightProperty);
             set => SetValue(InitialHeightProperty, value);
         }
@@ -265,8 +272,7 @@ namespace Frosty.Core.Controls
 
         #region -- SelectedPath --
         public static readonly DependencyProperty SelectedPathProperty = DependencyProperty.Register(nameof(SelectedPath), typeof(string), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(""));
-        public string SelectedPath
-        {
+        public string SelectedPath {
             get => (string)GetValue(SelectedPathProperty);
             set => SetValue(SelectedPathProperty, value);
         }
@@ -274,8 +280,7 @@ namespace Frosty.Core.Controls
 
         #region -- TileTemplate --
         public static readonly DependencyProperty TileTemplateProperty = DependencyProperty.Register(nameof(TileTemplate), typeof(DataTemplate), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(null));
-        public DataTemplate TileTemplate
-        {
+        public DataTemplate TileTemplate {
             get => (DataTemplate)GetValue(TileTemplateProperty);
             set => SetValue(TileTemplateProperty, value);
         }
@@ -283,8 +288,7 @@ namespace Frosty.Core.Controls
 
         #region -- TileZoom --
         public static readonly DependencyProperty TileZoomProperty = DependencyProperty.Register(nameof(TileZoom), typeof(double), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(50.0));
-        public double TileZoom
-        {
+        public double TileZoom {
             get => (double)GetValue(TileZoomProperty);
             set => SetValue(TileZoomProperty, value);
         }
@@ -292,8 +296,7 @@ namespace Frosty.Core.Controls
 
         #region -- GridView --
         public static readonly DependencyProperty GridViewProperty = DependencyProperty.Register(nameof(GridView), typeof(bool), typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(true, OnGridViewChanged));
-        public bool GridView
-        {
+        public bool GridView {
             get => (bool)GetValue(GridViewProperty);
             set => SetValue(GridViewProperty, value);
         }
@@ -311,8 +314,7 @@ namespace Frosty.Core.Controls
         #region Double Clicked
         public static readonly DependencyProperty OnDoubleClickedCommandProperty = DependencyProperty.Register(nameof(OnDoubleClickedCommand), typeof(ICommand), typeof(FrostyDataExplorer), new UIPropertyMetadata(null));
 
-        public ICommand OnDoubleClickedCommand
-        {
+        public ICommand OnDoubleClickedCommand {
             get => (ICommand)GetValue(OnDoubleClickedCommandProperty);
             set => SetValue(OnDoubleClickedCommandProperty, value);
         }
@@ -325,7 +327,7 @@ namespace Frosty.Core.Controls
         public ICommand FindOpenedAssetCommand => new RelayCommand(FindOpenedAsset);
 
         #endregion
-        
+
         #region OnFindOpenedAsset
 
         public ICommand BatchExportSelectedCommand => new RelayCommand(BatchExportSelected);
@@ -333,10 +335,10 @@ namespace Frosty.Core.Controls
         #endregion
 
         #endregion
-        
+
         public event EventHandler<RoutedEventArgs> SelectedAssetDoubleClick;
         public event EventHandler<RoutedEventArgs> SelectionChanged;
-        
+
         private TextBox m_filterTextBox;
         private TreeView m_assetTreeView;
         private ListView m_assetListView;
@@ -347,7 +349,7 @@ namespace Frosty.Core.Controls
         private readonly Dictionary<string, AssetPath> m_assetPathMapping = new Dictionary<string, AssetPath>(StringComparer.OrdinalIgnoreCase);
 
         private AssetPath m_selectedPath;
-        
+
         private readonly List<FilterData> m_filter = new List<FilterData>();
         private string m_prevFilterText = "";
 
@@ -356,14 +358,28 @@ namespace Frosty.Core.Controls
         private GridView m_detailView;
         private PlainView m_tileView;
 
+        public static readonly DependencyProperty TotalAssetsCountProperty = DependencyProperty.Register(
+            nameof(TotalAssetsCount),
+            typeof(int),
+            typeof(FrostyDataExplorer),
+            new PropertyMetadata(0));
+
         static FrostyDataExplorer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(FrostyDataExplorer), new FrameworkPropertyMetadata(typeof(FrostyDataExplorer)));
         }
 
+        private ComboBox typeComboBox; // Class-level variable
+
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+            typeComboBox = GetTemplateChild("PART_TypeComboBox") as ComboBox;
+            if (typeComboBox != null)
+            {
+                typeComboBox.SelectionChanged += PART_TypeComboBox_SelectionChanged;
+                PopulateAssetTypesComboBox(); // Adjust this method to use the class-level variable
+            }
 
             m_filterTextBox = GetTemplateChild(PART_FilterTextBox) as TextBox;
             m_assetTreeView = GetTemplateChild(PART_AssetTreeView) as TreeView;
@@ -377,13 +393,13 @@ namespace Frosty.Core.Controls
             IsVisibleChanged += FrostyDataExplorer_IsVisibleChanged;
 
             m_detailView = new GridView();
-            m_tileView = new PlainView {ItemTemplate = TileTemplate};
+            m_tileView = new PlainView { ItemTemplate = TileTemplate };
             UpdateViewType();
 
             m_detailView.Columns.Add(new GridViewColumn() { Header = new GridViewColumnHeader() { Content = "Name", Tag = "DisplayName" }, CellTemplate = FindResource("DisplayNameCellTemplate") as DataTemplate });
             m_detailView.Columns.Add(new GridViewColumn() { Header = new GridViewColumnHeader() { Content = "Type", Tag = "Type" }, CellTemplate = FindResource("TypeCellTemplate") as DataTemplate });
 
-            Binding b = new Binding("TileZoom") {Source = this};
+            Binding b = new Binding("TileZoom") { Source = this };
 
             BindingOperations.SetBinding(m_tileView, PlainView.ItemWidthProperty, b);
             BindingOperations.SetBinding(m_tileView, PlainView.ItemHeightProperty, b);
@@ -432,7 +448,7 @@ namespace Frosty.Core.Controls
             BatchExportSelectedWindow win = new BatchExportSelectedWindow(m_selectedPath, ItemsSource);
             if (win.ShowDialog() == true)
             {
-                
+
             }
 
             //App.Logger.Log("0xnot a valid string hash.");
@@ -514,7 +530,7 @@ namespace Frosty.Core.Controls
             else
             {
                 TreeViewItem tvi = m_assetTreeView.ItemContainerGenerator.ContainerFromItem(selectedPath) as TreeViewItem;
-                if(tvi != null)
+                if (tvi != null)
                 {
                     tvi.BringIntoView();
                     tvi.IsSelected = true;
@@ -558,6 +574,7 @@ namespace Frosty.Core.Controls
             SelectedPath = string.IsNullOrEmpty(m_selectedPath.FullPath) ? "" : m_selectedPath.FullPath.Remove(0, 1);
 
             UpdateListView(m_selectedPath);
+            UpdateTotalAssetsCountAsync();
         }
 
         private void ClearFilter()
@@ -568,24 +585,35 @@ namespace Frosty.Core.Controls
                 m_prevFilterText = m_filterTextBox.Text;
                 BuildFilterData(m_filterTextBox.Text);
                 UpdateTreeView();
+                UpdateTotalAssetsCountAsync();
             }
         }
 
         private void FilterTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if(m_filterTextBox.Text != m_prevFilterText)
+            if (m_filterTextBox.Text != m_prevFilterText)
             {
                 m_prevFilterText = m_filterTextBox.Text;
                 BuildFilterData(m_filterTextBox.Text);
                 UpdateTreeView();
+                UpdateTotalAssetsCountAsync();
             }
         }
 
         private void FilterTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            // This example assumes that typing a space after entering a filter should suggest adding another filter criterion
+            if (e.Key == Key.Space)
             {
-                m_filterTextBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                string currentText = m_filterTextBox.Text;
+                // Simple check: if there's a space following a type:value pattern, we insert "AND team:"
+                // Adjust the condition to fit the actual pattern in your application
+                if (currentText.Contains(":") && !currentText.TrimEnd().EndsWith("AND"))
+                {
+                    m_filterTextBox.Text = currentText.TrimEnd() + " AND find:";
+                    m_filterTextBox.CaretIndex = m_filterTextBox.Text.Length;
+                    e.Handled = true; // Prevents the handling of an additional space
+                }
             }
         }
 
@@ -633,9 +661,14 @@ namespace Frosty.Core.Controls
                 if (ShowOnlyUnModified && entry.IsModified)
                     continue;
 
+                if (ShowOnlyUnsavedModified && (!entry.IsModified || !entry.DisplayName.EndsWith("*")))
+                    continue;
+
                 if (!FilterText(entry.Name, entry))
                     continue;
 
+                if (!FilterText(entry.Name, entry))
+                    continue;
                 string[] arr = entry.Path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                 AssetPath next = root;
 
@@ -680,8 +713,8 @@ namespace Frosty.Core.Controls
                 }
             }
 
-            if(!m_assetPathMapping.ContainsKey("/"))
-                m_assetPathMapping.Add("/", new AssetPath("![root]", "", null, true));           
+            if (!m_assetPathMapping.ContainsKey("/"))
+                m_assetPathMapping.Add("/", new AssetPath("![root]", "", null, true));
             root.Children.Insert(0, m_assetPathMapping["/"]);
 
             m_assetTreeView.ItemsSource = root.Children;
@@ -705,6 +738,10 @@ namespace Frosty.Core.Controls
             {
                 if (ShowOnlyModified && !entry.IsModified)
                     continue;
+
+                if (ShowOnlyUnsavedModified && (!entry.IsModified || !entry.DisplayName.EndsWith("*")))
+                    continue;
+
                 if (ShowOnlyUnModified && entry.IsModified)
                     continue;
                 if (entry.Path.Equals(fullPath, StringComparison.OrdinalIgnoreCase))
@@ -716,6 +753,7 @@ namespace Frosty.Core.Controls
             }
 
             m_assetListView.ItemsSource = items;
+            TotalAssetsCount = items.Count;
 
             if (SelectedAsset != null)
             {
@@ -903,12 +941,109 @@ namespace Frosty.Core.Controls
                         });
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     m_filterTextBox.Text = "";
                     m_filter.Clear();
                 }
             }
+        }
+
+        private void PopulateAssetTypesComboBox()
+        {
+            if (typeComboBox == null || ItemsSource == null) return;
+
+            // Collecting unique asset types
+            var assetTypes = new HashSet<string>();
+            foreach (AssetEntry asset in ItemsSource)
+            {
+                if (!string.IsNullOrEmpty(asset.Type))
+                    assetTypes.Add(asset.Type);
+            }
+
+            // Ensure the ComboBox is cleared before adding new items
+            typeComboBox.Items.Clear();
+            typeComboBox.Items.Add("All");
+            foreach (string type in assetTypes.OrderBy(t => t))
+            {
+                typeComboBox.Items.Add(type);
+            }
+
+            // Default to "All"
+            typeComboBox.SelectedIndex = 0;
+        }
+
+        private void PART_TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (typeComboBox.SelectedItem == null || m_filterTextBox == null) return;
+
+            string selectedType = typeComboBox.SelectedItem.ToString();
+
+            if (selectedType == "All")
+            {
+                m_filterTextBox.Text = "";
+            }
+            else
+            {
+                // Ensure the filter text does not already contain a type filter.
+                // This regex pattern assumes your filters are semicolon-separated and checks for a type prefix.
+                var typeFilterPattern = @"type:\s?[^;]+";
+                var matches = System.Text.RegularExpressions.Regex.Matches(m_filterTextBox.Text, typeFilterPattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                string newFilter;
+                if (matches.Count > 0)
+                {
+                    // Replace the existing type filter with the newly selected type.
+                    newFilter = System.Text.RegularExpressions.Regex.Replace(m_filterTextBox.Text, typeFilterPattern, $"type:{selectedType}", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    // If no existing type filter is found, prepend the selected type to the current filter text.
+                    newFilter = $"type:{selectedType} " + m_filterTextBox.Text.Trim();
+                }
+
+                m_filterTextBox.Text = newFilter.Trim();
+            }
+
+            // Rebuild and apply filters based on the updated filter text.
+            BuildFilterData(m_filterTextBox.Text);
+            UpdateTreeView();
+            UpdateTotalAssetsCountAsync();
+
+            // Set focus back to the filter text box and position the cursor appropriately.
+            m_filterTextBox.Focus();
+            m_filterTextBox.CaretIndex = m_filterTextBox.Text.Length;
+        }
+        public int TotalAssetsCount {
+            get { return (int)GetValue(TotalAssetsCountProperty); }
+            set { SetValue(TotalAssetsCountProperty, value); }
+        }
+
+        private async Task UpdateTotalAssetsCountAsync()
+        {
+            if (Application.Current.Dispatcher.CheckAccess())
+            {
+                // This code runs on the UI thread.
+                var filteredAssets = ItemsSource.OfType<AssetEntry>().Where(asset => ApplyCurrentFilters(asset)).ToList();
+                TotalAssetsCount = filteredAssets.Count;
+            }
+            else
+            {
+                // This code runs on a background thread and marshals the call to the UI thread.
+                await Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    var filteredAssets = ItemsSource.OfType<AssetEntry>().Where(asset => ApplyCurrentFilters(asset)).ToList();
+                    TotalAssetsCount = filteredAssets.Count;
+                });
+            }
+        }
+
+        private bool ApplyCurrentFilters(AssetEntry asset)
+        {
+            return (!ShowOnlyModified || asset.IsModified) &&
+                   (!ShowOnlyUnModified || !asset.IsModified) &&
+                   (!ShowOnlyUnsavedModified || (asset.IsModified && asset.DisplayName.EndsWith("*"))) &&
+                   FilterText(asset.Name, asset); // Assuming FilterText correctly applies additional text-based filters.
         }
     }
 }

@@ -171,6 +171,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition x:Name="toolbarRow" Height="0"/>
                             <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="{Binding Path=InitialHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}"/>
                         </Grid.RowDefinitions>
@@ -186,24 +187,62 @@
                                     <Button Height="20" Width="20" ToolTip="Batch Export Selected Folder" HorizontalAlignment="Right" Margin="6,0,0,0" Command="{Binding Path=BatchExportSelectedCommand, RelativeSource={RelativeSource AncestorType={x:Type local:FrostyDataExplorer}}}">
                                         <Image Source="/FrostyEditor;component/Images/Export.png" Width="16"/>
                                     </Button>
-                                    <!-- Show Only Modified -->
-                                    <CheckBox x:Name="PART_ShowOnlyModifiedCheckBox" VerticalAlignment="Center" Margin="6,0,0,0" IsChecked="{Binding Path=ShowOnlyModified, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}">
-                                        <TextBlock Text="Show Only Modified" Margin="4,-1,0,0" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
+                                    <!-- Show Only Label -->
+                                    <TextBlock Text="Show Only:" VerticalAlignment="Center" Foreground="{StaticResource FontColor}" Margin="6,0,0,0"/>
+                                    <!-- Modified Checkbox -->
+                                    <CheckBox x:Name="PART_ShowOnlyModifiedCheckBox" VerticalAlignment="Center" Margin="4,0,0,0" IsChecked="{Binding Path=ShowOnlyModified, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}">
+                                        <TextBlock Text="Modified" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
                                     </CheckBox>
-                                    <CheckBox x:Name="PART_ShowOnlyUnModifiedCheckBox" VerticalAlignment="Center" Margin="6,0,0,0" IsChecked="{Binding Path=ShowOnlyUnModified, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}">
-                                        <TextBlock Text="Show Only Unmodified" Margin="4,-1,0,0" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
+                                    <!-- Unmodified Checkbox -->
+                                    <CheckBox x:Name="PART_ShowOnlyUnModifiedCheckBox" VerticalAlignment="Center" Margin="4,0,0,0" IsChecked="{Binding Path=ShowOnlyUnModified, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}">
+                                        <TextBlock Text="Unmodified" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
+                                    </CheckBox>
+                                    <!-- Unsaved Checkbox -->
+                                    <CheckBox x:Name="PART_ShowOnlyUnsavedModifiedCheckBox" VerticalAlignment="Center" Margin="4,0,0,0" IsChecked="{Binding Path=ShowOnlyUnsavedModified, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}">
+                                        <TextBlock Text="Unsaved" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
                                     </CheckBox>
                                 </StackPanel>
                             </Border>
                         </DockPanel>
 
-                        <DockPanel Grid.Row="1" LastChildFill="True">
+                        <DockPanel Grid.Row="1">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <!-- Added "Type:" label -->
+                                <TextBlock Text=" Type: " VerticalAlignment="Center" Margin="1,-1,1,1" />
+                                <ComboBox x:Name="PART_TypeComboBox" 
+                                          Width="240" 
+                                          Height="24" 
+                                          VerticalAlignment="Center" 
+                                          IsEditable="False"
+                                          DisplayMemberPath="DisplayName"
+                                          TextSearch.TextPath="DisplayName"
+                                          IsTextSearchEnabled="True">
+                                    <!-- ComboBox items will be populated dynamically -->
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" 
+                               HorizontalAlignment="Left" 
+                               VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                            <Border Background="Transparent" CornerRadius="2" Margin="1,-1,1,1" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Total Assets:" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding TotalAssetsCount, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:FrostyDataExplorer}}}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DockPanel>
+
+                        <DockPanel Grid.Row="2" LastChildFill="True">
+                            <TextBlock Text=" Search: " VerticalAlignment="Center" Margin="0,0,5,0"/>
                             <Border Background="Transparent" CornerRadius="2" Margin="1,-1,1,1">
                                 <ctrl:FrostyWatermarkTextBox x:Name="PART_FilterTextBox" WatermarkText="Filter" BorderThickness="1" Height="24" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Padding="4,0,0,0"/>
                             </Border>
                         </DockPanel>
 
-                        <TreeView x:Name="PART_AssetTreeView" Grid.Row="2" Margin="0,0,0,3" >
+                        <TreeView x:Name="PART_AssetTreeView" Grid.Row="3" Margin="0,0,0,3" >
                             <TreeView.Resources>
                                 <conv:TreeViewListSortConverter x:Key="treeViewListSortConverter"/>
                             </TreeView.Resources>
@@ -243,10 +282,10 @@
                             </TreeView.ItemTemplate>
                         </TreeView>
 
-                        <GridSplitter x:Name="gs" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="3" Background="{StaticResource ControlBackground}" ResizeDirection="Rows"/>
+                        <GridSplitter x:Name="gs" Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="3" Background="{StaticResource ControlBackground}" ResizeDirection="Rows"/>
 
-                        <ListView x:Name="PART_AssetListView" Grid.Row="3" HorizontalContentAlignment="Stretch" SelectionMode="Extended" />
-                        <Grid Grid.Row="2" Visibility="Hidden">
+                        <ListView x:Name="PART_AssetListView" Grid.Row="4" HorizontalContentAlignment="Stretch" SelectionMode="Extended" />
+                        <Grid Grid.Row="3" Visibility="Hidden">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="3*"/>
                                 <ColumnDefinition Width="1*"/>
