@@ -757,7 +757,7 @@ namespace FrostyModManager
         {
             OpenFileDialog ofd = new OpenFileDialog
             {
-                Filter = "(All supported formats)|*.fbmod;*.rar;*.zip;*.7z;*.daimod" + "|*.fbmod (Frostbite Mod)|*.fbmod" + "|*.rar (Rar File)|*.rar" + "|*.zip (Zip File)|*.zip" + "|*.7z (7z File)|*.7z" + "|*.daimod (DragonAge Mod)|*.daimod",
+                Filter = "*.fbmod (Frostbite Mod)|*.fbmod",
                 Title = "Install Mod",
                 Multiselect = true
             };
@@ -973,432 +973,93 @@ namespace FrostyModManager
 
                     try
                     {
-                        if (IsCompressed(fi))
+                        // dont allow any files without fbmod extension
+                        if (fi.Extension != ".fbmod")
                         {
-                            List<string> mods = new List<string>();
-                            List<string> collections = new List<string>();
-                            List<int> format = new List<int>();
-                            List<string> archives = new List<string>();
-                            int fbpacks = 0;
+                            if (fi.Extension == ".archive")
+                            continue;
 
-                            // create decompressor
-                            IDecompressor decompressor = null;
-                            if (fi.Extension == ".rar") decompressor = new RarDecompressor();
-                            else if (fi.Extension == ".zip" || fi.Extension == ".fbpack") decompressor = new ZipDecompressor();
-                            else if (fi.Extension == ".7z") decompressor = new SevenZipDecompressor();
-
-                            // search out fbmods in archive
-                            decompressor.OpenArchive(filename);
-                            foreach (CompressedFileInfo compressedFi in decompressor.EnumerateFiles())
+                            // If filename begins with CAREER- or ROSTER- or CAREERDRAFT- then it goes into the saves folder.
+                            if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24) && (fi.Name.StartsWith("CAREER-") || fi.Name.StartsWith("ROSTER-") || fi.Name.StartsWith("CAREERDRAFT-")))
                             {
-
-                                if (compressedFi.Extension == ".fbpack")
-                                {
-                                    //create temp file
-                                    DirectoryInfo tempdir = new DirectoryInfo($"temp/");
-                                    FileInfo tempfile = new FileInfo(tempdir + compressedFi.Filename);
-
-                                    tempdir.Create();
-                                    decompressor.DecompressToFile(tempfile.FullName);
-
-                                    //install temp file
-                                    Dispatcher.Invoke(() => {
-                                        InstallMods(new string[] { tempfile.FullName });
-                                    });
-
-                                    //delete temp files
-                                    if (tempfile.Exists) tempfile.Delete();
-                                    if (tempdir.Exists) tempdir.Delete();
-
-                                    fbpacks++;
-                                }
-                                else if (compressedFi.Extension == ".fbcollection")
-                                {
-                                    collections.Add(compressedFi.Filename);
-                                }
-                                else if (compressedFi.Extension == ".fbmod")
-                                {
-                                    string modFilename = compressedFi.Filename;
-                                    byte[] buffer = decompressor.DecompressToMemory();
-
-                                    using (MemoryStream ms = new MemoryStream(buffer))
-                                    {
-                                        int retCode = VerifyMod(ms);
-                                        if (retCode >= 0)
-                                        {
-                                            if ((retCode & 1) != 0)
-                                            {
-                                                // continue with import (warning)
-                                                errors.Add(new ImportErrorInfo() { filename = modFilename, error = "Mod was designed for a different game version, it may or may not work.", isWarning = true });
-                                            }
-
-                                            // add mod
-                                            mods.Add(compressedFi.Filename);
-                                            format.Add((retCode & 0x8000) != 0 ? 1 : 0);
-                                        }
-                                        // ignore RetCode -1 here
-                                        else if (retCode == -2)
-                                        {
-                                            errors.Add(new ImportErrorInfo() { filename = modFilename, error = "Mod was not designed for this game." });
-                                        }
-                                    }
-                                }
-                                else if (compressedFi.Extension == ".archive")
-                                {
-                                    archives.Add(compressedFi.Filename);
-                                }
-                                else if (compressedFi.Filename == "manifest.json")
-                                {
-                                    using (StreamReader reader = new StreamReader(compressedFi.Stream))
-                                    {
-                                        packManifest = JsonConvert.DeserializeObject<PackManifest>(reader.ReadToEnd());
-                                    }
-                                }
+                                errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "This is a Madden save file, it should be placed in your Madden saves folder." });
+                                continue;
                             }
-                            decompressor.CloseArchive();
-
-                            if (mods.Count == 0 && fbpacks == 0)
+                            else if(fi.Extension == ".rar" || fi.Extension == ".zip" || fi.Extension == ".7z")
                             {
-                                // no point continuing with this archive
-                                errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "Archive contains no installable mods." });
+                                errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "This is a compressed file. Please extract it and import any included .fbmod files." });
+                            }
+
+                            errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "File is not a valid Frosty Mod." });
+                            continue;
+                        }
+
+                        // make sure mod is designed for current profile
+                        bool newFormat = false;
+                        using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
+                        {
+                            int retCode = VerifyMod(stream);
+                            if ((retCode & 1) != 0)
+                            {
+                                // continue with import (warning)
+                                errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod was designed for a different game version, it may or may not work.", isWarning = true });
+                            }
+                            else if (retCode == -1)
+                            {
+                                errors.Add(new ImportErrorInfo { filename = fi.Name, error = "File is not a valid Frosty Mod." });
+                            }
+                            else if (retCode == -2)
+                            {
+                                errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod was not designed for this game." });
+                                continue;
+                            }
+                            else if (retCode == -3)
+                            {
+                                errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod was found to be invalid and cannot be used" });
                                 continue;
                             }
 
-                            // remove any invalid mods
-                            for (int i = 0; i < mods.Count; i++)
+                            if ((retCode & 0x8000) != 0)
                             {
-                                string mod = mods[i];
-                                if (format[i] == 0)
-                                {
-                                    // old legacy format requires an archive
-                                    if (!archives.Contains(mod.Replace(".fbmod", "_01.archive")))
-                                    {
-                                        errors.Add(new ImportErrorInfo() { filename = mod, error = "Mod is missing the archive component." });
-                                        mods.RemoveAt(i);
-                                        i--;
-                                        continue;
-                                    }
-                                }
-
-                                // check for existing mod of same name
-                                FrostyMod existingMod = availableMods.Find((IFrostyMod a) => { return a.Filename.ToLower().CompareTo(mod.ToLower()) == 0; }) as FrostyMod;
-                                if (existingMod != null)
-                                {
-                                    availableMods.Remove(existingMod);
-                                    DirectoryInfo di = new DirectoryInfo("Mods/" + ProfilesLibrary.ProfileName + "/");
-                                    foreach (FileInfo archiveFi in di.GetFiles(mod.Replace(".fbmod", "") + "*.archive"))
-                                        File.Delete(archiveFi.FullName);
-                                }
-                            }
-
-                            // remove unreferenced .archives
-                            for (int i = 0; i < archives.Count; i++)
-                            {
-                                string archive = archives[i];
-                                if (!mods.Contains(archive.Replace("_01.archive", ".fbmod")))
-                                {
-                                    archives.RemoveAt(i);
-                                    i--;
-                                }
-                            }
-
-                            if (mods.Count > 0)
-                            {
-                                // now actually decompress files
-                                decompressor.OpenArchive(filename);
-                                foreach (CompressedFileInfo compressedFi in decompressor.EnumerateFiles())
-                                {
-                                    if (mods.Contains(compressedFi.Filename) || archives.Contains(compressedFi.Filename))
-                                    {
-                                        decompressor.DecompressToFile("Mods/" + ProfilesLibrary.ProfileName + "/" + compressedFi.Filename);
-                                    }
-                                }
-                                decompressor.CloseArchive();
-
-                                // and add them to the mod manager
-                                for (int i = 0; i < mods.Count; i++)
-                                {
-                                    fi = new FileInfo("Mods/" + ProfilesLibrary.ProfileName + "/" + mods[i]);
-                                    lastInstalledMod = AddMod(fi.FullName, format[i]);
-                                }
-                            }
-
-                            if (collections.Count > 0)
-                            {
-                                // now actually decompress files
-                                decompressor.OpenArchive(filename);
-                                foreach (CompressedFileInfo compressedFi in decompressor.EnumerateFiles())
-                                {
-                                    if (collections.Contains(compressedFi.Filename))
-                                    {
-                                        decompressor.DecompressToFile("Mods/" + ProfilesLibrary.ProfileName + "/" + compressedFi.Filename);
-                                    }
-                                }
-                                decompressor.CloseArchive();
-
-                                // and add them to the mod manager
-                                for (int i = 0; i < collections.Count; i++)
-                                {
-                                    fi = new FileInfo("Mods/" + ProfilesLibrary.ProfileName + "/" + collections[i]);
-                                    lastInstalledMod = AddCollection(fi.FullName, 0);
-                                }
+                                newFormat = true;
                             }
                         }
-                        else if (fi.Extension == ".daimod")
+
+                        if (!newFormat)
                         {
-                            // special handling for DAI mod files
-                            using (NativeReader reader = new NativeReader(new FileStream(fi.FullName, FileMode.Open)))
+                            // make sure mod has archive file
+                            if (!File.Exists(fi.FullName.Replace(".fbmod", "_01.archive")))
                             {
-                                string magic = reader.ReadSizedString(8);
-                                if (magic != "DAIMODV2")
-                                {
-                                    errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "File is not a valid DAI Mod." });
-                                    continue;
-                                }
-
-                                int unk = reader.ReadInt();
-                                string name = reader.ReadNullTerminatedString();
-                                string xml = reader.ReadNullTerminatedString();
-                                string code = reader.ReadNullTerminatedString();
-
-                                int resCount = reader.ReadInt();
-                                List<byte[]> resources = new List<byte[]>();
-                                List<bool> shouldWrite = new List<bool>();
-
-                                for (int i = 0; i < resCount; i++)
-                                {
-                                    resources.Add(reader.ReadBytes(reader.ReadInt()));
-                                    shouldWrite.Add(true);
-                                }
-
-                                string configValues = "";
-                                if (code != "")
-                                {
-                                    Dispatcher.Invoke(() =>
-                                    {
-                                        ConfigWindow win = new ConfigWindow(code, resources, shouldWrite);
-                                        win.ShowDialog();
-
-                                        configValues = win.GetConfigValues();
-                                    });
-                                }
-
-                                System.Xml.XmlDocument xmlDoc = new System.Xml.XmlDocument();
-                                xmlDoc.LoadXml(xml);
-
-                                System.Xml.XmlElement elem = xmlDoc["daimod"]["details"];
-                                string newDesc = "(Converted from .daimod)\r\n\r\n" + elem["description"].InnerText + "\r\n\r\n" + configValues;
-
-                                DbObject modObject = new DbObject();
-                                modObject.AddValue("magic", "FBMODV2");
-                                modObject.AddValue("gameProfile", ProfilesLibrary.ProfileName);
-                                modObject.AddValue("gameVersion", 0);
-
-                                modObject.AddValue("title", elem["name"].InnerText);
-                                modObject.AddValue("author", elem["author"].InnerText);
-                                modObject.AddValue("category", "DAI Mods");
-                                modObject.AddValue("version", elem["version"].InnerText);
-                                modObject.AddValue("description", newDesc);
-
-                                DbObject resourcesList = new DbObject(false);
-                                DbObject actionsList = new DbObject(false);
-                                DbObject screenshotList = new DbObject(false);
-                                long offset = 0;
-
-                                int index = -1;
-                                int actualIndex = 0;
-
-                                foreach (System.Xml.XmlElement subElem in xmlDoc["daimod"]["resources"])
-                                {
-                                    index++;
-                                    if (subElem.GetAttribute("action") == "remove")
-                                        continue;
-
-                                    int resId = int.Parse(subElem.GetAttribute("resourceId"));
-                                    if (shouldWrite[resId] == false)
-                                        continue;
-
-                                    int resSize = resources[resId].Length;
-                                    string type = subElem.GetAttribute("type");
-
-                                    DbObject resource = new DbObject();
-                                    resource.AddValue("name", subElem.GetAttribute("name"));
-                                    resource.AddValue("type", type);
-
-                                    resource.AddValue("sha1", new Sha1(subElem.GetAttribute("sha1")));
-                                    resource.AddValue("originalSize", 0);
-                                    resource.AddValue("compressedSize", resSize);
-                                    resource.AddValue("archiveIndex", 1);
-                                    resource.AddValue("archiveOffset", offset);
-                                    resource.AddValue("shouldInline", false);
-
-                                    string actionString = subElem.GetAttribute("action");
-                                    if (type == "ebx" || type == "res")
-                                    {
-                                        resource.AddValue("uncompressedSize", int.Parse(subElem.GetAttribute("originalSize")));
-                                        if (actionString != "add")
-                                            resource.AddValue("originalSha1", new Sha1(subElem.GetAttribute("originalSha1")));
-                                        actionString = "modify";
-
-                                        if (type == "res")
-                                        {
-                                            resource.AddValue("resType", uint.Parse(subElem.GetAttribute("resType")));
-                                            if (resource.GetValue<uint>("resType") == 0x5C4954A6)
-                                                resource.SetValue("shouldInline", true);
-                                            resource.AddValue("resRid", (ulong)long.Parse(subElem.GetAttribute("resRid")));
-
-                                            string resMetaString = subElem.GetAttribute("meta");
-                                            byte[] resMeta = new byte[resMetaString.Length / 2];
-                                            for (int i = 0; i < resMeta.Length; i++)
-                                                resMeta[i] = byte.Parse(resMetaString.Substring(i * 2, 2), NumberStyles.AllowHexSpecifier);
-
-                                            resource.AddValue("resMeta", resMeta);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        string chunkid = subElem.GetAttribute("name");
-                                        byte[] chunkidBytes = new byte[chunkid.Length / 2];
-                                        for (int i = 0; i < chunkidBytes.Length; i++)
-                                            chunkidBytes[i] = byte.Parse(chunkid.Substring(i * 2, 2), NumberStyles.AllowHexSpecifier);
-
-                                        resource.SetValue("name", (new Guid(chunkidBytes)).ToString());
-                                        resource.AddValue("rangeStart", uint.Parse(subElem.GetAttribute("rangeStart")));
-                                        resource.AddValue("rangeEnd", uint.Parse(subElem.GetAttribute("rangeEnd")));
-                                        resource.AddValue("logicalOffset", uint.Parse(subElem.GetAttribute("logicalOffset")));
-                                        resource.AddValue("logicalSize", uint.Parse(subElem.GetAttribute("logicalSize")));
-
-                                        if (subElem.GetAttribute("meta") != "00")
-                                            resource.SetValue("firstMip", 3);
-
-                                        // add special chunks bundle
-                                        DbObject action = new DbObject();
-                                        action.AddValue("resourceId", resourcesList.Count - 1);
-                                        action.AddValue("type", "add");
-                                        action.AddValue("bundle", "chunks");
-                                        actionsList.Add(action);
-                                    }
-
-                                    foreach (System.Xml.XmlElement bundleElem in xmlDoc["daimod"]["bundles"])
-                                    {
-                                        foreach (System.Xml.XmlElement entryElem in bundleElem["entries"])
-                                        {
-                                            int id = int.Parse(entryElem.GetAttribute("id"));
-                                            if (id == index)
-                                            {
-                                                DbObject action = new DbObject();
-                                                action.AddValue("resourceId", actualIndex);
-                                                action.AddValue("type", actionString);
-                                                action.AddValue("bundle", bundleElem.GetAttribute("name"));
-                                                actionsList.Add(action);
-                                            }
-                                        }
-                                    }
-
-                                    resourcesList.Add(resource);
-                                    offset += resSize;
-                                    actualIndex++;
-                                }
-
-                                modObject.AddValue("screenshots", screenshotList);
-                                modObject.AddValue("resources", resourcesList);
-                                modObject.AddValue("actions", actionsList);
-
-                                using (DbWriter writer = new DbWriter(new FileStream("Mods/" + ProfilesLibrary.ProfileName + "/" + fi.Name.Replace(".daimod", ".fbmod"), FileMode.Create)))
-                                    writer.Write(modObject);
-                                using (NativeWriter writer = new NativeWriter(new FileStream("Mods/" + ProfilesLibrary.ProfileName + "/" + fi.Name.Replace(".daimod", "_01.archive"), FileMode.Create)))
-                                {
-                                    for (int i = 0; i < resources.Count; i++)
-                                    {
-                                        if (shouldWrite[i])
-                                            writer.Write(resources[i]);
-                                    }
-                                }
-
-                                fi = new FileInfo("Mods/" + ProfilesLibrary.ProfileName + "/" + fi.Name.Replace(".daimod", ".fbmod"));
-                                lastInstalledMod = AddMod(fi.FullName, 0);
-                            }
-                        }
-                        else
-                        {
-                            // dont allow any files without fbmod extension
-                            if (fi.Extension != ".fbmod")
-                            {
-                                if (fi.Extension == ".archive")
-                                    continue;
-
-                                // If filename begins with CAREER- or ROSTER- or CAREERDRAFT- then it goes into the saves folder.
-                                if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24) && (fi.Name.StartsWith("CAREER-") || fi.Name.StartsWith("ROSTER-") || fi.Name.StartsWith("CAREERDRAFT-")))
-                                {
-                                    errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "This is a Madden save file, it should be placed in your Madden saves folder." });
-                                    continue;
-                                }
-
-                                errors.Add(new ImportErrorInfo() { filename = fi.Name, error = "File is not a valid Frosty Mod." });
+                                errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod is missing the archive component." });
                                 continue;
                             }
-
-                            // make sure mod is designed for current profile
-                            bool newFormat = false;
-                            using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
-                            {
-                                int retCode = VerifyMod(stream);
-                                if ((retCode & 1) != 0)
-                                {
-                                    // continue with import (warning)
-                                    errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod was designed for a different game version, it may or may not work.", isWarning = true });
-                                }
-                                else if (retCode == -1)
-                                {
-                                    errors.Add(new ImportErrorInfo { filename = fi.Name, error = "File is not a valid Frosty Mod." });
-                                }
-                                else if (retCode == -2)
-                                {
-                                    errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod was not designed for this game." });
-                                    continue;
-                                }
-                                else if (retCode == -3)
-                                {
-                                    errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod was found to be invalid and cannot be used" });
-                                    continue;
-                                }
-
-                                if ((retCode & 0x8000) != 0)
-                                    newFormat = true;
-                            }
-
-                            if (!newFormat)
-                            {
-                                // make sure mod has archive file
-                                if (!File.Exists(fi.FullName.Replace(".fbmod", "_01.archive")))
-                                {
-                                    errors.Add(new ImportErrorInfo { filename = fi.Name, error = "Mod is missing the archive component." });
-                                    continue;
-                                }
-                            }
-
-                            // check for existing mod of same name
-                            {
-                                FrostyMod existingMod = availableMods.Find((IFrostyMod a) => a.Filename.ToLower().CompareTo(fi.Name.ToLower()) == 0) as FrostyMod;
-                                if (existingMod != null)
-                                {
-                                    availableMods.Remove(existingMod);
-                                    DirectoryInfo di = new DirectoryInfo("Mods/" + ProfilesLibrary.ProfileName + "/");
-                                    foreach (FileInfo archiveFi in di.GetFiles(fi.Name.Replace(".fbmod", "") + "_*.archive"))
-                                        File.Delete(archiveFi.FullName);
-                                    File.Delete(di.FullName + "/" + fi.Name);
-                                }
-                            }
-
-                            // copy mod over
-                            File.Copy(fi.FullName, "Mods/" + ProfilesLibrary.ProfileName + "/" + fi.Name);
-                            foreach (FileInfo archiveFi in fi.Directory.GetFiles(fi.Name.Replace(".fbmod", "") + "_*.archive"))
-                                File.Copy(archiveFi.FullName, "Mods/" + ProfilesLibrary.ProfileName + "/" + archiveFi.Name);
-
-                            // add mod to manager
-                            fi = new FileInfo("Mods/" + ProfilesLibrary.ProfileName + "/" + fi.Name);
-                            lastInstalledMod = AddMod(fi.FullName, newFormat ? 1 : 0);
                         }
+
+                        // check for existing mod of same name
+                        {
+                            FrostyMod existingMod = availableMods.Find((IFrostyMod a) => a.Filename.ToLower().CompareTo(fi.Name.ToLower()) == 0) as FrostyMod;
+                            if (existingMod != null)
+                            {
+                                availableMods.Remove(existingMod);
+                                DirectoryInfo di = new DirectoryInfo("Mods/" + ProfilesLibrary.ProfileName + "/");
+                                foreach (FileInfo archiveFi in di.GetFiles(fi.Name.Replace(".fbmod", "") + "_*.archive"))
+                                {
+                                    File.Delete(archiveFi.FullName);
+                                }
+                                File.Delete(di.FullName + "/" + fi.Name);
+                            }
+                        }
+
+                        // copy mod over
+                        File.Copy(fi.FullName, "Mods/" + ProfilesLibrary.ProfileName + "/" + fi.Name);
+                        foreach (FileInfo archiveFi in fi.Directory.GetFiles(fi.Name.Replace(".fbmod", "") + "_*.archive"))
+                        {
+                            File.Copy(archiveFi.FullName, "Mods/" + ProfilesLibrary.ProfileName + "/" + archiveFi.Name);
+                        }
+
+                        // add mod to manager
+                        fi = new FileInfo("Mods/" + ProfilesLibrary.ProfileName + "/" + fi.Name);
+                        lastInstalledMod = AddMod(fi.FullName, newFormat ? 1 : 0);
                     }
                     catch (FrostyModLoadException e)
                     {
