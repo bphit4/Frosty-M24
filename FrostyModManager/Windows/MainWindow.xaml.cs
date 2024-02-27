@@ -521,6 +521,11 @@ namespace FrostyModManager
             updateAppliedModButtons();
 
             Config.Add("SelectedPack", selectedPack.Name, ConfigScope.Game);
+
+            if(selectedPack.GhostModCount > 0)
+            {
+                FrostyMessageBox.Show("One or more applied mods in the selected pack are missing, denoted by a red X in the applied mods list. You will need to re-import these mods if you would like to use them.", "Frosty Mod Manager");
+            }
         }
 
         private void removeProfileButton_Click(object sender, RoutedEventArgs e)

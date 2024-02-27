@@ -22,7 +22,7 @@ namespace FrostyModManager
                 if (Mod != null)
                     return Mod.ModDetails.Icon;
                 else
-                    return new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/ModImportWarning.png") as ImageSource;
+                    return new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/GhostModWarning.png") as ImageSource;
             }
         }
 

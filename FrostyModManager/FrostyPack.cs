@@ -12,9 +12,12 @@ namespace FrostyModManager
         public List<FrostyAppliedMod> AppliedMods { get; } = new List<FrostyAppliedMod>();
         public event RoutedEventHandler AppliedModsUpdated;
 
+        public int GhostModCount { get; set; }
+
         public FrostyPack(string inName)
         {
             Name = inName;
+            GhostModCount = 0;
         }
 
         public void Refresh()
@@ -29,11 +32,16 @@ namespace FrostyModManager
             if (index != -1)
                 return;
 
-            // if mod is null and couldn't be found, create a FrostyAppliedMod with IsFound to false
+            // if mod is null and couldn't be found, create a FrostyAppliedMod with IsFound to false and increment ghost mod count
             if (mod != null)
+            {
                 AppliedMods.Add(new FrostyAppliedMod(mod, isEnabled));
+            }
             else
+            {
                 AppliedMods.Add(new FrostyAppliedMod(backupFileName, isEnabled));
+                GhostModCount++;
+            }
 
             Config.Add(Name, ToConfigString(), ConfigScope.Pack);
             AppliedModsUpdated?.Invoke(this, new RoutedEventArgs());
