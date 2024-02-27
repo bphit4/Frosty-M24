@@ -281,6 +281,9 @@
     <Resource Include="Images\PrimaryActionMerge.png" />
     <Resource Include="Images\Import.png" />
     <Resource Include="Images\Open.png" />
+    <Resource Include="Images\GhostModWarning.png" />
+    <Resource Include="Images\ConflictFail.png" />
+    <Resource Include="Images\ConflictPass.png" />
     <Content Include="ThirdParty\Newtonsoft.Json.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
