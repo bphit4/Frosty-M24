@@ -131,8 +131,8 @@ namespace FrostyModManager
     public class ModPrimaryActionConverter : IValueConverter
     {
         private static ImageSource blankSource = null;
-        private static ImageSource primaryActionModifySource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/PrimaryActionModify.png") as ImageSource;
-        private static ImageSource primaryActionReplaceSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/PrimaryActionReplace.png") as ImageSource;
+        private static ImageSource primaryActionModifySource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/ConflictFail.png") as ImageSource;
+        private static ImageSource primaryActionReplaceSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/ConflictPass.png") as ImageSource;
         private static ImageSource primaryActionAddSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/PrimaryActionAdd.png") as ImageSource;
         private static ImageSource primaryActionMergeSource = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/PrimaryActionMerge.png") as ImageSource;
 
@@ -1254,7 +1254,7 @@ namespace FrostyModManager
 
         private void UpdateConflicts()
         {
-            bool onlyShowReplacements = (bool)showOnlyReplacementsCheckBox.IsChecked;
+            bool onlyShowReplacements = true;
 
             StringBuilder sb = new StringBuilder();
             List<ModResourceInfo> totalResourceList = new List<ModResourceInfo>();
@@ -1262,7 +1262,7 @@ namespace FrostyModManager
             CancellationTokenSource cancelToken = new CancellationTokenSource();
 
             bool cancelled = false;
-            FrostyTaskWindow.Show("Updating Actions", "", (task) =>
+            FrostyTaskWindow.Show("Updating Conflicts", "", (task) =>
             {
                 try
                 {
@@ -1287,7 +1287,11 @@ namespace FrostyModManager
 
                         foreach (var mod in mods)
                         {
-                            if (mod.NewFormat)
+                            if(mod == null)
+                            {
+                                continue;
+                            }
+                            else if (mod.NewFormat)
                             {
                                 foreach (BaseModResource resource in mod.Resources)
                                 {
@@ -1381,6 +1385,11 @@ namespace FrostyModManager
                 FrostyAppliedMod appliedMod = selectedPack.AppliedMods[i];
                 if (!appliedMod.IsFound && !appliedMod.IsEnabled)
                     continue;
+
+                if(appliedMod.Mod == null)
+                {
+                    continue;
+                }
 
                 Binding primaryActionBinding = new Binding("") { Converter = new ModPrimaryActionConverter(), ConverterParameter = appliedMod.Mod.Filename };
                 Binding primaryTooltipBinding = new Binding("") { Converter = new ModPrimaryActionTooltipConverter(), ConverterParameter = appliedMod.Mod.Filename };

@@ -817,26 +817,12 @@
                             <!-- Mod Description -->
                             <ctrl:FrostyTabItem x:Name="modDescTabItem" Header="Description" Visibility="Collapsed"/>
                             <!-- Conflicts -->
-                            <ctrl:FrostyTabItem x:Name="conflictsTabItem" Header="Actions" Visibility="Collapsed">
+                            <ctrl:FrostyTabItem x:Name="conflictsTabItem" Header="Conflicts" Visibility="Collapsed">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="26"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-
-                                    <Border Grid.Row="0" BorderBrush="{StaticResource ControlBackground}" BorderThickness="0,0,0,2">
-                                        <DockPanel Margin="1">
-                                            <Border Background="{StaticResource ControlBackground}" DockPanel.Dock="Left" RenderOptions.EdgeMode="Aliased">
-                                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Margin="6,0,6,0">
-                                                    <CheckBox x:Name="showOnlyReplacementsCheckBox" VerticalAlignment="Center" Margin="0,0,0,0" Checked="PART_ShowOnlyReplacementsCheckBox_Checked">
-                                                        <TextBlock Text="Show only replacements" Margin="4,-1,0,0" VerticalAlignment="Center" Foreground="{StaticResource FontColor}"/>
-                                                    </CheckBox>
-                                                </StackPanel>
-                                            </Border>
-                                            <!-- Filler -->
-                                            <Border Background="Transparent" Margin="1,0,0,0" HorizontalAlignment="Stretch" DockPanel.Dock="Left"/>
-                                        </DockPanel>
-                                    </Border>
 
                                     <Border Grid.Row="1" Background="{StaticResource ListBackground}" Margin="2">
                                         <ListView x:Name="conflictsListView">
