@@ -221,7 +221,9 @@ namespace Frosty.Core.Legacy
 
             App.AssetManager.RevertAsset(lfe);
 
-            if (lfe.Filename == "portraits" || lfe.Filename == "portraits_256")
+            string[] lagFixableFiles = {"portraits", "portraits_256", "icons"};
+
+            if (lagFixableFiles.Contains<string>(lfe.Filename))
             {
                 Guid originalChunkId = lfe.ChunkId;
                 ChunkAssetEntry orig = App.AssetManager.GetChunkEntry(lfe.ChunkId);
