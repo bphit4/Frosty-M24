@@ -186,6 +186,12 @@ namespace Frosty.Core.Windows
         public bool ShowAllFiles { get; set; } = false;
 
         [Category("Editor")]
+        [DisplayName("Modify Original Legacy Chunks")]
+        [Description("If checked, when modifying legacy assets, the original chunk will be modified instead of creating a new chunk.\nWARNING: This can cause instability. If you experience issues such as the game freezing on a black screen, revert the asset, uncheck this option, and try again.")]
+        [EbxFieldMeta(EbxFieldType.Boolean)]
+        public bool ModifyOriginalLegacy { get; set; } = false;
+
+        [Category("Editor")]
         [DisplayName("Set as Default Installation")]
         [Description("Use this installation for .fbproject files.")]
         [EbxFieldMeta(EbxFieldType.Boolean)]
@@ -219,6 +225,7 @@ namespace Frosty.Core.Windows
             AssetDisplayModuleInId = Config.Get<bool>("DisplayModuleInId", false);
             RememberChoice = Config.Get<bool>("UseDefaultProfile", false);
             ShowAllFiles = Config.Get<bool>("ShowAllFiles", false);
+            ModifyOriginalLegacy = Config.Get<bool>("ModifyOriginalLegacy", false);
 
             //Checks the registry for the current association instead of loading from config
             string KeyName = "frostyproject";
@@ -246,6 +253,7 @@ namespace Frosty.Core.Windows
             Config.Add("DisplayModuleInId", AssetDisplayModuleInId);
             Config.Add("UseDefaultProfile", RememberChoice);
             Config.Add("ShowAllFiles", ShowAllFiles);
+            Config.Add("ModifyOriginalLegacy", ModifyOriginalLegacy);
 
             if (RememberChoice)
                 Config.Add("DefaultProfile", ProfilesLibrary.ProfileName);
