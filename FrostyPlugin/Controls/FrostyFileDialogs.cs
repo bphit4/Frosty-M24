@@ -8,14 +8,18 @@ namespace Frosty.Core.Controls
     {
         public string FileName => ofd.FileName;
         public string[] FileNames => ofd.FileNames;
-        public int FilterIndex => ofd.FilterIndex;
+
+        // Consolidated FilterIndex property with getter and setter
+        public int FilterIndex {
+            get => ofd.FilterIndex;
+            set => ofd.FilterIndex = value;
+        }
 
         public bool Multiselect { get => ofd.Multiselect; set => ofd.Multiselect = value; }
         public string Title { get => ofd.Title; set => ofd.Title = value; }
 
         private string key;
         private OpenFileDialog ofd;
-        public int filterIndex;
 
         public FrostyOpenFileDialog(string title, string filter, string inKey)
         {

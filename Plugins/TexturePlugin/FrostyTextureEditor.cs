@@ -328,7 +328,13 @@ namespace TexturePlugin
 
         public void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", "PNG (*.png)|*.png|TGA (*.tga)|*.tga|HDR (*.hdr)|*.hdr|DDS (*.dds)|*.dds", "Texture");
+            // List of supported import types, must match the order used in the dialog filter
+            List<string> importTypes = new List<string>() { "DDS (*.dds)|*.dds", "PNG (*.png)|*.png", "HDR (*.hdr)|*.hdr", "TGA (*.tga)|*.tga" };
+
+            // Initialize the open file dialog with user's preferred format selected
+            FrostyOpenFileDialog ofd = new FrostyOpenFileDialog("Import Texture", string.Join("|", importTypes), "Texture");
+            ofd.FilterIndex = importTypes.IndexOf(Config.Get<string>("PreferredTextureImportType", "PNG (*.png)|*.png")) + 1;
+
             if (m_textureAsset.Type != TextureType.TT_2d)
             {
                 ofd.Multiselect = true;

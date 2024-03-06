@@ -75,16 +75,22 @@ namespace Frosty.Core.Windows
         [Editor(typeof(FrostyCustomComboDataEditor<string, string>))]
         public CustomComboData<string, string> PreferredExportType { get; set; }
 
+        [Category("Editor")]
+        [DisplayName("Preferred Import Type")]
+        [Description("The preferred texture import type/format for the user.")]
+        [Editor(typeof(FrostyCustomComboDataEditor<string, string>))]
+        public CustomComboData<string, string> PreferredTextureImportType { get; set; }
+
         [Category("General")]
         [DisplayName("Disable Launch Process Check")]
         [Description("Disable the functionality to check if a process is already running when trying to launch")]
         [EbxFieldMeta(EbxFieldType.Boolean)]
         public bool DisableLaunchProcessCheck { get; set; } = false;
-        
+
         public override void Load()
         {
             base.Load();
-            
+
             UpdateCheck = Config.Get<bool>("UpdateCheck", true);
             UpdateCheckPrerelease = Config.Get<bool>("UpdateCheckPrerelease", false);
 
@@ -98,25 +104,31 @@ namespace Frosty.Core.Windows
             PreferredExportType = new CustomComboData<string, string>(exportTypes, exportTypes);
             PreferredExportType.SelectedIndex = exportTypes.IndexOf(Config.Get<string>("PreferredExportType", "PNG (*.png)|*.png"));
 
+            List<string> importTypes = new List<string>() { "DDS (*.dds)|*.dds", "PNG (*.png)|*.png", "HDR (*.hdr)|*.hdr", "TGA (*.tga)|*.tga" };
+            PreferredTextureImportType = new CustomComboData<string, string>(importTypes, importTypes);
+            PreferredTextureImportType.SelectedIndex = importTypes.IndexOf(Config.Get<string>("PreferredTextureImportType", "PNG (*.png)|*.png"));
+
             DisableLaunchProcessCheck = Config.Get<bool>("DisableLaunchProcessCheck", false);
         }
 
         public override void Save()
         {
             base.Save();
-            
+
             Config.Add("UpdateCheck", UpdateCheck);
             Config.Add("UpdateCheckPrerelease", UpdateCheckPrerelease);
-            
+
             Config.Add("ApplyingThreadCount", ApplyingThreadCount);
             Config.Add("MaxCasFileSize", MaxCasFileSize.SelectedName);
 
             Config.Add("PreferredExportType", PreferredExportType.SelectedName);
+            Config.Add("PreferredTextureImportType", PreferredTextureImportType.SelectedName);
+
 
             Config.Add("DisableLaunchProcessCheck", DisableLaunchProcessCheck);
         }
     }
-    
+
     [DisplayName("Editor Options")]
     public class EditorOptionsData : BaseOptionsData
     {
@@ -200,7 +212,7 @@ namespace Frosty.Core.Windows
         public override void Load()
         {
             base.Load();
-            
+
             if (ProfilesLibrary.HasLoadedProfile)
             {
                 List<string> langs = GetLocalizedLanguages();
@@ -231,7 +243,8 @@ namespace Frosty.Core.Windows
             string KeyName = "frostyproject";
             string OpenWith = Assembly.GetEntryAssembly().Location;
 
-            if (Registry.CurrentUser.OpenSubKey("Software\\Classes\\" + KeyName) != null) {
+            if (Registry.CurrentUser.OpenSubKey("Software\\Classes\\" + KeyName) != null)
+            {
                 string openCommand = (string)Registry.CurrentUser.OpenSubKey("Software\\Classes\\" + KeyName).OpenSubKey("shell").OpenSubKey("open").OpenSubKey("command").GetValue("");
                 if (openCommand.Contains(OpenWith)) DefaultInstallation = true;
             }
@@ -240,7 +253,7 @@ namespace Frosty.Core.Windows
         public override void Save()
         {
             base.Save();
-            
+
             Config.Add("AutosaveEnabled", AutosaveEnabled);
             Config.Add("AutosavePeriod", AutosavePeriod);
             Config.Add("AutosaveMaxCount", AutosaveMaxSaves);
@@ -267,7 +280,8 @@ namespace Frosty.Core.Windows
             LocalizedStringDatabase.Current.Initialize();
 
             //Create file association if enabled
-            if (DefaultInstallation) {
+            if (DefaultInstallation)
+            {
                 string Extension = ".fbproject";
                 string KeyName = "frostyproject";
                 string OpenWith = Assembly.GetEntryAssembly().Location;
@@ -304,7 +318,7 @@ namespace Frosty.Core.Windows
         {
             return true;
         }
-        
+
         [DllImport("shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2);
 
@@ -364,7 +378,7 @@ namespace Frosty.Core.Windows
         public override void Load()
         {
             base.Load();
-            
+
             RememberChoice = Config.Get<bool>("UseDefaultProfile", false);
             AllowM24SDKUpdate = Config.Get<bool>("AllowM24SdkUpdate", false);
             CommandLineArgs = Config.Get<string>("CommandLineArgs", "", ConfigScope.Game);
@@ -373,7 +387,7 @@ namespace Frosty.Core.Windows
         public override void Save()
         {
             base.Save();
-            
+
             Config.Add("UseDefaultProfile", RememberChoice);
             Config.Add("AllowM24SdkUpdate", AllowM24SDKUpdate);
             Config.Add("CommandLineArgs", CommandLineArgs, ConfigScope.Game);
@@ -423,7 +437,7 @@ namespace Frosty.Core.Windows
                 FrostyTabItem ti = new FrostyTabItem
                 {
                     Header = new OptionsDisplayNameToStringConverter().Convert(optionData, null, null, null),
-                    Content = new FrostyPropertyGrid() {Object = optionData}
+                    Content = new FrostyPropertyGrid() { Object = optionData }
                 };
                 optionsTabControl.Items.Add(ti);
             }
