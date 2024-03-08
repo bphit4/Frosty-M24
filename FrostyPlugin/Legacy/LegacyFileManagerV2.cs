@@ -223,7 +223,7 @@ namespace Frosty.Core.Legacy
 
             string[] lagFixableFiles = {"portraits", "portraits_256", "icons"};
 
-            if (lagFixableFiles.Contains<string>(lfe.Filename) || Config.Get<bool>("ModifyOriginalLegacy", false))
+            if (lagFixableFiles.Contains<string>(lfe.Filename))
             {
                 Guid originalChunkId = lfe.ChunkId;
                 ChunkAssetEntry orig = App.AssetManager.GetChunkEntry(lfe.ChunkId);
